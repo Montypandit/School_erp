@@ -214,8 +214,8 @@ const Home = () => {
                         </Link>
                         
                         <Link
-                            to="/studenthome"
-                            style={hovered === 'student' ? {
+                            to="/coordinator/home"
+                            style={hovered === 'coordinator' ? {
                                 ...linkStyle,
                                 background: 'linear-gradient(135deg, #ed8936, #dd6b20)',
                                 transform: 'translateY(-5px) scale(1.05)',
@@ -225,7 +225,7 @@ const Home = () => {
                                 background: 'linear-gradient(135deg, #ed8936, #dd6b20)',
                                 boxShadow: '0 8px 25px rgba(237, 137, 54, 0.3)',
                             }}
-                            onMouseEnter={() => setHovered('student')}
+                            onMouseEnter={() => setHovered('coordinator')}
                             onMouseLeave={() => setHovered(null)}
                         >
                             <span style={{ position: 'relative', zIndex: 2 }}>🎓 Coordinator Portal</span>
