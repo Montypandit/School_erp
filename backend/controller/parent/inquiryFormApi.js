@@ -23,14 +23,14 @@ router.post('/inquiry', async (req, res) => {
     const inquiryId = generateInquiryId();
 
     const newInquiry = new InquiryForm({
-      inquiryId,
-      name,
-      fatherName,
-      motherName,
-      city,
-      state,
-      pincode,
-      phone
+      inquiryId:inquiryId,
+      name:name,
+      fatherName:fatherName,
+      motherName:motherName,
+      city:city,
+      state:state,
+      pincode:pincode,
+      phone:phone
     });
 
     const saved = await newInquiry.save();
@@ -42,7 +42,7 @@ router.post('/inquiry', async (req, res) => {
 });
 
 //  Get All Inquiries
-router.get('/inquiries', async (req, res) => {
+router.get('/all/inquiries', async (req, res) => {
   try {
     const all = await InquiryForm.find();
     res.status(200).json(all);
