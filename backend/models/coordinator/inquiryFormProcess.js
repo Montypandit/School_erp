@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const inquiryFormProcessSchema =new mongoose.Schema({
     inquiryId: { type: String, required: true, unique: true },
     name: { type: String, required: true },
+    imageUrl:{type:String},
     fatherName: { type: String, required: true },
     motherName: { type: String },
     city: { type: String },
