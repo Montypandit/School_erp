@@ -1,3 +1,3 @@
 module.exports = {
-    mongoKey:'mongodb+srv://erpdb:erp3283@cluster0.24a8agz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
+    mongoKey:'mongodb+srv://erpsystem:erp0000@erpsystem.o9m5cu2.mongodb.net/?retryWrites=true&w=majority&appName=erpSystem'
 }

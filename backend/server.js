@@ -12,7 +12,8 @@ const {mongoKey} = require('./config/db');
 
 
 
-
+const userLoginApi = require('./controller/loginApi');
+server.use(userLoginApi);
 
 
 server.listen(port,()=>{
