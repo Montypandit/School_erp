@@ -16,6 +16,7 @@ router.post('/create/inquiry', async (req, res) => {
       motherName,
       city,
       state,
+      dob,
       pincode,
       phone
     } = req.body;
@@ -28,6 +29,7 @@ router.post('/create/inquiry', async (req, res) => {
       fatherName:fatherName,
       motherName:motherName,
       city:city,
+      dob:dob,
       state:state,
       pincode:pincode,
       phone:phone
