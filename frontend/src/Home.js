@@ -214,8 +214,13 @@ const Home = () => {
                         </Link>
                         
                         <Link
+<<<<<<< HEAD
                             to="/coordinator/home"
                             style={hovered === 'coordinator' ? {
+=======
+                            to="/coordinator/login"
+                            style={hovered === 'student' ? {
+>>>>>>> c3779b7c28943b4ae23e64659d66c6570908e2bc
                                 ...linkStyle,
                                 background: 'linear-gradient(135deg, #ed8936, #dd6b20)',
                                 transform: 'translateY(-5px) scale(1.05)',
