@@ -1,5 +1,5 @@
 import React from "react";
-import InquiryForm from "../../parents/InquiryForm";
+import InquiryForm from "./InquiryForm";
 
 const AddInquiryForm = () => {
   return (

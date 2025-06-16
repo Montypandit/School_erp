@@ -109,7 +109,6 @@ const Home = () => {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
                 minHeight: '100vh',
                 padding: '100px 20px 40px',
                 position: 'relative',
@@ -214,13 +213,8 @@ const Home = () => {
                         </Link>
                         
                         <Link
-<<<<<<< HEAD
-                            to="/coordinator/home"
+                            to="/coordinator"
                             style={hovered === 'coordinator' ? {
-=======
-                            to="/coordinator/login"
-                            style={hovered === 'student' ? {
->>>>>>> c3779b7c28943b4ae23e64659d66c6570908e2bc
                                 ...linkStyle,
                                 background: 'linear-gradient(135deg, #ed8936, #dd6b20)',
                                 transform: 'translateY(-5px) scale(1.05)',

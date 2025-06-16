@@ -141,7 +141,7 @@ const InquiryForm = () => {
         value={formData.previousClass}
         onChange={handleChange}
         required
-        style={styles.select}
+        style={styles.input}
       >
         <option value="">Previous Class</option>
         <option value="Nursery">Nursery</option>
@@ -164,7 +164,7 @@ const InquiryForm = () => {
         value={formData.currentClass}
         onChange={handleChange}
         required
-        style={styles.select}
+        style={styles.input}
       >
         <option value="">Current Class Applying For</option>
         <option value="Nursery">Nursery</option>
