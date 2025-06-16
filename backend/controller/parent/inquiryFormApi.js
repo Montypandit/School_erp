@@ -8,7 +8,7 @@ const generateInquiryId = () => {
 };
 
 // Create Inquiry
-router.post('/inquiry', async (req, res) => {
+router.post('/create/inquiry', async (req, res) => {
   try {
     const {
       name,
@@ -52,7 +52,7 @@ router.get('/all/inquiries', async (req, res) => {
 });
 
 // Get Inquiry by inquiryId
-router.get('/inquiry/:inquiryId', async (req, res) => {
+router.get('/get/inquiry/:inquiryId', async (req, res) => {
   try {
     const inquiry = await InquiryForm.findOne({ inquiryId: req.params.inquiryId });
 
