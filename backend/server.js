@@ -18,7 +18,7 @@ const inquiryProcessRouter = require('./controller/coordinator/inquiryFormProces
 // Use APIs
 server.use(userLoginApi);
 server.use(inquiryApi); // Mount all inquiry routes
-server.use(inquiryProcessRouter);
+server.use('/api', inquiryProcessRouter);
 // Start server
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);

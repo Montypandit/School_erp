@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 
 // Create Inquiry Process (admin or coordinator)
-router.post('/inquiry-process', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.post('/inquiry/process', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const { inquiryId } = req.body;
 
@@ -26,7 +26,7 @@ router.post('/inquiry-process', authMiddleware, authorizeRoles('admin', 'coordin
 });
 
 // Get All Inquiries (admin/coordinator)
-router.get('/inquiry-process', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.get('/inquiry/process', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const all = await InquiryFormProcess.find().sort({ createdAt: -1 });
     res.status(200).json(all);
@@ -36,7 +36,7 @@ router.get('/inquiry-process', authMiddleware, authorizeRoles('admin', 'coordina
 });
 
 // Get Single Inquiry by inquiryId (admin/coordinator)
-router.get('/inquiry-process/:inquiryId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.get('/inquiry/process/:inquiryId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const inquiry = await InquiryFormProcess.findOne({ inquiryId: req.params.inquiryId });
     if (!inquiry) return res.status(404).json({ message: 'Inquiry not found' });
@@ -47,7 +47,7 @@ router.get('/inquiry-process/:inquiryId', authMiddleware, authorizeRoles('admin'
 });
 
 // Update Inquiry Process (admin  only)
-router.put('/inquiry-process/:inquiryId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.put('/inquiry/process/:inquiryId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
   try {
     const updated = await InquiryFormProcess.findOneAndUpdate(
       { inquiryId: req.params.inquiryId },
@@ -63,7 +63,7 @@ router.put('/inquiry-process/:inquiryId', authMiddleware, authorizeRoles('admin'
 });
 
 // Delete Inquiry (admin only)
-router.delete('/inquiry-process/:inquiryId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.delete('/inquiry/process/:inquiryId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
   try {
     const deleted = await InquiryFormProcess.findOneAndDelete({ inquiryId: req.params.inquiryId });
 
