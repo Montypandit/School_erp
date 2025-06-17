@@ -11,10 +11,13 @@ const inquiryFormProcessSchema =new mongoose.Schema({
     pincode: { type: String },
     phone: { type: String, required: true },
     email: { type: String },
+    remarks:{type:String},
     previousClass:{type:String,required:true},
     currentClass:{type:String, required:true},
     schoolInfo: { type: Boolean, required: true },
     schoolVisit: { type: Boolean, required: true },
     aboutFees: { type: Boolean, required: true },
+    educationPolicy:{type:Boolean, required:true},
+    prospectus:{type:Boolean},
     formProceeded: { type: Boolean, required: true },
 },{timestamps:true})
