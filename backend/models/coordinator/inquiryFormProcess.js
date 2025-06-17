@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-
 const inquiryFormProcessSchema =new mongoose.Schema({
     inquiryId: { type: String, required: true, unique: true },
     name: { type: String, required: true },
@@ -23,5 +22,4 @@ const inquiryFormProcessSchema =new mongoose.Schema({
 },{timestamps:true});
 
 const InquiryFormProcess = mongoose.model('InquiryFormProcess', inquiryFormProcessSchema);
-
 module.exports = InquiryFormProcess;

@@ -17,14 +17,14 @@ const { mongoKey } = require('./config/db');
 const userLoginApi = require('./controller/loginApi');
 const inquiryApi = require('./controller/parent/inquiryFormApi'); 
 const inquiryProcessRouter = require('./controller/coordinator/inquiryFormProcessApi');
-
+const admissionApprovalApi = require('./controller/principal/admissionApproval');
 
 
 // Use APIs
 server.use(userLoginApi);
 server.use(inquiryApi); // Mount all inquiry routes
 server.use(inquiryProcessRouter);
-
+server.use(admissionApprovalApi);                                       ``
 
 // Start server
 server.listen(port, () => {
