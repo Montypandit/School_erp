@@ -15,5 +15,6 @@ const inquiryFormProcessSchema =new mongoose.Schema({
     currentClass:{type:String, required:true},
     schoolInfo: { type: Boolean, required: true },
     schoolVisit: { type: Boolean, required: true },
-    aboutFees: { type: Boolean, required: true }
+    aboutFees: { type: Boolean, required: true },
+    formProceeded: { type: Boolean, required: true },
 },{timestamps:true})

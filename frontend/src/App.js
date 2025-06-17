@@ -1,20 +1,24 @@
+import React from "react";
+
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Home from './Home'
+import Home from './Home';
 import AdminLogin from './admin/AdminLogin';
 import AdminHome from './admin/AdminHome';
+import InquiryForm from "./component/coordinator/InquiryForm";
 
-
-function App() {
+const App = () => {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/admin/login' element={<AdminLogin/>}/>
-        <Route path='/admin/home' element = {<AdminHome/>}/>
+        <Route path='/admin/home' element={<AdminHome/>}/>
+        <Route path='/parent/inquiry/form' element={<InquiryForm/>}/>
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
-}
+};
 
 export default App;
+
