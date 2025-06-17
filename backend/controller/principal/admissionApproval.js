@@ -4,19 +4,8 @@ const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 const AdmissionApproval = require('../../models/principal/admissionApproval')
 
-router.post('/admission/approval',authMiddleware, authorizeRoles('admin', 'principal') ,async (req,res)=>{
-    try{
-        const bodyData = req.body;
+// post api to post admission details 
 
-        const admissionApprovalData = new AdmissionApproval(bodyData);
-        const savedData =   await admissionApprovalData.save();
-
-        res.status(201).json({message:'Admission Status saved successfully', data :savedData})
-    }catch(error){
-        console.log(error);
-        res.status(500).json({message:'Internal server error'});
-    }
-});
 
 router.get('/get/all/admission/approval/status',authMiddleware, authorizeRoles('admin', 'principal','coordinator') , async (req,res)=>{
     try{

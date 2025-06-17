@@ -191,7 +191,25 @@ const Home = () => {
                             onMouseEnter={() => setHovered('admin')}
                             onMouseLeave={() => setHovered(null)}
                         >
-                            <span style={{ position: 'relative', zIndex: 2 }}>👨‍💼 Admin Portal</span>
+                            <span style={{ position: 'relative', zIndex: 2 }}>Admin Portal</span>
+                        </Link>
+
+                         <Link
+                            to="/principal/home"
+                            style={hovered === 'principal' ? {
+                                ...linkStyle,
+                                background: 'linear-gradient(135deg,rgb(81, 56, 220), #38a169)',
+                                transform: 'translateY(-5px) scale(1.05)',
+                                boxShadow: '0 15px 35px rgba(72, 187, 120, 0.4)',
+                            } : {
+                                ...linkStyle,
+                                background: 'linear-gradient(135deg,rgb(81, 56, 220), #38a169)',
+                                boxShadow: '0 8px 25px rgba(72, 187, 120, 0.3)',
+                            }}
+                            onMouseEnter={() => setHovered('principal')}
+                            onMouseLeave={() => setHovered(null)}
+                        >
+                            <span style={{ position: 'relative', zIndex: 2 }}>Principal Portal</span>
                         </Link>
                         
                         <Link
@@ -209,7 +227,7 @@ const Home = () => {
                             onMouseEnter={() => setHovered('teacher')}
                             onMouseLeave={() => setHovered(null)}
                         >
-                            <span style={{ position: 'relative', zIndex: 2 }}>👩‍🏫 Teacher Portal</span>
+                            <span style={{ position: 'relative', zIndex: 2 }}>Teacher Portal</span>
                         </Link>
                         
                         <Link
@@ -227,7 +245,7 @@ const Home = () => {
                             onMouseEnter={() => setHovered('coordinator')}
                             onMouseLeave={() => setHovered(null)}
                         >
-                            <span style={{ position: 'relative', zIndex: 2 }}>🎓 Coordinator Portal</span>
+                            <span style={{ position: 'relative', zIndex: 2 }}>Coordinator Portal</span>
                         </Link>
                     </div>
                 </div>
