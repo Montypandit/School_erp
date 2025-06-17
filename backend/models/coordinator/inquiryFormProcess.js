@@ -20,4 +20,8 @@ const inquiryFormProcessSchema =new mongoose.Schema({
     educationPolicy:{type:Boolean, required:true},
     prospectus:{type:Boolean},
     formProceeded: { type: Boolean, required: true },
-},{timestamps:true})
+},{timestamps:true});
+
+const InquiryFormProcess = mongoose.model('InquiryFormProcess', inquiryFormProcessSchema);
+
+module.exports = InquiryFormProcess;
