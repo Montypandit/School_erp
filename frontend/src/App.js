@@ -5,7 +5,7 @@ import './App.css';
 import Home from './Home';
 import AdminLogin from './admin/AdminLogin';
 import AdminHome from './admin/AdminHome';
-import AddInquiry from './component/coordinator/AddInquiry';
+import InquiryForm from "./component/coordinator/InquiryForm";
 
 const App = () => {
   return (
@@ -14,7 +14,7 @@ const App = () => {
         <Route path='/' element={<Home/>}/>
         <Route path='/admin/login' element={<AdminLogin/>}/>
         <Route path='/admin/home' element={<AdminHome/>}/>
-        <Route path='/coordinator' element={<AddInquiry/>}/>
+        <Route path='/parent/inquiry/form' element={<InquiryForm/>}/>
       </Routes>
     </Router>
   );

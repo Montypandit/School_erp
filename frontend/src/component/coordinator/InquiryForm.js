@@ -3,7 +3,6 @@ import React, { useState } from "react";
 const InquiryForm = () => {
   const [formData, setFormData] = useState({
     name: "",
-    imageUrl: "",
     fatherName: "",
     motherName: "",
     city: "",
@@ -11,11 +10,6 @@ const InquiryForm = () => {
     pincode: "",
     phone: "",
     email: "",
-    previousClass: "",
-    currentClass: "",
-    schoolInfo: false,
-    schoolVisit: false,
-    aboutFees: false
   });
 
   const handleChange = (e) => {
@@ -63,14 +57,6 @@ const InquiryForm = () => {
         value={formData.name}
         onChange={handleChange}
         required
-        style={styles.input}
-      />
-
-      <input
-        name="imageUrl"
-        placeholder="Student Photo URL"
-        value={formData.imageUrl}
-        onChange={handleChange}
         style={styles.input}
       />
 
@@ -181,36 +167,6 @@ const InquiryForm = () => {
         <option value="Class 9">Class 9</option>
         <option value="Class 10">Class 10</option>
       </select>
-
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-        <label style={{ display: 'flex', alignItems: 'center' }}>
-          <input
-            type="checkbox"
-            name="schoolInfo"
-            checked={formData.schoolInfo}
-            onChange={handleChange}
-          />
-          Received School Information
-        </label>
-        <label style={{ display: 'flex', alignItems: 'center' }}>
-          <input
-            type="checkbox"
-            name="schoolVisit"
-            checked={formData.schoolVisit}
-            onChange={handleChange}
-          />
-          School Visit Done
-        </label>
-        <label style={{ display: 'flex', alignItems: 'center' }}>
-          <input
-            type="checkbox"
-            name="aboutFees"
-            checked={formData.aboutFees}
-            onChange={handleChange}
-          />
-          Inquired About Fees
-        </label>
-      </div>
 
       <button type="submit" style={styles.button}>
         Submit Inquiry
