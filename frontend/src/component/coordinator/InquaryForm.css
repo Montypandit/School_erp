@@ -1,0 +1,253 @@
+:root {
+    --primary-color: #3498db;
+    --text-color: #2c3e50;
+    --light-text: #7f8c8d;
+    --border-color: #e0e0e0;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .inquiry-form-container {
+    max-width: 700px;
+    margin: 1.5rem auto;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+  }
+  
+  .inquiry-form-container h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 1rem;
+  }
+  
+  .inquiry-form-container h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 2px;
+    background: var(--primary-color);
+  }
+  
+  .inquiry-form {
+    padding: 1.2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px var(--shadow-color);
+  }
+  
+  .inquiry-form .form-section {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+  }
+  
+  .inquiry-form .form-section h3 {
+    color: var(--text-color);
+    font-size: 1.1rem;
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-bottom: 0.4rem;
+    position: relative;
+  }
+  
+  .inquiry-form .form-section h3::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 20px;
+    height: 2px;
+    background: var(--primary-color);
+  }
+  
+  .inquiry-form .form-group {
+    margin-bottom: 0.8rem;
+    position: relative;
+  }
+  
+  .inquiry-form label {
+    display: block;
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+  }
+  
+  .inquiry-form input[type="text"],
+  .inquiry-form input[type="email"],
+  .inquiry-form input[type="number"],
+  .inquiry-form input[type="date"],
+  .inquiry-form textarea,
+  .inquiry-form select {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background: white;
+    transition: all 0.3s ease;
+  }
+  
+  .inquiry-form input:focus,
+  .inquiry-form textarea:focus,
+  .inquiry-form select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+  }
+  
+  .inquiry-form input[type="date"] {
+    background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%233498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3e%3ccircle cx="12" cy="12" r="10"/%3e%3cpath d="M12 2v7M12 20v-7M12 12a1 1 0 0 0 1 1h-2a1 1 0 0 0 1-1z"/%3e%3c/svg%3e');
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2rem;
+  }
+  
+  .inquiry-form .gender-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .inquiry-form .gender-group label {
+    flex: 1;
+    text-align: center;
+    padding: 0.7rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .inquiry-form .gender-group label:hover {
+    background: rgba(52, 152, 219, 0.05);
+  }
+  
+  .inquiry-form .gender-group input[type="radio"] {
+    display: none;
+  }
+  
+  .inquiry-form .gender-group input[type="radio"]:checked + label {
+    border-color: var(--primary-color);
+    background: rgba(52, 152, 219, 0.1);
+  }
+  
+  .inquiry-form .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  .inquiry-form .checkbox-group label {
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 0.95rem;
+  }
+  
+  .inquiry-form .checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .inquiry-form .checkbox-group input[type="checkbox"]:checked {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+  }
+  
+  .inquiry-form .checkbox-group input[type="checkbox"]:checked::after {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background: white;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+  }
+  
+  .inquiry-form button {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+  }
+  
+  .inquiry-form button:hover {
+    background: linear-gradient(135deg, #2980b9, #2c3e50);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+  }
+  
+  .inquiry-form label:after {
+    content: '*';
+    color: #e74c3c;
+    margin-left: 0.25rem;
+  }
+  
+  .inquiry-form input.error,
+  .inquiry-form textarea.error,
+  .inquiry-form select.error {
+    border-color: #e74c3c;
+  }
+  
+  .inquiry-form .error-message {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+  
+  @media (max-width: 768px) {
+    .inquiry-form-container {
+      margin: 1rem;
+      padding: 1rem;
+    }
+    
+    .inquiry-form .form-section {
+      padding: 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    
+    .inquiry-form .form-group {
+      margin-bottom: 0.6rem;
+    }
+    
+    .inquiry-form label {
+      font-size: 0.9rem;
+    }
+    
+    .inquiry-form input,
+    .inquiry-form textarea,
+    .inquiry-form select {
+      padding: 0.6rem 0.8rem;
+      font-size: 0.9rem;
+    }
+    
+    .inquiry-form button {
+      padding: 0.8rem;
+      font-size: 1rem;
+    }
+  }
