@@ -4,7 +4,7 @@ const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 const AdmissionApproval = require('../../models/principal/admissionApproval')
 
-// post api to post admission details 
+// put api to post admission details 
 
 router.get('/get/all/admission/approval/status',authMiddleware, authorizeRoles('admin', 'principal','coordinator') , async (req,res)=>{
     try{
@@ -15,6 +15,8 @@ router.get('/get/all/admission/approval/status',authMiddleware, authorizeRoles('
         res.status(500).json({message:'Internal server error'});
     }
 });
+
+
 
 router.get('/get/admission/approval/status/:admissionId',authMiddleware, authorizeRoles('admin', 'principal','coordinator') , async (req,res)=>{
     try{

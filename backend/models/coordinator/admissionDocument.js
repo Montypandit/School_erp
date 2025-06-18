@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const documentSubmit = mongoose.Schema({
+const documentSubmit =new mongoose.Schema({
     admissionId:{type:String,required:true},
     documentType:{type:String, required:true},
     documentUrl:{type:String, required:true}

@@ -1,6 +1,6 @@
-import { Counter } from '../models/others/counter';
+const Counter = require('../models/others/counter');
 
-export async function getNextAdmissionId() {
+async function getNextAdmissionId() {
   const counter = await Counter.findByIdAndUpdate(
     { _id: 'admissionId' },
     { $inc: { seq: 1 } },
@@ -11,3 +11,5 @@ export async function getNextAdmissionId() {
   const paddedSeq = String(counter.seq).padStart(3, '0');
   return `ADM${paddedSeq}`;
 }
+
+module.exports = getNextAdmissionId;

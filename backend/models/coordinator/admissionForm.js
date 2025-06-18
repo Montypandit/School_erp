@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const admissionFormSchema = mongoose.Schema({
+const admissionFormSchema =new  mongoose.Schema({
     admissionId:{type:String, required:true, unique:true},
     inquiryId:{type:String, required:true, unique:true},
     name: { type: String, required: true },
@@ -29,7 +29,7 @@ const admissionFormSchema = mongoose.Schema({
     copyOfBirthCertificate:{type:Boolean},
     copyOfIdProof:{type:Boolean},
     photosOfStudent:{type:Boolean},
-},{timestamp:true});
+},{timestamps:true});
 
 const AdmissionForm = mongoose.model('AdmissionForm', admissionFormSchema);
 module.exports = AdmissionForm;

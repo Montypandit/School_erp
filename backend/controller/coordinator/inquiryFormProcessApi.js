@@ -5,7 +5,8 @@ const authorizeRoles = require('../../middleware/authorizeRules');
 const bcrypt = require('bcryptjs');
 const router = express.Router();
 const AdmissionApproval = require('../../models/principal/admissionApproval');
-import {getNextAdmissionId} from '../../utils/getAdmissionId'
+const getNextAdmissionId = require('../../utils/getAdmissionId');
+
 
 // Create Inquiry Process (admin or coordinator)
 router.post('/create/inquiry-process', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
@@ -14,7 +15,7 @@ router.post('/create/inquiry-process', authMiddleware, authorizeRoles('admin', '
     const newInquiry = new InquiryFormProcess(formData);
     const saved = await newInquiry.save();
 
-    const admissionId = getNextAdmissionId();
+    const admissionId =await getNextAdmissionId();
 
     const admissionApproval = new AdmissionApproval({
       admissionId:admissionId,
