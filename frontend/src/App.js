@@ -8,6 +8,7 @@ import AdminHome from './admin/AdminHome';
 import InquiryForm from "./component/coordinator/InquiryForm";
 import CoordinatorHome from './coordinator/CoordinatorHome'
 import CoordinatorLogin from "./component/coordinator/CoordinatorLogin";
+import EmployeeForm from "./admin/EmployeeForm";
 
 const App = () => {
   return (
@@ -19,7 +20,7 @@ const App = () => {
         <Route path='/parent/inquiry/form' element={<InquiryForm/>}/>
         <Route path="/coordinator/home" element={<CoordinatorHome/>}/>
         <Route path="/coordinator/login" element={<CoordinatorLogin/>}/>
-
+        <Route path="/admin/employee/form" element={<EmployeeForm/>}/>
       </Routes>
     </Router>
   );
