@@ -6,7 +6,6 @@ const AdmissionApproval = require('../../models/principal/admissionApproval')
 
 // post api to post admission details 
 
-
 router.get('/get/all/admission/approval/status',authMiddleware, authorizeRoles('admin', 'principal','coordinator') , async (req,res)=>{
     try{
         const admissionApprovalData = await AdmissionApproval.find();
