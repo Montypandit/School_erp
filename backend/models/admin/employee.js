@@ -20,5 +20,6 @@ const employee =new mongoose.Schema({
     imageUrl:{type:String}
 },{timestamps:true});
 
+
 const employeeModel = mongoose.model('EMPLOYEE',employee);
 module.exports = employeeModel;

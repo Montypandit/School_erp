@@ -6,10 +6,12 @@ const feesSchema = mongoose.Schema({
     class:{type:String, required:true},
     fatherName:{type:String, required:true},
     gender:{type:String},
-    totalAmount:{type:String, required:true},
-    paidAmount:{type:String, required:true},
-    dueAmount:{type:String, required:true},
-
+    registrationFees:{type:String},
+    admissionFees:{type:String},
+    annualCharges:{type:String},
+    activityFees:{type:String},
+    maintenanceFees:{type:String},
+    tutionFees:{type:String}
 },{timestamps:true});
 
 const feesModel= mongoose.model('FEES',feesSchema);

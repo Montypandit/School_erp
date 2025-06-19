@@ -192,7 +192,6 @@ const AdminHome = () => {
       padding: '20px',
       backgroundColor: '#f5f7fa',
       minHeight: '100vh',
-      paddingTop: '90px' // Add padding to account for fixed navbar
     }}>
      <AdminNavbar />
 

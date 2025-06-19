@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import './EmployeeForm.css';
-
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { AdUnits } from '@mui/icons-material';
+import AdminNavbar from './AdminNavbar'
 const EmployeeForm = () => {
   const [formData, setFormData] = useState({
-    empId: '',
     firstName: '',
     lastName: '',
     email: '',
@@ -23,40 +24,9 @@ const EmployeeForm = () => {
     imageUrl: ''
   });
 
+  const navigate = useNavigate();
   const [errors, setErrors] = useState({});
 
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = {};
-
-    if (!formData.empId) {
-      newErrors.empId = 'Employee ID is required';
-      valid = false;
-    }
-
-    if (!formData.firstName) {
-      newErrors.firstName = 'First Name is required';
-      valid = false;
-    }
-
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-      valid = false;
-    }
-
-    if (!formData.phone) {
-      newErrors.phone = 'Phone number is required';
-      valid = false;
-    }
-
-    if (!formData.role) {
-      newErrors.role = 'Role is required';
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,16 +36,72 @@ const EmployeeForm = () => {
     }));
   };
 
+  const handleImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+            toast.info('No file selected.');
+            return;
+        }
+
+        const uploadFormData = new FormData();
+        uploadFormData.append('file', file);
+        uploadFormData.append('upload_preset', 'ERP_IMAGES'); 
+
+        try {
+            const res = await fetch(
+                'https://api.cloudinary.com/v1_1/daud3283/image/upload', 
+                {
+                    method: 'POST',
+                    body: uploadFormData,
+                }
+            );
+            const data = await res.json();
+            if (data.secure_url) {
+                setFormData((prevData) => ({
+                    ...prevData,
+                    imageUrl: data.secure_url,
+                }));
+                toast.success('Image uploaded successfully!');
+            } else {
+                toast.error(data.error?.message || 'Failed to upload image. Please check preset/cloud name.');
+            }
+        } catch (error) {
+            toast.error('Image upload failed. Please try again.');
+            console.error('Cloudinary upload error:', error);
+        } finally {
+            // setLoading(false); // Optional: manage loading state for upload
+        }
+    };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) return;
-
     try {
-      const response = await axios.post('http://localhost:5000/admin/employee', formData);
-      alert('Employee added successfully!');
+
+      const token = sessionStorage.getItem('adminToken');
+      if(!token){
+        toast.info('Please login to continue');
+        navigate('admin/login');
+        return;
+      }
+      const res = await fetch('http://localhost:5000/create/employee', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization':`Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Server error:', errorData);
+        toast.error(errorData.message || 'Failed to add employee');
+        throw new Error('Failed to add employee');
+
+      }
+      toast.success('Employee added successfully');
       setFormData({
-        empId: '',
         firstName: '',
         lastName: '',
         email: '',
@@ -96,27 +122,16 @@ const EmployeeForm = () => {
       setErrors({});
     } catch (error) {
       console.error('Error adding employee:', error);
-      alert('Error adding employee. Please try again.');
+      toast.error('Error adding employee. Please try again.');
     }
   };
 
   return (
+    <div>
+    <AdminNavbar/>
     <div className="employee-form-container">
       <h2>Add New Employee</h2>
       <form onSubmit={handleSubmit} className="employee-form">
-        <div className="form-group">
-          <label htmlFor="empId">Employee ID *</label>
-          <input
-            type="text"
-            id="empId"
-            name="empId"
-            value={formData.empId}
-            onChange={handleChange}
-            className={errors.empId ? 'error' : ''}
-          />
-          {errors.empId && <div className="error-message">{errors.empId}</div>}
-        </div>
-
         <div className="form-group">
           <label htmlFor="firstName">First Name *</label>
           <input
@@ -300,18 +315,27 @@ const EmployeeForm = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="imageUrl">Image URL</label>
+          <label htmlFor="imageUpload">Upload Image</label>
           <input
-            type="text"
-            id="imageUrl"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleChange}
+            type="file"
+            id="imageUpload"
+            name="image"
+            accept="image/*"
+            onChange={handleImageChange}
           />
+
+          {formData.imageUrl && (
+            <img
+              src={formData.imageUrl}
+              alt="Uploaded preview"
+              className="mt-2 w-32 h-32 object-cover rounded"
+            />
+          )}
         </div>
 
-        <button type="submit" className="submit-btn">Add Employee</button>
+        <button type="button" onClick={handleSubmit} className="submit-btn">Add Employee</button>
       </form>
+    </div>
     </div>
   );
 };

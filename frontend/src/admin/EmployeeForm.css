@@ -1,7 +1,7 @@
 /* Graceful grayish layout */
 .employee-form-container {
     max-width: 800px;
-    margin: 40px auto;
+    margin: 90px auto;
     padding: 30px;
     background-color: #f0f2f5; /* very light gray background */
     border-radius: 12px;
@@ -11,16 +11,16 @@
   
   /* Blue heading – unchanged */
   .employee-form-container h2 {
-    background-color: #007bff;
+    background-color: #56f473;
     color: white;
-    padding: 14px 30px;
+    padding: 10px 20px;
     font-size: 24px;
     font-weight: bold;
     text-align: center;
     border-radius: 40px;
     width: fit-content;
     margin: 0 auto 30px;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+    box-shadow: 0 1px 5px rgba(0, 123, 255, 0.4);
     letter-spacing: 1px;
     text-transform: uppercase;
   }

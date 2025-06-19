@@ -3,25 +3,13 @@ const Employee = require('../../models/admin/employee');
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 const router = express.Router();
+const getEmpCounter = require('../../utils/getEmpCounter');
 
-// Generate Unique 4-5 Digit empId
-const generateUniqueEmpId = async () => {
-  let empId;
-  let exists = true;
 
-  while (exists) {
-    empId = Math.floor(1000 + Math.random() * 90000).toString(); // 4-5 digit
-    exists = await Employee.findOne({ empId });
-  }
-
-  return empId;
-};
-
-// Create Employee 
+// Create Employee api
 router.post('/create/employee', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
-        const empId = await generateUniqueEmpId();
-    
+        const empId = await getEmpCounter();
         const {
           firstName, lastName, email, phone, gender, dob, doj, qualification,
           residentalAddress, permanentAddress, role, aadharNo, panNo,

@@ -106,6 +106,7 @@ const AdminLogin = () => {
       // If response is OK, the body is the token itself (plain text)
       const token = await response.text();
       sessionStorage.setItem('adminToken', token);
+      sessionStorage.setItem('adminEmail', formData.email);
       toast.success('Login successful! Redirecting...');
       navigate('/admin/home');
 

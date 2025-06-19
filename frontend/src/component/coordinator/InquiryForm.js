@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import './InquiryForm.css';
+import { toast } from 'react-toastify';
 
 const InquiryForm = () => {
   const [formData, setFormData] = useState({
-    inquiryId: '',
     name: '',
-    class: '',
+    currentClass: '',
     dob: '',
     gender: '',
     fatherName: '',
@@ -36,7 +35,7 @@ const InquiryForm = () => {
       valid = false;
     }
 
-    if (!formData.class) {
+    if (!formData.currentClass) {
       newErrors.class = 'Class is required';
       valid = false;
     }
@@ -92,7 +91,7 @@ const InquiryForm = () => {
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       setFormData(prev => ({
         ...prev,
@@ -120,25 +119,30 @@ const InquiryForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
 
     try {
-      // Store data in API
-      const response = await axios.post("http://localhost:5000/create/inquiry", {
-        ...formData,
-        dob: formData.dob ? new Date(formData.dob) : null,
-        class: formData.class  // Backend expects 'class' as a property
-      });
-      
+
+      const res = await fetch('http://localhost:5000/create/inquiry', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+
+      if (!res.ok) {
+        console.log('Network response was not ok');
+        throw new Error('Network response was not ok');
+      }
+
       // Show success message
-      alert("Inquiry submitted successfully! Thank you for your interest!");
-      
+      toast.success("Inquiry submitted successfully! Thank you for your interest!");
+
       // Reset form
       setFormData({
-        inquiryId: '',
         name: '',
-        class: '',
+        currentClass: '',
         dob: '',
         gender: '',
         fatherName: '',
@@ -156,26 +160,12 @@ const InquiryForm = () => {
         howDoYouKnowAboutSUNVILLEKIDZ: '',
         references: ''
       });
-      
+
       // Clear errors
       setErrors({});
     } catch (error) {
       console.error('Error submitting inquiry:', error);
-      
-      // Handle different types of errors
-      if (error.response) {
-        // Server responded with an error
-        alert(`Error: ${error.response.data.message || error.response.data.error || 'Something went wrong. Please try again.'}`);
-      } else if (error.request) {
-        // Request made but no response
-        alert('No response from server. Please check your internet connection and try again.');
-      } else if (error.message.includes('Network Error')) {
-        // Network error
-        alert('Unable to connect to server. Please check your internet connection and try again.');
-      } else {
-        // Other errors
-        alert('Error occurred. Please try again.');
-      }
+      toast.error(error.error);
     }
   };
 
@@ -193,143 +183,143 @@ const InquiryForm = () => {
         {/* Student Information */}
         <div className="form-section">
           <h3>Student Information</h3>
-          <div className="form-group">
-            <input 
-              type="text" 
-              name="inquiryId" 
-              value={formData.inquiryId} 
-              onChange={handleChange} 
-              className={errors.inquiryId ? 'error' : ''}
-            />
-            <label htmlFor="inquiryId">INQUIRY ID *</label>
-            {errors.inquiryId && <div className="error-message">{errors.inquiryId}</div>}
-          </div>
 
+          <label htmlFor="name">STUDENT NAME</label>
           <div className="form-group">
-            <input 
-              type="text" 
-              name="name" 
-              value={formData.name} 
-              onChange={handleChange} 
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
               className={errors.name ? 'error' : ''}
             />
-            <label htmlFor="name">STUDENT NAME *</label>
             {errors.name && <div className="error-message">{errors.name}</div>}
           </div>
 
+          <label htmlFor="class">CLASS</label>
           <div className="form-group">
-            <input 
-              type="text" 
-              name="class" 
-              value={formData.class} 
-              onChange={handleChange} 
+            <input
+              type="text"
+              name="currentClass"
+              value={formData.currentClass}
+              onChange={handleChange}
               className={errors.class ? 'error' : ''}
             />
-            <label htmlFor="class">CLASS *</label>
             {errors.class && <div className="error-message">{errors.class}</div>}
           </div>
 
           <div className="form-group">
-            <input 
-              type="date" 
-              name="dob" 
-              value={formData.dob} 
-              onChange={handleChange} 
+            <label htmlFor="dob">DATE OF BIRTH</label>
+            <input
+              type="date"
+              name="dob"
+              value={formData.dob}
+              onChange={handleChange}
               className={errors.dob ? 'error' : ''}
             />
-            <label htmlFor="dob">DATE OF BIRTH *</label>
             {errors.dob && <div className="error-message">{errors.dob}</div>}
           </div>
 
-          <div className="form-group gender-group">
-            <div 
+          <div className="form-group gender-group flex gap-4">
+            {/* Male Option */}
+            <div
               onClick={() => handleGenderChange('male')}
-              className={`gender-option ${formData.gender === 'male' ? 'selected' : ''}`}
+              className={`gender-option cursor-pointer border px-4 py-2 rounded-md transition-all ${formData.gender === 'male'
+                  ? 'bg-blue-100 text-white border-blue-500'
+                  : 'bg-white text-gray-700 border-gray-300'
+                }`}
             >
-              <input 
-                type="radio" 
-                name="gender" 
-                value="male" 
-                checked={formData.gender === 'male'} 
-                onChange={() => {}} // Prevent direct change
+              <label className="cursor-pointer">MALE</label>
+              <input
+                type="radio"
+                name="gender"
+                value="male"
+                checked={formData.gender === 'male'}
+                onChange={() => { }}
+                className="hidden"
               />
-              <label>MALE</label>
             </div>
 
-            <div 
+            {/* Female Option */}
+            <div
               onClick={() => handleGenderChange('female')}
-              className={`gender-option ${formData.gender === 'female' ? 'selected' : ''}`}
+              className={`gender-option cursor-pointer border px-4 py-2 rounded-md transition-all ${formData.gender === 'female'
+                  ? 'bg-pink-100 text-white border-pink-500'
+                  : 'bg-white text-gray-700 border-gray-300'
+                }`}
             >
-              <input 
-                type="radio" 
-                name="gender" 
-                value="female" 
-                checked={formData.gender === 'female'} 
-                onChange={() => {}} // Prevent direct change
+              <label className="cursor-pointer">FEMALE</label>
+              <input
+                type="radio"
+                name="gender"
+                value="female"
+                checked={formData.gender === 'female'}
+                onChange={() => { }}
+                className="hidden"
               />
-              <label>FEMALE</label>
             </div>
 
-            {errors.gender && <div className="error-message">{errors.gender}</div>}
+            {errors.gender && <div className="text-red-500 text-sm mt-2">{errors.gender}</div>}
           </div>
+
         </div>
 
         {/* Father's Information */}
         <div className="form-section">
           <h3>Father's Information</h3>
           <div className="form-group">
-            <input 
-              type="text" 
-              name="fatherName" 
-              value={formData.fatherName} 
-              onChange={handleChange} 
+            <label htmlFor="fatherName">FATHER'S NAME</label>
+            <input
+              type="text"
+              name="fatherName"
+              value={formData.fatherName}
+              onChange={handleChange}
               className={errors.fatherName ? 'error' : ''}
             />
-            <label htmlFor="fatherName">FATHER'S NAME *</label>
             {errors.fatherName && <div className="error-message">{errors.fatherName}</div>}
           </div>
 
           <div className="form-group">
-            <input 
-              type="text" 
-              name="fatherQualification" 
-              value={formData.fatherQualification} 
-              onChange={handleChange} 
-            />
             <label htmlFor="fatherQualification">QUALIFICATION</label>
-          </div>
-
-          <div className="form-group">
-            <input 
-              type="text" 
-              name="fatherOccupation" 
-              value={formData.fatherOccupation} 
-              onChange={handleChange} 
+            <input
+              type="text"
+              name="fatherQualification"
+              value={formData.fatherQualification}
+              onChange={handleChange}
             />
-            <label htmlFor="fatherOccupation">OCCUPATION</label>
           </div>
 
           <div className="form-group">
-            <input 
-              type="number" 
-              name="fatherPhoneNo" 
-              value={formData.fatherPhoneNo} 
-              onChange={handleChange} 
+            <label htmlFor="fatherOccupation">OCCUPATION</label>
+            <input
+              type="text"
+              name="fatherOccupation"
+              value={formData.fatherOccupation}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="fatherPhoneNo">PHONE NUMBER *</label>
+            <input
+              type="number"
+              name="fatherPhoneNo"
+              value={formData.fatherPhoneNo}
+              onChange={handleChange}
               className={errors.fatherPhoneNo ? 'error' : ''}
             />
-            <label htmlFor="fatherPhoneNo">PHONE NUMBER *</label>
             {errors.fatherPhoneNo && <div className="error-message">{errors.fatherPhoneNo}</div>}
           </div>
 
           <div className="form-group">
-            <input 
-              type="email" 
-              name="fatherEmail" 
-              value={formData.fatherEmail} 
-              onChange={handleChange} 
+            <label htmlFor="fatherEmail">EMAIL</label>
+            <input
+              type="email"
+              name="fatherEmail"
+              value={formData.fatherEmail}
+              onChange={handleChange}
               className={errors.fatherEmail ? 'error' : ''}
             />
-            <label htmlFor="fatherEmail">EMAIL *</label>
             {errors.fatherEmail && <div className="error-message">{errors.fatherEmail}</div>}
           </div>
         </div>
@@ -338,58 +328,58 @@ const InquiryForm = () => {
         <div className="form-section">
           <h3>Mother's Information</h3>
           <div className="form-group">
-            <input 
-              type="text" 
-              name="motherName" 
-              value={formData.motherName} 
-              onChange={handleChange} 
+            <label htmlFor="motherName">MOTHER'S NAME *</label>
+            <input
+              type="text"
+              name="motherName"
+              value={formData.motherName}
+              onChange={handleChange}
               className={errors.motherName ? 'error' : ''}
             />
-            <label htmlFor="motherName">MOTHER'S NAME *</label>
             {errors.motherName && <div className="error-message">{errors.motherName}</div>}
           </div>
 
           <div className="form-group">
-            <input 
-              type="text" 
-              name="motherQualification" 
-              value={formData.motherQualification} 
-              onChange={handleChange} 
-            />
             <label htmlFor="motherQualification">QUALIFICATION</label>
-          </div>
-
-          <div className="form-group">
-            <input 
-              type="text" 
-              name="motherOccupation" 
-              value={formData.motherOccupation} 
-              onChange={handleChange} 
+            <input
+              type="text"
+              name="motherQualification"
+              value={formData.motherQualification}
+              onChange={handleChange}
             />
-            <label htmlFor="motherOccupation">OCCUPATION</label>
           </div>
 
           <div className="form-group">
-            <input 
-              type="number" 
-              name="motherPhoneNo" 
-              value={formData.motherPhoneNo} 
-              onChange={handleChange} 
+            <label htmlFor="motherOccupation">OCCUPATION</label>
+            <input
+              type="text"
+              name="motherOccupation"
+              value={formData.motherOccupation}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="motherPhoneNo">PHONE NUMBER *</label>
+            <input
+              type="number"
+              name="motherPhoneNo"
+              value={formData.motherPhoneNo}
+              onChange={handleChange}
               className={errors.motherPhoneNo ? 'error' : ''}
             />
-            <label htmlFor="motherPhoneNo">PHONE NUMBER *</label>
             {errors.motherPhoneNo && <div className="error-message">{errors.motherPhoneNo}</div>}
           </div>
 
           <div className="form-group">
-            <input 
-              type="email" 
-              name="motherEmail" 
-              value={formData.motherEmail} 
-              onChange={handleChange} 
+            <label htmlFor="motherEmail">EMAIL</label>
+            <input
+              type="email"
+              name="motherEmail"
+              value={formData.motherEmail}
+              onChange={handleChange}
               className={errors.motherEmail ? 'error' : ''}
             />
-            <label htmlFor="motherEmail">EMAIL *</label>
             {errors.motherEmail && <div className="error-message">{errors.motherEmail}</div>}
           </div>
         </div>
@@ -398,32 +388,33 @@ const InquiryForm = () => {
         <div className="form-section">
           <h3>Additional Information</h3>
           <div className="form-group">
-            <textarea 
-              name="residentialAddress" 
-              value={formData.residentialAddress} 
-              onChange={handleChange} 
+            <label htmlFor="residentialAddress">RESIDENTIAL ADDRESS *</label>
+            <textarea
+              name="residentialAddress"
+              value={formData.residentialAddress}
+              onChange={handleChange}
               rows="3"
               className={errors.residentialAddress ? 'error' : ''}
             />
-            <label htmlFor="residentialAddress">RESIDENTIAL ADDRESS *</label>
             {errors.residentialAddress && <div className="error-message">{errors.residentialAddress}</div>}
           </div>
 
           <div className="form-group checkbox-group">
-            <input 
-              type="checkbox" 
-              name="haveYouVisitedOurWebsite" 
-              checked={formData.haveYouVisitedOurWebsite} 
-              onChange={handleChange} 
-            />
             <label htmlFor="haveYouVisitedOurWebsite">Have you visited our website?</label>
+            <input
+              type="checkbox"
+              name="haveYouVisitedOurWebsite"
+              checked={formData.haveYouVisitedOurWebsite}
+              onChange={handleChange}
+            />
           </div>
 
           <div className="form-group">
-            <select 
-              name="howDoYouKnowAboutSUNVILLEKIDZ" 
-              value={formData.howDoYouKnowAboutSUNVILLEKIDZ} 
-              onChange={handleChange} 
+            <label htmlFor="howDoYouKnowAboutSUNVILLEKIDZ">How did you know about SUNVILLE KIDZ?</label>
+            <select
+              name="howDoYouKnowAboutSUNVILLEKIDZ"
+              value={formData.howDoYouKnowAboutSUNVILLEKIDZ}
+              onChange={handleChange}
             >
               <option value="">Select how you know about SUNVILLE KIDZ</option>
               <option value="website">School Website</option>
@@ -431,17 +422,16 @@ const InquiryForm = () => {
               <option value="referral">Referral</option>
               <option value="other">Other</option>
             </select>
-            <label htmlFor="howDoYouKnowAboutSUNVILLEKIDZ">How did you know about SUNVILLE KIDZ?</label>
           </div>
 
           <div className="form-group">
-            <textarea 
-              name="references" 
-              value={formData.references} 
-              onChange={handleChange} 
+            <label htmlFor="references">References (if any)</label>
+            <textarea
+              name="references"
+              value={formData.references}
+              onChange={handleChange}
               rows="3"
             />
-            <label htmlFor="references">References (if any)</label>
           </div>
         </div>
 

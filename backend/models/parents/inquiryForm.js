@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const inquiryFormSchema =new mongoose.Schema({
     inquiryId:{type:String, required:true, unique:true},
     name:{type:String, required:true},
-    class:{type:String, required:true},
+    currentClass:{type:String, required:true},
     dob:{type:Date},
     gender:{type:String, required:true},
     fatherName:{type:String, required:true},

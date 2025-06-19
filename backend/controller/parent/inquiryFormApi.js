@@ -12,7 +12,7 @@ router.post('/create/inquiry', async (req, res) => {
   try {
     const {
       name,
-      className,
+      currentClass,
       dob,
       gender,
       fatherName,
@@ -36,7 +36,7 @@ router.post('/create/inquiry', async (req, res) => {
     const newInquiry = new InquiryForm({
       inquiryId,
       name,
-      class: className,
+      currentClass,
       dob,
       gender,
       fatherName,
