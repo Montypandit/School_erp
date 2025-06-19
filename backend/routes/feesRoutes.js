@@ -1,17 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const {
-  createFee,
+  createFees,
   getAllFees,
-  getFeeById,
+  getSingleFee,
   updateFee,
-  deleteFee,
+  deleteFee
 } = require('../controller/coordinator/feesController');
 
-router.post('/', createFee);           
-router.get('/', getAllFees);           
-router.get('/:id', getFeeById);        
-router.put('/:id', updateFee);         
-router.delete('/:id', deleteFee);      
+const authMiddleware = require('../middleware/authMiddleware');
+const authorizeRoles = require('../middleware/authorizeRules');
+
+
+router.post('/create/fees', authMiddleware, authorizeRoles('admin', 'coordinator'), createFees);
+router.get('/get/all/fees', authMiddleware, authorizeRoles('admin', 'coordinator'), getAllFees);
+router.get('/get/fees/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), getSingleFee);
+router.put('/update/fees/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), updateFee);
+router.delete('/delete/fees/:id', authMiddleware, authorizeRoles('admin'), deleteFee);
 
 module.exports = router;
