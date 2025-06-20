@@ -49,7 +49,6 @@ const FeeCard = styled(Card)(({ theme }) => ({
 
 const FeesGeneration = () => {
   const [formData, setFormData] = useState({
-    recietId: '',
     name: '',
     class: '',
     fatherName: '',
@@ -80,7 +79,6 @@ const FeesGeneration = () => {
     console.log('Form submitted:', formData);
     // Reset form after submission
     setFormData({
-      recietId: '',
       name: '',
       class: '',
       fatherName: '',

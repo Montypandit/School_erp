@@ -35,7 +35,7 @@ router.post('/create/inquiry-process', authMiddleware, authorizeRoles('admin', '
 router.get('/get/all/inquiry-process', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const all = await InquiryFormProcess.find().sort({ createdAt: -1 });
-    res.status(200).json(all);
+    res.status(200).json({data:all});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

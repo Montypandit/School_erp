@@ -83,7 +83,7 @@ const CoordinatorLogin = () => {
     setIsLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5000/user/login', {
+      const response = await fetch('http://localhost:5000/api/auth/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,26 +111,8 @@ const CoordinatorLogin = () => {
 
     } catch (error) {
       console.error('Login error:', error);
-      let errorMessage = 'Login failed. Please try again.';
 
-      if (error.response && error.response.data) {
-        // Handle errors where server responded with error data (e.g., from response.json() if !response.ok)
-        if (error.response.status === 401) {
-          errorMessage = 'Invalid email or password';
-        } else if (error.response.data.message) {
-          errorMessage = error.response.data.message;
-        } else if (error.response.status) { // Fallback if data.message is not there but status is
-            errorMessage = `Login failed: ${error.response.data.error || `Server error ${error.response.status}`}`;
-        }
-      } else if (error.message && (error.message.includes('Failed to fetch') || error.name === 'TypeError')) {
-        // Handle network errors (e.g., server down, CORS issues if not configured on server)
-        errorMessage = 'Unable to connect to the server. Please check your connection or API configuration.';
-      } else if (error.response && error.response.status) {
-        // Fallback for other HTTP errors if data wasn't JSON or error.response.data was not set
-         errorMessage = `Login failed with status: ${error.response.status}`;
-      }
-
-      toast.error(errorMessage);
+      toast.error('Error to login!!!');
     } finally {
       setIsLoading(false);
     }

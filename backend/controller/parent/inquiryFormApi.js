@@ -1,6 +1,8 @@
 const express = require('express');
 const InquiryForm = require('../../models/parents/inquiryForm');
 const router = express.Router();
+const authMiddleware = require('../../middleware/authMiddleware');
+const authorizeRoles = require('../../middleware/authorizeRules')
 
 // Generate 4-5 digit unique inquiry ID
 const generateInquiryId = () => {
@@ -64,12 +66,12 @@ router.post('/create/inquiry', async (req, res) => {
 });
 
 // Get All Inquiries
-router.get('/all/inquiries', async (req, res) => {
+router.get('/all/inquiries',authMiddleware,authorizeRoles('coordinator','admin'), async (req, res) => {
   try {
     const all = await InquiryForm.find();
-    res.status(200).json(all);
+    res.status(200).json({data:all});
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message, message:'Not found' });
   }
 });
 

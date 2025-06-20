@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const feesSchema = mongoose.Schema({
     recietId:{type:String, required:true, unique:true},
+    admissionId:{type:String, required:true},
     name:{type:String, required:true},
     class:{type:String, required:true},
     fatherName:{type:String, required:true},
