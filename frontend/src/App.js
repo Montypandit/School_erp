@@ -9,6 +9,8 @@ import CoordinatorHome from './coordinator/CoordinatorHome';
 import CoordinatorLogin from "./component/coordinator/CoordinatorLogin";
 import EmployeeForm from "./admin/EmployeeForm";
 import FeesGeneration from "./coordinator/feesGeneration";
+import TeacherLogin from "./teacher/TeacherLogin";
+import TeacherHome from "./teacher/TeacherHome";
 
 const App = () => {
   return (
@@ -23,6 +25,8 @@ const App = () => {
         <Route path="/admin/employee/form" element={<EmployeeForm/>}/>
         <Route path="/parents/inquiry/form" element={<InquiryForm/>}/>
         <Route path="/coordinator/fees/generate" element={<FeesGeneration/>}/>
+        <Route path="/teacher/login" element={<TeacherLogin/>}/>
+        <Route path="/teacher/home" element={<TeacherHome/>}/>
       </Routes>
     </Router>
   );

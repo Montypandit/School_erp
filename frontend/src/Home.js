@@ -213,7 +213,7 @@ const Home = () => {
                         </Link>
                         
                         <Link
-                            to="/teacherhome"
+                            to="/teacher/login"
                             style={hovered === 'teacher' ? {
                                 ...linkStyle,
                                 background: 'linear-gradient(135deg, #48bb78, #38a169)',

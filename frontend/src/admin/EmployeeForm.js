@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { AdUnits } from '@mui/icons-material';
 import AdminNavbar from './AdminNavbar'
+
+
 const EmployeeForm = () => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -83,7 +85,7 @@ const EmployeeForm = () => {
         navigate('admin/login');
         return;
       }
-      const res = await fetch('http://localhost:5000/create/employee', {
+      const res = await fetch('http://localhost:5000/api/employees/create/employee', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -333,7 +335,7 @@ const EmployeeForm = () => {
           )}
         </div>
 
-        <button type="button" onClick={handleSubmit} className="submit-btn">Add Employee</button>
+        <button type="submit" onClick={handleSubmit} className="submit-btn">Add Employee</button>
       </form>
     </div>
     </div>

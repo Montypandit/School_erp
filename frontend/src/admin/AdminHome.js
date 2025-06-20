@@ -244,14 +244,14 @@ const AdminHome = () => {
         marginBottom: '30px'
       }}>
         <ActionButton 
-          to="/addnewteacher" 
+          to="/admin/employee/form" 
           icon="👩‍🏫" 
-          label="Add New Teacher" 
+          label="Add New Employee" 
         />
         <ActionButton 
           to="/admin/admission" 
           icon="👨‍🎓" 
-          label="Add New Student" 
+          label="All other Employees" 
         />
           <ActionButton 
           to="/admin/teacher/:id" 
