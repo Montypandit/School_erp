@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 const CoordinatorDashboard = () => {
   const [inquiries, setInquiries] = useState([]);
   const [admissions, setAdmissions] = useState([]);
-  const [forwarded, setForwarded] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -38,30 +37,18 @@ const CoordinatorDashboard = () => {
             'Authorization': `Bearer ${token}`
           }
         });
-        const forwarded = await fetch('http://localhost:5000/api/inquiry-process/get/all/inquiry-process', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
 
-        if (!inquiryRes.ok || !admissionRes.ok || !forwarded.ok) {
+        if (!inquiryRes.ok || !admissionRes.ok) {
           toast.error('Failed to fetch inquiries');
           throw new Error('Failed to fetch data');
         }
 
         const inquiryData = await inquiryRes.json();
         const admissionData = await admissionRes.json();
-        const forwardedData = await forwarded.json();
-
-        console.log(inquiryData.data);
-        console.log(forwardedData);
-        console.log(admissionData);
 
         setInquiries(inquiryData.data);
         setAdmissions(admissionData.data);
-        setForwarded(forwardedData.data);
+
       } catch (error) {
         console.error('Fetch error:', error);
       } finally {
@@ -159,26 +146,30 @@ const CoordinatorDashboard = () => {
             <div className="overflow-x-auto">
               <table className="min-w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
+                  <tr className="border-b border-gray-200" >
                     <th className="py-4 px-4">ID</th>
                     <th className="py-4 px-4">Name</th>
                     <th className="py-4 px-4">Father Name</th>
                     <th className="py-4 px-4">Class</th>
-                    <th className="py-4 px-4">Date</th>
+                    <th className="py-4 px-4">Date</th>   
+                    <th className="py-4 px-4">Action</th>                   
                   </tr>
                 </thead>
                 <tbody>
                   {filteredInquiries.map((i) => (
-                    <tr key={i._id} className="hover:bg-gray-50">
-                      <td className="py-4 px-4">{i.inquiryId}</td>
+                    <tr key={i._id} className="hover:bg-gray-50 text-center">
+                      <td className="py-4 px-4 ">{i.inquiryId}</td>
                       <td className="py-4 px-4">{i.name}</td>
                       <td className="py-4 px-4">{i.fatherName}</td>
-                      <td className="py-4 px-4"><StatusBadge status={i.currentClass} /></td>
+                      <td className="py-4 px-4">{i.currentClass}</td>
                       <td className="py-4 px-4">{new Date(i.createdAt).toLocaleDateString('en-IN', {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',
                       })}</td>
+                      <td className="py-4 px-4"><button className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700'  onClick={()=>{
+                        navigate('/parents/inquiry/form');
+                      }}>Forward</button></td>
                     </tr>
                   ))}
                 </tbody>
@@ -235,8 +226,8 @@ const CoordinatorDashboard = () => {
                     <tr key={admission.id} className="hover:bg-gray-50">
                       <td className="py-4 px-4">{admission.id}</td>
                       <td className="py-4 px-4">{admission.name}</td>
-                      <td className="py-4 px-4"><StatusBadge status={admission.status} /></td>
                       <td className="py-4 px-4">{admission.date}</td>
+                      <td className="py-4 px-4"><StatusBadge status={admission.status} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -255,10 +246,6 @@ const CoordinatorDashboard = () => {
     );
   };
 
-  const forwardedInquiries = inquiries.filter(i => i.formProceeded === true);
-  const processedInquiries = inquiries.filter(i =>
-    [true, false].includes(i.formProceeded)
-  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -275,13 +262,11 @@ const CoordinatorDashboard = () => {
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-10">
                 <DashboardCard title="Total Inquiries" value={inquiries.length} color="blue" icon="📝" />
-                <DashboardCard title="Processed Inquiries" value={forwarded.length} color="green" icon="✅" />
                 <DashboardCard title="Approved Admissions" value={admissions.filter(a => a.admissionApproved === "Approved").length} color="emerald" icon="🎓" />
                 <DashboardCard title="Pending Reviews" value={admissions.filter(a => a.admissionApproved === "Pending").length} color="yellow" icon="⏳" />
               </div>
 
               <InquiryTable enquiries={inquiries} title="All Inquiry Details" />
-              <InquiryTable enquiries={forwardedInquiries} title="Forwarded Inquiry Details" />
               <AdmissionTable admissions={admissions} title="Admission Status Details" />
             </>
           )}

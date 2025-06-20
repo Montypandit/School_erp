@@ -5,6 +5,25 @@ const authorizeRoles = require('../../middleware/authorizeRules');
 const AdmissionApproval = require('../../models/principal/admissionApproval')
 
 // put api to post admission details 
+router.put('/update/admission/status',authMiddleware,authorizeRoles('admin','principal'), async (req,res)=>{
+    try{
+        const {inquiryId, admissionApproved} = req.body;
+         const updatedData = await AdmissionApproval.findOneAndUpdate(
+      { inquiryId }, // filter
+      { admissionApproved:admissionApproved },    // update
+      { new: true }  // return updated document
+    );
+
+     if (!updatedData) {
+      return res.status(404).json({ message: 'Admission record not found' });
+    }
+    
+        res.status(200).json({message:'Admission Status updated successfully', data:updatedData});
+    }catch(error){
+        console.log(error);
+        res.status(500).json({message:'Internal server error', error:error})
+    }
+})
 
 
 router.get('/get/all/admission/approval/status',authMiddleware, authorizeRoles('admin', 'principal','coordinator') , async (req,res)=>{
