@@ -19,16 +19,16 @@ const userLoginApi = require('./controller/loginApi');
 const inquiryApi = require('./controller/parent/inquiryFormApi'); 
 const inquiryProcessRouter = require('./controller/coordinator/inquiryFormProcessApi');
 const admissionApprovalApi = require('./controller/principal/admissionApproval');
-const feesRoutes = require('./routes/feesRoutes'); // ✅ Fees API import
-const addEmployee = require('./controller/admin/addEmployee');
+const feesRoutes = require('./routes/feesRoutes'); // ✅ Fees API
+const addEmployeeRoutes = require('./controller/admin/addEmployee'); // ✅ Employee API
 
-// Use APIs
-server.use(userLoginApi);
-server.use(inquiryApi);
-server.use(inquiryProcessRouter);
-server.use(admissionApprovalApi);
-server.use('/api/fees', feesRoutes); // ✅ Mounting fees API
-server.use(addEmployee);
+// Use APIs (with consistent route prefix)
+server.use('/api/auth', userLoginApi);
+server.use('/api/inquiry', inquiryApi);
+server.use('/api/inquiry-process', inquiryProcessRouter);
+server.use('/api/admissions', admissionApprovalApi);
+server.use('/api/fees', feesRoutes);
+server.use('/api/employees', addEmployeeRoutes);
 
 // Start server
 server.listen(port, () => {
