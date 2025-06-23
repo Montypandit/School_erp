@@ -11,11 +11,8 @@ import EmployeeForm from "./admin/EmployeeForm";
 import FeesGeneration from "./coordinator/feesGeneration";
 import TeacherLogin from "./teacher/TeacherLogin";
 import TeacherHome from "./teacher/TeacherHome";
-<<<<<<< HEAD
 import FeePaid from './coordinator/FeePaid'
-=======
 import EnquiryStudent from "./coordinator/enquiryStudent";
->>>>>>> 30ef96db8ac91fa740161de31c05444f9a2193c7
 
 const App = () => {
   return (

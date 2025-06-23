@@ -204,9 +204,10 @@ const CoordinatorDashboard = () => {
 
     const filteredAdmissions = admissions
       .filter(
-        (a) =>
-          a.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          a.status.toLowerCase().includes(searchQuery.toLowerCase())
+        (inquiry) =>
+          inquiry?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          inquiry?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          inquiry?.status?.toLowerCase().includes(searchQuery.toLowerCase())
       )
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, visibleCount);
