@@ -1,5 +1,5 @@
 const express = require('express');
-const Attendance = require('../../models/attendance.model'); // assume model is already created
+const Attendance = require('../../models/teacher/attendanceSchema'); // assume model is already created
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 const router = express.Router();
