@@ -22,15 +22,15 @@ const CoordinatorDashboard = () => {
           navigate('coordinator/login');
           return;
         }
-
-        const inquiryRes = await fetch('http://localhost:5000/api/inquiry/all/inquiries', {
+        const admissionRes = await fetch('http://localhost:5000/api/admissions/get/all/admission/approval/status', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           }
         });
-        const admissionRes = await fetch('http://localhost:5000/api/admissions/get/all/admission/approval/status', {
+
+        const inquiryRes = await fetch('http://localhost:5000/api/inquiry/all/inquiries', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -43,6 +43,15 @@ const CoordinatorDashboard = () => {
           throw new Error('Failed to fetch data');
         }
 
+        if (!inquiryRes.ok || !admissionRes.ok) {
+          const inquiryErr = await inquiryRes.text();
+          const admissionErr = await admissionRes.text();
+          console.error('Error details:', { inquiryErr, admissionErr });
+          toast.error('Failed to fetch dashboard data');
+          throw new Error('Fetch failed');
+        }
+
+
         const inquiryData = await inquiryRes.json();
         const admissionData = await admissionRes.json();
 
@@ -52,6 +61,7 @@ const CoordinatorDashboard = () => {
       } catch (error) {
         console.error('Fetch error:', error);
       } finally {
+        console.log('hello finally')
         setLoading(false);
       }
     };
@@ -151,8 +161,8 @@ const CoordinatorDashboard = () => {
                     <th className="py-4 px-4">Name</th>
                     <th className="py-4 px-4">Father Name</th>
                     <th className="py-4 px-4">Class</th>
-                    <th className="py-4 px-4">Date</th>   
-                    <th className="py-4 px-4">Action</th>                   
+                    <th className="py-4 px-4">Date</th>
+                    <th className="py-4 px-4">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -167,7 +177,7 @@ const CoordinatorDashboard = () => {
                         month: '2-digit',
                         year: 'numeric',
                       })}</td>
-                      <td className="py-4 px-4"><button className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700'  onClick={()=>{
+                      <td className="py-4 px-4"><button className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700' onClick={() => {
                         navigate('/parents/inquiry/form');
                       }}>Forward</button></td>
                     </tr>

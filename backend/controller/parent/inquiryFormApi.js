@@ -36,25 +36,25 @@ router.post('/create/inquiry', async (req, res) => {
     const inquiryId = generateInquiryId();
 
     const newInquiry = new InquiryForm({
-      inquiryId,
-      name,
-      currentClass,
-      dob,
-      gender,
-      fatherName,
-      fatherQualification,
-      fatherOccupation,
-      fatherPhoneNo,
-      fatherEmail,
-      motherName,
-      motherQualification,
-      motherOccupation,
-      motherPhoneNo,
-      motherEmail,
-      residentalAddress,
-      haveYouVisitedOurWebsite,
-      howDoYouKnowAboutSUNVILLEKIDZ,
-      references
+      inquiryId:inquiryId,
+      name:name,
+      currentClass:currentClass,
+      dob:dob,
+      gender:gender,
+      fatherName:fatherName,
+      fatherQualification:fatherQualification,
+      fatherOccupation:fatherOccupation,
+      fatherPhoneNo:fatherPhoneNo,
+      fatherEmail:fatherEmail,
+      motherName:motherName,
+      motherQualification:motherQualification,
+      motherOccupation:motherOccupation,
+      motherPhoneNo:motherPhoneNo,
+      motherEmail:motherEmail,
+      residentalAddress:residentalAddress,
+      haveYouVisitedOurWebsite:haveYouVisitedOurWebsite,
+      howDoYouKnowAboutSUNVILLEKIDZ:howDoYouKnowAboutSUNVILLEKIDZ,
+      references:references
     });
 
     const saved = await newInquiry.save();
