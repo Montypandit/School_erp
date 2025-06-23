@@ -54,6 +54,12 @@ const CoordinatorNavbar = () => {
               >
                 Generate Fees
               </Link>
+              <Link
+                to="/coordinator/enquiry"
+                className="bg-green-100 hover:bg-green-200 text-green-800 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+              >
+                Enquiry
+              </Link>
             </div>
           </div>
 
@@ -173,6 +179,12 @@ const CoordinatorNavbar = () => {
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
               >
                 Admission Status
+              </Link>
+              <Link
+                to="/coordinator/enquiry"
+                className="bg-green-100 text-green-800 hover:bg-green-200 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+              >
+                Enquiry
               </Link>
               <hr className="my-2 border-gray-200" />
               <div className="px-3 py-2">
