@@ -13,7 +13,7 @@ import TeacherLogin from "./teacher/TeacherLogin";
 import TeacherHome from "./teacher/TeacherHome";
 import FeePaid from './coordinator/FeePaid'
 import EnquiryStudent from "./coordinator/enquiryStudent";
-
+import EmployeeLogin from "./admin/EmployeeLogin";
 const App = () => {
   return (
     <Router>
@@ -31,6 +31,8 @@ const App = () => {
         <Route path="/teacher/login" element={<TeacherLogin/>}/>
         <Route path="/teacher/home" element={<TeacherHome/>}/>
         <Route path="/coordinator/enquiry/process/:inquiryId" element={<EnquiryStudent/>}/>
+        <Route path="/coordinator/enquiry" element={<EnquiryStudent/>}/>
+        <Route path="/admin/employees" element={<EmployeeLogin/>}/>
       </Routes>
     </Router>
   );

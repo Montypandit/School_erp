@@ -249,9 +249,9 @@ const AdminHome = () => {
           label="Add New Employee" 
         />
         <ActionButton 
-          to="/admin/admission" 
+          to="/admin/employees" 
           icon="👨‍🎓" 
-          label="All other Employees" 
+          label="All Employees" 
         />
           <ActionButton 
           to="/admin/teacher/:id" 

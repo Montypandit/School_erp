@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import './EmployeeForm.css';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { AdUnits } from '@mui/icons-material';
-import AdminNavbar from './AdminNavbar'
-
+import AdminNavbar from './AdminNavbar';
+import './EmployeeForm.css';
 
 const EmployeeForm = () => {
-  const [formData, setFormData] = useState({
+  const navigate = useNavigate();
+
+  const initialFormData = {
     firstName: '',
     lastName: '',
     email: '',
@@ -16,7 +16,7 @@ const EmployeeForm = () => {
     dob: '',
     doj: '',
     qualification: '',
-    residentalAddress: '',
+    residentialAddress: '',
     permanentAddress: '',
     role: '',
     aadharNo: '',
@@ -24,11 +24,10 @@ const EmployeeForm = () => {
     passportNo: '',
     salary: '',
     imageUrl: ''
-  });
+  };
 
-  const navigate = useNavigate();
+  const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -39,305 +38,205 @@ const EmployeeForm = () => {
   };
 
   const handleImageChange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) {
-            toast.info('No file selected.');
-            return;
-        }
+    const file = e.target.files[0];
+    if (!file) {
+      toast.info('No file selected.');
+      return;
+    }
 
-        const uploadFormData = new FormData();
-        uploadFormData.append('file', file);
-        uploadFormData.append('upload_preset', 'ERP_IMAGES'); 
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    uploadFormData.append('upload_preset', 'ERP_IMAGES');
 
-        try {
-            const res = await fetch(
-                'https://api.cloudinary.com/v1_1/daud3283/image/upload', 
-                {
-                    method: 'POST',
-                    body: uploadFormData,
-                }
-            );
-            const data = await res.json();
-            if (data.secure_url) {
-                setFormData((prevData) => ({
-                    ...prevData,
-                    imageUrl: data.secure_url,
-                }));
-                toast.success('Image uploaded successfully!');
-            } else {
-                toast.error(data.error?.message || 'Failed to upload image. Please check preset/cloud name.');
-            }
-        } catch (error) {
-            toast.error('Image upload failed. Please try again.');
-            console.error('Cloudinary upload error:', error);
-        } finally {
-            // setLoading(false); // Optional: manage loading state for upload
-        }
-    };
+    try {
+      const res = await fetch('https://api.cloudinary.com/v1_1/daud3283/image/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      const data = await res.json();
+      if (data.secure_url) {
+        setFormData(prev => ({
+          ...prev,
+          imageUrl: data.secure_url,
+        }));
+        toast.success('Image uploaded successfully!');
+      } else {
+        toast.error(data.error?.message || 'Upload failed. Check Cloudinary config.');
+      }
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      toast.error('Image upload failed. Try again.');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
 
+    const requiredFields = ['firstName', 'email', 'phone', 'role'];
+    const newErrors = {};
+
+    requiredFields.forEach(field => {
+      if (!formData[field]) {
+        newErrors[field] = 'This field is required';
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error('Please fill all required fields');
+      return;
+    }
+
+    try {
       const token = sessionStorage.getItem('adminToken');
-      if(!token){
+      if (!token) {
         toast.info('Please login to continue');
-        navigate('admin/login');
+        navigate('/admin/login');
         return;
       }
+
       const res = await fetch('http://localhost:5000/api/employees/create/employee', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization':`Bearer ${token}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(formData)
       });
 
+      const result = await res.json();
 
       if (!res.ok) {
-        const errorData = await res.json();
-        console.error('Server error:', errorData);
-        toast.error(errorData.message || 'Failed to add employee');
-        throw new Error('Failed to add employee');
-
+        toast.error(result.message || 'Failed to add employee');
+        return;
       }
-      toast.success('Employee added successfully');
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        gender: '',
-        dob: '',
-        doj: '',
-        qualification: '',
-        residentalAddress: '',
-        permanentAddress: '',
-        role: '',
-        aadharNo: '',
-        panNo: '',
-        passportNo: '',
-        salary: '',
-        imageUrl: ''
-      });
+
+      toast.success(result.message || 'Employee added successfully');
+      setFormData(initialFormData);
       setErrors({});
     } catch (error) {
-      console.error('Error adding employee:', error);
-      toast.error('Error adding employee. Please try again.');
+      console.error('Add employee error:', error);
+      toast.error('Something went wrong. Try again.');
     }
+  };
+
+  const handleCancel = () => {
+    setFormData(initialFormData);
+    setErrors({});
+    toast.info('Form reset.');
   };
 
   return (
     <div>
-    <AdminNavbar/>
-    <div className="employee-form-container">
-      <h2>Add New Employee</h2>
-      <form onSubmit={handleSubmit} className="employee-form">
-        <div className="form-group">
-          <label htmlFor="firstName">First Name *</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            className={errors.firstName ? 'error' : ''}
-          />
-          {errors.firstName && <div className="error-message">{errors.firstName}</div>}
-        </div>
+      <AdminNavbar />
+      <div className="employee-form-container">
+        <h2>Add New Employee</h2>
+        <form onSubmit={handleSubmit} className="employee-form">
 
-        <div className="form-group">
-          <label htmlFor="lastName">Last Name</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-          />
-        </div>
+          {/* Basic Fields */}
+          {[
+            { label: 'First Name *', name: 'firstName', type: 'text', required: true },
+            { label: 'Last Name', name: 'lastName', type: 'text' },
+            { label: 'Email *', name: 'email', type: 'email', required: true },
+            { label: 'Phone *', name: 'phone', type: 'tel', required: true },
+            { label: 'Date of Birth', name: 'dob', type: 'date' },
+            { label: 'Date of Joining', name: 'doj', type: 'date' },
+            { label: 'Qualification', name: 'qualification', type: 'text' },
+            { label: 'Aadhar Number', name: 'aadharNo', type: 'text' },
+            { label: 'PAN Number', name: 'panNo', type: 'text' },
+            { label: 'Passport Number', name: 'passportNo', type: 'text' },
+            { label: 'Salary', name: 'salary', type: 'number' },
+          ].map((field) => (
+            <div className="form-group" key={field.name}>
+              <label>{field.label}</label>
+              <input
+                type={field.type}
+                name={field.name}
+                value={formData[field.name]}
+                onChange={handleChange}
+                className={errors[field.name] ? 'error' : ''}
+              />
+              {errors[field.name] && <div className="error-message">{errors[field.name]}</div>}
+            </div>
+          ))}
 
-        <div className="form-group">
-          <label htmlFor="email">Email *</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={errors.email ? 'error' : ''}
-          />
-          {errors.email && <div className="error-message">{errors.email}</div>}
-        </div>
+          {/* Gender Dropdown */}
+          <div className="form-group">
+            <label>Gender</label>
+            <select name="gender" value={formData.gender} onChange={handleChange}>
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="phone">Phone *</label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            className={errors.phone ? 'error' : ''}
-          />
-          {errors.phone && <div className="error-message">{errors.phone}</div>}
-        </div>
+          {/* Role Dropdown */}
+          <div className="form-group">
+            <label>Role *</label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className={errors.role ? 'error' : ''}
+            >
+              <option value="">Select Role</option>
+              <option value="teacher">Teacher</option>
+              <option value="principal">Principal</option>
+              <option value="coordinator">Coordinator</option>
+              <option value="peon">Peon</option>
+            </select>
+            {errors.role && <div className="error-message">{errors.role}</div>}
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="gender">Gender</label>
-          <select
-            id="gender"
-            name="gender"
-            value={formData.gender}
-            onChange={handleChange}
-          >
-            <option value="">Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
+          {/* Address Fields */}
+          <div className="form-group">
+            <label>Residential Address</label>
+            <textarea name="residentialAddress" rows="3" value={formData.residentialAddress} onChange={handleChange}></textarea>
+          </div>
+          <div className="form-group">
+            <label>Permanent Address</label>
+            <textarea name="permanentAddress" rows="3" value={formData.permanentAddress} onChange={handleChange}></textarea>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="dob">Date of Birth</label>
-          <input
-            type="date"
-            id="dob"
-            name="dob"
-            value={formData.dob}
-            onChange={handleChange}
-          />
-        </div>
+          {/* Image Upload */}
+          <div className="form-group">
+            <label>Upload Image</label>
+            <input type="file" accept="image/*" onChange={handleImageChange} />
+            {formData.imageUrl && (
+              <img
+                src={formData.imageUrl}
+                alt="Preview"
+                style={{
+                  marginTop: "10px",
+                  width: "120px",
+                  height: "120px",
+                  borderRadius: "8px",
+                  objectFit: "cover"
+                }}
+              />
+            )}
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="doj">Date of Joining</label>
-          <input
-            type="date"
-            id="doj"
-            name="doj"
-            value={formData.doj}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="qualification">Qualification</label>
-          <input
-            type="text"
-            id="qualification"
-            name="qualification"
-            value={formData.qualification}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="residentialAddress">Residential Address</label>
-          <textarea
-            id="residentialAddress"
-            name="residentialAddress"
-            value={formData.residentialAddress}
-            onChange={handleChange}
-            rows="3"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="permanentAddress">Permanent Address</label>
-          <textarea
-            id="permanentAddress"
-            name="permanentAddress"
-            value={formData.permanentAddress}
-            onChange={handleChange}
-            rows="3"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="role">Role *</label>
-          <select
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className={errors.role ? 'error' : ''}
-          >
-            <option value="">Select Role</option>
-            <option value="teacher">Teacher</option>
-            <option value="principal">Principal</option>
-            <option value="coordinator">Coordinator</option>
-            <option value="peon">Peon</option>
-          </select>
-          {errors.role && <div className="error-message">{errors.role}</div>}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="aadharNo">Aadhar Number</label>
-          <input
-            type="text"
-            id="aadharNo"
-            name="aadharNo"
-            value={formData.aadharNo}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="panNo">PAN Number</label>
-          <input
-            type="text"
-            id="panNo"
-            name="panNo"
-            value={formData.panNo}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="passportNo">Passport Number</label>
-          <input
-            type="text"
-            id="passportNo"
-            name="passportNo"
-            value={formData.passportNo}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="salary">Salary</label>
-          <input
-            type="number"
-            id="salary"
-            name="salary"
-            value={formData.salary}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="imageUpload">Upload Image</label>
-          <input
-            type="file"
-            id="imageUpload"
-            name="image"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-
-          {formData.imageUrl && (
-            <img
-              src={formData.imageUrl}
-              alt="Uploaded preview"
-              className="mt-2 w-32 h-32 object-cover rounded"
-            />
-          )}
-        </div>
-
-        <button type="submit" onClick={handleSubmit} className="submit-btn">Add Employee</button>
-      </form>
-    </div>
+          {/* Buttons */}
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <button type="submit" className="submit-btn">Add Employee</button>
+            <button type="button" onClick={handleCancel} className="cancel-btn" style={{
+              padding: "0.75rem 1.5rem",
+              borderRadius: "6px",
+              fontSize: "0.875rem",
+              fontWeight: "500",
+              border: "1px solid rgb(173, 181, 192)",
+              backgroundColor: "#f9fafb",
+              color: "#374151",
+              cursor: "pointer"
+            }}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
