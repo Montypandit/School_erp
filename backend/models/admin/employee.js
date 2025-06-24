@@ -17,7 +17,9 @@ const employee =new mongoose.Schema({
     panNo:{type:String},
     passportNo:{type:String},
     salary:{type:Number},
-    imageUrl:{type:String}
+    imageUrl:{type:String},
+    password:{type:String},
+    
 },{timestamps:true});
 
 
