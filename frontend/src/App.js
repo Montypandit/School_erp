@@ -15,7 +15,6 @@ import FeePaid from './coordinator/FeePaid'
 import EnquiryStudent from "./coordinator/enquiryStudent";
 import EmployeeLogin from "./admin/EmployeeLogin";
 import GetAllTeacher from "./teacher/GetAllTeacher";
-import GetTeacher from "./teacher/GetTeacher";
 
 const App = () => {
   return (
@@ -37,7 +36,6 @@ const App = () => {
         <Route path="/coordinator/enquiry" element={<EnquiryStudent/>}/>
         <Route path="/admin/employees" element={<EmployeeLogin/>}/>
         <Route path="/admin/allteachers" element={<GetAllTeacher/>}/>
-        <Route path="/admin/teacher/:empId" element={<GetTeacher/>}/>
       </Routes>
     </Router>
   );
