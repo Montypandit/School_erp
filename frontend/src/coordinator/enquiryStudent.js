@@ -1,543 +1,484 @@
-import React, { useState } from 'react';
-import { 
-  Container, 
-  Typography, 
-  Paper, 
-  Button, 
-  Box, 
-  Grid, 
-  TextField, 
-  FormControlLabel, 
-  Checkbox,
-  Divider,
-  Card,
-  CardContent,
-  FormGroup,
-  Avatar,
-  Chip,
-  Stack,
-  alpha,
-  useTheme
-} from '@mui/material';
-import { 
-  Save as SaveIcon,
-  Add as AddIcon,
-  Person as PersonIcon,
-  Email as EmailIcon,
-  Phone as PhoneIcon,
-  Home as HomeIcon,
-  School as SchoolIcon,
-  Info as InfoIcon,
-  CalendarToday as CalendarIcon,
-  Assignment as AssignmentIcon,
-  CheckCircle as CheckCircleIcon,
-  AccessTime as AccessTimeIcon
-} from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
+import React, { useState, useEffect } from "react"
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  GraduationCap,
+  Info,
+  Calendar,
+  ClipboardList,
+  Save,
+  Loader2,
+  Building,
+  Eye,
+  DollarSign,
+  CheckCircle2,
+  FileText,
+  BookOpen,
+  CheckSquare,
+} from "lucide-react"
+import { toast } from "react-toastify"
+import { useNavigate, useParams } from "react-router-dom"
 
-// Styled Components
-const StyledCard = styled(Card)(({ theme }) => ({
-  borderRadius: 12,
-  boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)',
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  transition: 'all 0.2s ease-in-out',
-  '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: '0 8px 24px 0 rgba(0,0,0,0.1)'
-  },
-  '& .MuiCardContent-root': {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    '&:hover': {
-      transform: 'none',
-      boxShadow: 'none'
-    }
-  }
-}));
+export default function EnquiryStudent() {
+  const [student, setStudent] = useState(null)
+  const [remarks, setRemarks] = useState("")
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [saving, setSaving] = useState(false)
 
-const SectionHeader = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  marginBottom: theme.spacing(3),
-  '& svg': {
-    marginRight: theme.spacing(1.5),
-    color: theme.palette.primary.main
-  }
-}));
+  const navigate = useNavigate();
+  const {inquiryId} = useParams();
 
-const InfoItem = ({ icon, label, value, color = 'text.primary' }) => {
-  // Handle both string and element values
-  const renderValue = () => {
-    if (React.isValidElement(value)) {
-      return value;
-    }
-    return (
-      <Typography variant="body2" sx={{ color, fontWeight: 500, mt: 0.25 }}>
-        {value}
-      </Typography>
-    );
-  };
-
-  return (
-    <Box sx={{ display: 'flex', mb: 2, alignItems: 'flex-start' }}>
-      <Box sx={{ 
-        color: 'primary.main', 
-        mr: 2,
-        mt: 0.5
-      }}>
-        {icon}
-      </Box>
-      <Box>
-        <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-          {label}
-        </Typography>
-        {renderValue()}
-      </Box>
-    </Box>
-  );
-};
-
-// Sample student data - replace with actual API call in production
-const sampleStudent = {
-  id: 'ENQ-2023-456',
-  name: 'Rahul Sharma',
-  parentName: 'Amit Sharma',
-  email: 'rahul.s@example.com',
-  phone: '+91 98765 43210',
-  address: '123, ABC Colony, Andheri East, Mumbai - 400069',
-  className: 'Nursery',
-  dateOfEnquiry: '2025-06-20',
-  source: 'Website',
-  status: 'New',
-  schoolInfo: false,
-  schoolVisit: false,
-  feesStructure: false,
-  remarks: ''
-};
-
-const EnquiryStudent = () => {
-  const theme = useTheme();
-  const [student, setStudent] = useState(sampleStudent);
-  const [remarks, setRemarks] = useState('');
-  
-  const handleNewEnquiry = () => {
-    setStudent({
-      id: `ENQ-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
-      name: '',
-      parentName: '',
-      email: '',
-      phone: '',
-      address: '',
-      className: '',
-      dateOfEnquiry: new Date().toISOString().split('T')[0],
-      source: 'Website',
-      status: 'New',
-      schoolInfo: false,
-      schoolVisit: false,
-      feesStructure: false,
-    });
-    setRemarks('');
-  };
-
-  const handleCheckboxChange = (event) => {
-    const { name, checked } = event.target;
-    setStudent(prev => ({
-      ...prev,
-      [name]: checked
-    }));
-  };
-
-  const handleRemarksChange = (event) => {
-    setRemarks(event.target.value);
-  };
-
-  const handleSave = () => {
-    // Basic validation
-    if (!student.name || !student.parentName || !student.phone) {
-      alert('Please fill in all required fields');
-      return;
-    }
-    
-    const enquiryData = {
-      ...student,
-      remarks,
-      dateOfEnquiry: student.dateOfEnquiry || new Date().toISOString().split('T')[0]
-    };
-    
-    console.log('Saving data:', enquiryData);
-    // TODO: Add API call to save the data
-    // Example:
-    // try {
-    //   const response = await fetch('/api/enquiries', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(enquiryData)
-    //   });
-    //   const result = await response.json();
-    //   if (response.ok) {
-    //     alert('Enquiry saved successfully!');
-    //   } else {
-    //     throw new Error(result.message || 'Failed to save enquiry');
-    //   }
-    // } catch (error) {
-    //   console.error('Error saving enquiry:', error);
-    //   alert('Error saving enquiry: ' + error.message);
-    // }
-  };
-
+  // Utility function to get status colors
   const getStatusColor = (status) => {
-    const colors = {
-      'New': { main: 'primary.main', light: 'primary.light', dark: 'primary.dark' },
-      'In Progress': { main: 'warning.main', light: 'warning.light', dark: 'warning.dark' },
-      'Completed': { main: 'success.main', light: 'success.light', dark: 'success.dark' },
-      'default': { main: 'text.primary', light: 'grey.100', dark: 'text.primary' }
-    };
-    return colors[status] || colors['default'];
-  };
+    switch (status) {
+      case "New":
+        return "bg-blue-100 text-blue-800 border-blue-200"
+      case "In Progress":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200"
+      case "Completed":
+        return "bg-green-100 text-green-800 border-green-200"
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200"
+    }
+  }
+
+  // Utility function to format date
+  const formatDate = (dateString) => {
+    const today = new Date();
+  return today.toLocaleDateString('en-IN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+  }
+
+  // Utility function to validate student data
+  const validateStudentData = (studentData) => {
+    if (!studentData) return false
+    return !!(studentData.name && studentData.fatherName && studentData.fatherPhoneNo)
+  }
+
+  // InfoItem component defined inline
+  const InfoItem = ({ icon, label, value, isLink, linkType }) => {
+    const renderValue = () => {
+      if (React.isValidElement(value)) {
+        return value
+      }
+
+      if (isLink && typeof value === "string" && value) {
+        const href = linkType === "email" ? `mailto:${value}` : `tel:${value.replace(/\D/g, "")}`
+        return (
+          <a href={href} className="text-blue-600 hover:text-blue-800 hover:underline transition-colors font-medium">
+            {value}
+          </a>
+        )
+      }
+
+      return <span className="text-gray-900 font-medium">{value || "Not provided"}</span>
+    }
+
+    return (
+      <div className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+        <div className="text-blue-600 mt-0.5 flex-shrink-0">{icon}</div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{label}</p>
+          <div className="text-sm">{renderValue()}</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Fetch student data on component mount
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        const token = sessionStorage.getItem('coordinatorToken');
+        if(!token){
+          toast.info('Please login to continue');
+          navigate('coordinator/login');
+          return;
+        }
+
+        const res = await fetch(`http://localhost:5000/api/inquiry/get/inquiry/${inquiryId}`,{
+          method:'GET',
+          headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if(!res.ok){
+          console.error('Error fetching inquiry:', res.status, res.statusText);
+          toast.error('Failed to fetch inquiry details.');
+          throw new Error('Failed to fetch inquiry details');
+        }
+        const data =await res.json();
+
+        setStudent({
+          ...data,
+          // Initialize process fields
+          schoolInfo: false,
+          schoolVisit: false,
+          aboutFees: false,
+          educationPolicy: false,
+          prospectus: false,
+          formProceeded: false,
+        })
+        setRemarks("Initial enquiry received.")
+        setError(null)
+      } catch (err) {
+        console.error("Error fetching student data:", err)
+        setError("Failed to load student data")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStudentData()
+  }, [inquiryId, navigate])
+
+  const handleCheckboxChange = (name, checked) => {
+    if (!student) return
+    setStudent((prev) => (prev ? { ...prev, [name]: checked } : null))
+  }
+
+  const handleSave = async () => {
+    if (!student) return
+
+    // Basic validation
+    if (!validateStudentData(student)) {
+      toast.info("Student data is incomplete (missing Name, Father's Name, or Phone).")
+      return
+    }
+
+    setSaving(true)
+    try {
+      const processData = {
+        inquiryId: student.inquiryId,
+        remarks,
+        schoolInfo: !!student.schoolInfo,
+        schoolVisit: !!student.schoolVisit,
+        aboutFees: !!student.aboutFees,
+        educationPolicy: !!student.educationPolicy,
+        prospectus: !!student.prospectus,
+        formProceeded: !!student.formProceeded,
+      }
+
+      console.log("Saving data:", processData)
+
+      const token = sessionStorage.getItem('coordinatorToken');
+      if(!token){
+        toast.info('Please login to continue');
+        navigate('coordinator/login');
+        return;
+      }
+      const response = await fetch('http://localhost:5000/api/inquiry-process/create/inquiry-process', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(processData)
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'An unknown error occurred' }));
+        throw new Error(errorData.message || 'Failed to save enquiry process');
+      }
+
+      toast.success("Enquiry processed successfully!")
+      navigate('/coordinator/home')
+    } catch (error) {
+      console.error("Error processing enquiry:", error)
+      toast.error("Error processing enquiry: " + error.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleGoBack = () => {
+    navigate(-1)
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading student data...</h3>
+              <p className="text-gray-600">Please wait while we fetch the information</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-6 border border-red-200 bg-red-50 rounded-lg p-4">
+            <p className="text-red-800">{error}</p>
+          </div>
+          <button
+            onClick={handleGoBack}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:shadow-md transition-all duration-200"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Go Back
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // No student data
+  if (!student) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-6 border border-yellow-200 bg-yellow-50 rounded-lg p-4">
+            <p className="text-yellow-800">No student data found for inquiry ID: {inquiryId}</p>
+          </div>
+          <button
+            onClick={handleGoBack}
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:shadow-md transition-all duration-200"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Go Back
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 4, gap: 2, position: 'relative' }}>
-        <Box sx={{ position: 'absolute', left: 0 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleNewEnquiry}
-            sx={{
-              textTransform: 'none',
-              borderRadius: 2,
-              px: 3,
-              py: 1,
-              fontWeight: 600,
-              boxShadow: '0 2px 10px rgba(25, 118, 210, 0.2)',
-              '&:hover': {
-                boxShadow: '0 4px 14px rgba(25, 118, 210, 0.3)',
-                transform: 'translateY(-1px)',
-              },
-              transition: 'all 0.2s ease-in-out',
-            }}
-          >
-            New Enquiry
-          </Button>
-        </Box>
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography variant="h4" component="h1" sx={{ 
-            fontWeight: 700, 
-            color: 'text.primary',
-            mb: 0.5
-          }}>
-            Student Enquiry
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <CalendarIcon fontSize="small" sx={{ mr: 0.5, fontSize: '1rem' }} />
-            Enquiry ID: {student.id} • {new Date(student.dateOfEnquiry).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
-          </Typography>
-        </Box>
-      </Box>
-      
-      <Grid container spacing={3}>
-        {/* Student Information */}
-        <Grid item xs={12} md={7}>
-          <StyledCard>
-            <CardContent sx={{ p: 4 }}>
-              <SectionHeader>
-                <PersonIcon />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Student Information</Typography>
-              </SectionHeader>
-              
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <InfoItem 
-                    icon={<PersonIcon fontSize="small" />} 
-                    label="Student Name" 
-                    value={student.name} 
-                  />
-                  <InfoItem 
-                    icon={<PersonIcon fontSize="small" />} 
-                    label="Parent/Guardian" 
-                    value={student.parentName} 
-                  />
-                  <InfoItem 
-                    icon={<SchoolIcon fontSize="small" />} 
-                    label="Class Applied" 
-                    value={student.className} 
-                  />
-                  <InfoItem 
-                    icon={<InfoIcon fontSize="small" />} 
-                    label="Source" 
-                    value={student.source} 
-                  />
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Box sx={{ display: 'flex', mb: 2, alignItems: 'flex-start' }}>
-                    <Box sx={{ color: 'primary.main', mr: 2, mt: 0.5 }}>
-                      <EmailIcon fontSize="small" />
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                        Email
-                      </Typography>
-                      <Typography 
-                        component="a"
-                        href={`mailto:${student.email}`}
-                        sx={{ 
-                          color: 'primary.main', 
-                          textDecoration: 'none',
-                          '&:hover': { 
-                            textDecoration: 'underline' 
-                          }
-                        }}
-                      >
-                        {student.email}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: 'flex', mb: 2, alignItems: 'flex-start' }}>
-                    <Box sx={{ color: 'primary.main', mr: 2, mt: 0.5 }}>
-                      <PhoneIcon fontSize="small" />
-                    </Box>
-                    <Box>
-                      <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
-                        Phone
-                      </Typography>
-                      <Typography
-                        component="a"
-                        href={`tel:${student.phone.replace(/\D/g, '')}`}
-                        sx={{ 
-                          color: 'primary.main', 
-                          textDecoration: 'none',
-                          '&:hover': { 
-                            textDecoration: 'underline' 
-                          }
-                        }}
-                      >
-                        {student.phone}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <InfoItem 
-                    icon={<HomeIcon fontSize="small" />} 
-                    label="Address" 
-                    value={student.address} 
-                  />
-                </Grid>
-              </Grid>
-            </CardContent>
-          </StyledCard>
-        </Grid>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Header */}
+        <div className="relative mb-8">
+          <div className="absolute left-0 top-0">
+            <button
+              onClick={handleGoBack}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-white hover:shadow-md transition-all duration-200"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </button>
+          </div>
 
-        {/* Coordinator Section */}
-        <Grid item xs={12} md={5}>
-          <StyledCard>
-            <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-              <SectionHeader>
-                <AssignmentIcon />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Coordinator Actions</Typography>
-              </SectionHeader>
-              
-              <Box sx={{ mb: 3 }}>
-                <Stack spacing={1.5}>
-                  <Box 
-                    sx={{ 
-                      p: 2, 
-                      borderRadius: 2,
-                      border: `1px solid ${theme.palette.divider}`,
-                      bgcolor: student.schoolInfo ? alpha(theme.palette.primary.light, 0.05) : 'transparent',
-                      transition: 'all 0.2s ease-in-out',
-                      '&:hover': {
-                        borderColor: theme.palette.primary.main,
-                        backgroundColor: alpha(theme.palette.primary.light, 0.05),
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                      },
-                      '&:not(:last-child)': {
-                        mb: 2
-                      }
-                    }}
-                  >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={student.schoolInfo}
-                          onChange={handleCheckboxChange}
-                          name="schoolInfo"
-                          color="primary"
-                          size="small"
-                        />
-                      }
-                      label={
-                        <Box>
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>School Information</Typography>
-                          <Typography variant="caption" color="text.secondary">Share school brochure and details</Typography>
-                        </Box>
-                      }
-                      sx={{ m: 0, width: '100%' }}
-                      componentsProps={{
-                        typography: {
-                          component: 'div',
-                          sx: { width: '100%' }
-                        }
-                      }}
-                    />
-                  </Box>
-                  
-                  <Box 
-                    sx={{ 
-                      p: 2, 
-                      borderRadius: 2,
-                      border: `1px solid ${theme.palette.divider}`,
-                      bgcolor: student.schoolVisit ? alpha(theme.palette.primary.light, 0.05) : 'transparent',
-                      transition: 'all 0.2s ease-in-out',
-                      '&:hover': {
-                        borderColor: theme.palette.primary.main,
-                        backgroundColor: alpha(theme.palette.primary.light, 0.05),
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                      },
-                      '&:not(:last-child)': {
-                        mb: 2
-                      }
-                    }}
-                  >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={student.schoolVisit}
-                          onChange={handleCheckboxChange}
-                          name="schoolVisit"
-                          color="primary"
-                          size="small"
-                        />
-                      }
-                      label={
-                        <Box>
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>School Visit</Typography>
-                          <Typography variant="caption" color="text.secondary">Schedule a campus tour</Typography>
-                        </Box>
-                      }
-                      sx={{ m: 0, width: '100%' }}
-                      componentsProps={{
-                        typography: {
-                          component: 'div',
-                          sx: { width: '100%' }
-                        }
-                      }}
-                    />
-                  </Box>
-                  
-                  <Box 
-                    sx={{ 
-                      p: 2, 
-                      borderRadius: 2,
-                      border: `1px solid ${theme.palette.divider}`,
-                      bgcolor: student.feesStructure ? alpha(theme.palette.primary.light, 0.05) : 'transparent',
-                      transition: 'all 0.2s ease-in-out',
-                      '&:hover': {
-                        borderColor: theme.palette.primary.main,
-                        backgroundColor: alpha(theme.palette.primary.light, 0.05),
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                      },
-                      '&:not(:last-child)': {
-                        mb: 2
-                      }
-                    }}
-                  >
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={student.feesStructure}
-                          onChange={handleCheckboxChange}
-                          name="feesStructure"
-                          color="primary"
-                          size="small"
-                        />
-                      }
-                      label={
-                        <Box>
-                          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>Fees Structure</Typography>
-                          <Typography variant="caption" color="text.secondary">Share fee details and payment plans</Typography>
-                        </Box>
-                      }
-                      sx={{ m: 0, width: '100%' }}
-                      componentsProps={{
-                        typography: {
-                          component: 'div',
-                          sx: { width: '100%' }
-                        }
-                      }}
-                    />
-                  </Box>
-                </Stack>
-              </Box>
-              
-              <Box sx={{ mt: 'auto' }}>
-                <TextField
-                  fullWidth
-                  label="Remarks"
-                  multiline
-                  rows={3}
-                  value={remarks}
-                  onChange={handleRemarksChange}
-                  variant="outlined"
-                  margin="normal"
-                  placeholder="Add any additional remarks here..."
-                  InputProps={{
-                    sx: {
-                      borderRadius: 2,
-                      '&:hover fieldset': {
-                        borderColor: 'primary.light',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'primary.main',
-                      },
-                    }
-                  }}
-                />
-                
-                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<SaveIcon />}
-                    onClick={handleSave}
-                    size="large"
-                    fullWidth
-                    sx={{
-                      px: 4,
-                      py: 1.5,
-                      borderRadius: 2,
-                      textTransform: 'none',
-                      fontWeight: 600,
-                      fontSize: '1rem',
-                      boxShadow: '0 4px 14px 0 rgba(0,118,255,0.2)',
-                      '&:hover': {
-                        boxShadow: '0 8px 24px 0 rgba(0,118,255,0.3)',
-                        transform: 'translateY(-2px)',
-                        backgroundColor: theme.palette.primary.dark,
-                      },
-                      '&:active': {
-                        transform: 'translateY(0)',
-                        boxShadow: '0 4px 14px 0 rgba(0,118,255,0.2)',
-                      },
-                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                    }}
-                  >
-                    Save Changes
-                  </Button>
-                </Box>
-              </Box>
-            </CardContent>
-          </StyledCard>
-        </Grid>
-      </Grid>
-    </Container>
-  );
-};
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full mb-4 shadow-lg">
+              <GraduationCap className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Student Enquiry</h1>
+            <div className="flex items-center justify-center space-x-4 text-sm text-gray-600 mb-3">
+              <div className="flex items-center">
+                <Calendar className="h-4 w-4 mr-1" />
+                Enquiry ID: {inquiryId}
+              </div>
+              <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+              <div>{formatDate()}</div>
+            </div>
+            <span
+              className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(student.status)}`}
+            >
+              {student.status}
+            </span>
+          </div>
+        </div>
 
-export default EnquiryStudent;
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Student Information */}
+          <div className="lg:col-span-2">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border-0 hover:shadow-2xl transition-all duration-300">
+              <div className="p-6 pb-4 border-b border-gray-100">
+                <h2 className="flex items-center text-xl font-semibold text-gray-900">
+                  <User className="h-5 w-5 mr-3 text-blue-600" />
+                  Student Information
+                </h2>
+              </div>
+              <div className="p-6 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                    <InfoItem icon={<User className="h-4 w-4" />} label="Student Name" value={student.name} />
+                    <InfoItem icon={<User className="h-4 w-4" />} label="Parent/Guardian" value={student.fatherName} />
+                    <InfoItem
+                      icon={<GraduationCap className="h-4 w-4" />}
+                      label="Class Applied"
+                      value={student.currentClass}
+                    />
+                    <InfoItem icon={<Info className="h-4 w-4" />} label="DOB" value={new Date(student.dob).toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      })} />
+                  </div>
+                  <div className="space-y-1">
+                    <InfoItem
+                      icon={<Mail className="h-4 w-4" />}
+                      label="Email"
+                      value={student.fatherEmail}
+                      isLink={true}
+                      linkType="email"
+                    />
+                    <InfoItem
+                      icon={<Phone className="h-4 w-4" />}
+                      label="Phone"
+                      value={student.fatherPhoneNo}
+                      isLink={true}
+                      linkType="phone"
+                    />
+                    <InfoItem icon={<MapPin className="h-4 w-4" />} label="Gender" value={student.gender} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Coordinator Actions */}
+          <div className="lg:col-span-1">
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border-0 hover:shadow-2xl transition-all duration-300 h-fit">
+              <div className="p-6 pb-4 border-b border-gray-100">
+                <h2 className="flex items-center text-xl font-semibold text-gray-900">
+                  <ClipboardList className="h-5 w-5 mr-3 text-blue-600" />
+                  Coordinator Actions
+                </h2>
+              </div>
+              <div className="p-6 pt-4 space-y-6">
+                {/* Action Items */}
+                <div className="space-y-4">
+                  {[
+                    {
+                      key: "schoolInfo",
+                      icon: <Building className="h-5 w-5" />,
+                      title: "School Information Provided",
+                      description: "Shared school brochure and details.",
+                      checked: student.schoolInfo,
+                      required: true,
+                    },
+                    {
+                      key: "schoolVisit",
+                      icon: <Eye className="h-5 w-5" />,
+                      title: "School Visit Scheduled",
+                      description: "A campus tour has been scheduled.",
+                      checked: student.schoolVisit,
+                      required: true,
+                    },
+                    {
+                      key: "aboutFees",
+                      icon: <DollarSign className="h-5 w-5" />,
+                      title: "Fee Structure Discussed",
+                      description: "Shared fee details and payment plans.",
+                      checked: student.aboutFees,
+                      required: true,
+                    },
+                    {
+                      key: "educationPolicy",
+                      icon: <BookOpen className="h-5 w-5" />,
+                      title: "Education Policy Explained",
+                      description: "Discussed the school's education policy.",
+                      checked: student.educationPolicy,
+                      required: true,
+                    },
+                    {
+                      key: "prospectus",
+                      icon: <FileText className="h-5 w-5" />,
+                      title: "Prospectus Given",
+                      description: "Provided a copy of the school prospectus.",
+                      checked: student.prospectus,
+                      required: false,
+                    },
+                    {
+                      key: "formProceeded",
+                      icon: <CheckSquare className="h-5 w-5" />,
+                      title: "Forward for Admission",
+                      description: "Proceed with the admission form.",
+                      checked: student.formProceeded,
+                      required: true,
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.key}
+                      className={`relative p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer group ${
+                        item.checked
+                          ? "border-blue-200 bg-blue-50/50 shadow-sm"
+                          : "border-gray-200 hover:border-blue-200 hover:bg-blue-50/30"
+                      }`}
+                      onClick={() => handleCheckboxChange(item.key, !item.checked)}
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={!!item.checked}
+                            onChange={(e) => handleCheckboxChange(item.key, e.target.checked)}
+                            className="mt-0.5 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center space-x-2 mb-1">
+                            <div
+                              className={`${
+                                item.checked ? "text-blue-600" : "text-gray-500 group-hover:text-blue-600"
+                              } transition-colors`}
+                            >
+                              {item.icon}
+                            </div>
+                            <h4 className="font-semibold text-gray-900 text-sm">{item.title}{item.required && <span className="text-red-500">*</span>}</h4>
+                            {item.checked && <CheckCircle2 className="h-4 w-4 text-green-600 ml-auto" />}
+                          </div>
+                          <p className="text-xs text-gray-600 leading-relaxed">{item.description}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Remarks */}
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-gray-900">Remarks</label>
+                  <textarea
+                    value={remarks}
+                    onChange={(e) => setRemarks(e.target.value)}
+                    placeholder="Add any additional remarks here..."
+                    rows={4}
+                    className="w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none transition-colors"
+                  />
+                </div>
+
+                {/* Save Button */}
+                <button
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:transform-none disabled:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

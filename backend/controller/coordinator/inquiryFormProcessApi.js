@@ -6,15 +6,14 @@ const bcrypt = require('bcryptjs');
 const router = express.Router();
 const AdmissionApproval = require('../../models/principal/admissionApproval');
 const getNextAdmissionId = require('../../utils/getAdmissionId');
-
+const InquiryForm = require('../../models/parents/inquiryForm')
 
 // Create Inquiry Process (admin or coordinator)
 router.post('/create/inquiry-process', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const formData = req.body;
     const newInquiry = new InquiryFormProcess(formData);
-    const saved = await newInquiry.save();
-
+    const saved = await newInquiry.save();    
     const admissionId =await getNextAdmissionId();
 
     const admissionApproval = new AdmissionApproval({
@@ -23,10 +22,13 @@ router.post('/create/inquiry-process', authMiddleware, authorizeRoles('admin', '
       admissionApproved:'Pending'
     });
 
+    await InquiryForm.findOneAndUpdate({inquiryId:saved.inquiryId}, {updatedAt:new Date().toISOString()}, {new:true})
+
     await admissionApproval.save();
     
     res.status(201).json({ message: 'Inquiry Process created successfully', data: saved });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message });
   }
 });

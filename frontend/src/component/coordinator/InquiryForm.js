@@ -123,7 +123,7 @@ const InquiryForm = () => {
 
     try {
 
-      const res = await fetch('http://localhost:5000/create/inquiry', {
+      const res = await fetch('http://localhost:5000/api/inquiry/create/inquiry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

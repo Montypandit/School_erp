@@ -46,19 +46,13 @@ const CoordinatorNavbar = () => {
                 to="/admission-status"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
-                Admission Status
+                Admission
               </Link>
               <Link
                 to="/coordinator/all/fee/details"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Generate Fees
-              </Link>
-              <Link
-                to="/coordinator/enquiry"
-                className="bg-green-100 hover:bg-green-200 text-green-800 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
-              >
-                Enquiry
               </Link>
             </div>
           </div>

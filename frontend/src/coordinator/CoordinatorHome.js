@@ -54,14 +54,23 @@ const CoordinatorDashboard = () => {
 
         const inquiryData = await inquiryRes.json();
         const admissionData = await admissionRes.json();
+        
+        // Map admission data to include student details from inquiries
+        const enrichedAdmissions = admissionData.data.map(admission => {
+          const correspondingInquiry = inquiryData.data.find(inq => inq.inquiryId === admission.inquiryId);
+          return {
+            ...admission,
+            name: correspondingInquiry ? correspondingInquiry.name : 'N/A',
+            email: correspondingInquiry ? correspondingInquiry.fatherEmail : 'N/A', // Assuming fatherEmail is the relevant email
+          };
+        });
 
         setInquiries(inquiryData.data);
-        setAdmissions(admissionData.data);
+        setAdmissions(enrichedAdmissions);
 
       } catch (error) {
         console.error('Fetch error:', error);
       } finally {
-        console.log('hello finally')
         setLoading(false);
       }
     };
@@ -136,11 +145,10 @@ const CoordinatorDashboard = () => {
     const filteredInquiries = enquiries
       .filter(
         (inquiry) =>
-          inquiry?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          inquiry?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          inquiry?.status?.toLowerCase().includes(searchQuery.toLowerCase())
+          inquiry?.name?.toLowerCase().includes(searchQuery.toLowerCase()) || // Student Name
+          inquiry?.fatherName?.toLowerCase().includes(searchQuery.toLowerCase()) // Father Name
       )
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, visibleCount);
 
     const handleShowMore = () => setVisibleCount((prev) => prev + 5);
@@ -177,9 +185,12 @@ const CoordinatorDashboard = () => {
                         month: '2-digit',
                         year: 'numeric',
                       })}</td>
+                      {
+                        i.createdAt === i.updatedAt ?
                       <td className="py-4 px-4"><button className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700' onClick={() => {
-                        navigate('/parents/inquiry/form');
-                      }}>Forward</button></td>
+                        navigate(`/coordinator/enquiry/process/${i.inquiryId}`);
+                      }}>Forward</button></td> : <td className='bg-yellow-100 text-yellow-800 border-yellow-400 rounded-lg text-xl font-300 '>Forwarded</td>
+                      }
                     </tr>
                   ))}
                 </tbody>
@@ -203,13 +214,12 @@ const CoordinatorDashboard = () => {
     const [visibleCount, setVisibleCount] = useState(5);
 
     const filteredAdmissions = admissions
-      .filter(
-        (inquiry) =>
-          inquiry?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          inquiry?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          inquiry?.status?.toLowerCase().includes(searchQuery.toLowerCase())
+      .filter((admission) =>
+          admission?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          admission?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          admission?.admissionApproved?.toLowerCase().includes(searchQuery.toLowerCase())
       )
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, visibleCount);
 
     const handleShowMore = () => setVisibleCount((prev) => prev + 5);
@@ -228,17 +238,28 @@ const CoordinatorDashboard = () => {
                   <tr className="border-b border-gray-200">
                     <th className="py-4 px-4">ID</th>
                     <th className="py-4 px-4">Name</th>
-                    <th className="py-4 px-4">Status</th>
-                    <th className="py-4 px-4">Date</th>
+                    <th className="py-4 px-4">Approval Status</th>
+                    <th className='py-4 px-4'>Forwarded Date</th>
+                    <th className="py-4 px-4">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAdmissions.map((admission) => (
-                    <tr key={admission.id} className="hover:bg-gray-50">
-                      <td className="py-4 px-4">{admission.id}</td>
+                    <tr key={admission._id} className="hover:bg-gray-50 text-center">
+                      <td className="py-4 px-4">{admission.admissionId}</td>
                       <td className="py-4 px-4">{admission.name}</td>
-                      <td className="py-4 px-4">{admission.date}</td>
-                      <td className="py-4 px-4"><StatusBadge status={admission.status} /></td>
+                      <td className="py-4 px-4"><StatusBadge status={admission.admissionApproved} /></td>
+                      <td className="py-4 px-4">{new Date(admission.createdAt).toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                      })}</td>
+                      {
+                        admission.admissionApproved === 'Approved' ?
+                      <td className="py-4 px-4"><button className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700' onClick={() => {
+                        navigate(``);
+                      }}>Grant Admission</button></td> : <div className="text-xl font-bold text-red-400 align-center text-center mt-2">Not Approved</div>
+                      }
                     </tr>
                   ))}
                 </tbody>
