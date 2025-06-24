@@ -32,6 +32,7 @@ const App = () => {
         <Route path="/coordinator/fees/generate/:admissionId" element={<FeesGeneration/>}/>
         <Route path="/teacher/login" element={<TeacherLogin/>}/>
         <Route path="/teacher/home" element={<TeacherHome/>}/>
+        <Route path="/coordinator/enquiry/process/:inquiryId" element={<EnquiryStudent/>}/>
         <Route path="/coordinator/enquiry" element={<EnquiryStudent/>}/>
         <Route path="/admin/employees" element={<EmployeeLogin/>}/>
         <Route path="/admin/allteachers" element={<GetAllTeacher/>}/>
