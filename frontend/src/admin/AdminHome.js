@@ -256,7 +256,7 @@ const AdminHome = () => {
           <ActionButton 
           to="/admin/teacher/:id" 
           icon="🔍" 
-          label="Find a Teacher" 
+          label="Find an Employee" 
         />
         <ActionButton 
           to="/admin/allteachers" 
