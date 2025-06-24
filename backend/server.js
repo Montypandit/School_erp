@@ -22,6 +22,7 @@ const admissionApprovalApi = require('./controller/principal/admissionApproval')
 const feesRoutes = require('./routes/feesRoutes'); // ✅ Fees API
 const addEmployeeRoutes = require('./controller/admin/addEmployee'); // ✅ Employee API
 const finalAdmission = require('./controller/coordinator/admission');
+const teacherRoutes = require('./controller/teacher/teacherapi');
 
 // Use APIs (with consistent route prefix)
 server.use('/api/auth', userLoginApi);
@@ -31,6 +32,7 @@ server.use('/api/admissions', admissionApprovalApi);
 server.use('/api/fees', feesRoutes);
 server.use('/api/employees', addEmployeeRoutes);
 server.use('/api/final/admission', finalAdmission);
+server.use('/api/teachers', teacherRoutes);
 
 // Start server
 server.listen(port, () => {

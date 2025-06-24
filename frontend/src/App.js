@@ -14,6 +14,8 @@ import TeacherHome from "./teacher/TeacherHome";
 import FeePaid from './coordinator/FeePaid'
 import EnquiryStudent from "./coordinator/enquiryStudent";
 import EmployeeLogin from "./admin/EmployeeLogin";
+import GetAllTeacher from "./teacher/GetAllTeacher";
+
 const App = () => {
   return (
     <Router>
@@ -32,6 +34,7 @@ const App = () => {
         <Route path="/teacher/home" element={<TeacherHome/>}/>
         <Route path="/coordinator/enquiry" element={<EnquiryStudent/>}/>
         <Route path="/admin/employees" element={<EmployeeLogin/>}/>
+        <Route path="/admin/allteachers" element={<GetAllTeacher/>}/>
       </Routes>
     </Router>
   );
