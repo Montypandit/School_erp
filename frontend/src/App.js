@@ -14,13 +14,28 @@ import TeacherHome from "./teacher/TeacherHome";
 import FeePaid from './coordinator/FeePaid'
 import EnquiryStudent from "./coordinator/enquiryStudent";
 import EmployeeLogin from "./admin/EmployeeLogin";
+import PrincipalLogin from './principal/PrincipalLogin'
+import PrincipalHome from "./component/principal/PrincipalHome";
+import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
+
+
 const App = () => {
   return (
     <Router>
       <Routes>
+
+      {/* login routes */}
         <Route path='/' element={<Home/>}/>
         <Route path='/admin/login' element={<AdminLogin/>}/>
+        <Route path="/admin/employees" element={<EmployeeLogin/>}/>
+        <Route path="/principal/login" element={<PrincipalLogin/>}/>
+
+
+
+
         <Route path='/admin/home' element={<AdminHome/>}/>
+        <Route path='/principal/home' element={<PrincipalHome/>}/>
+        <Route path='/principal/admission/detail/:inquiryId' element={<PrincipalAdmissionDetail/>}/>
         <Route path='/parent/inquiry/form' element={<InquiryForm/>}/>
         <Route path="/coordinator/home" element={<CoordinatorHome/>}/>
         <Route path="/coordinator/login" element={<CoordinatorLogin/>}/>
@@ -32,7 +47,6 @@ const App = () => {
         <Route path="/teacher/home" element={<TeacherHome/>}/>
         <Route path="/coordinator/enquiry/process/:inquiryId" element={<EnquiryStudent/>}/>
         <Route path="/coordinator/enquiry" element={<EnquiryStudent/>}/>
-        <Route path="/admin/employees" element={<EmployeeLogin/>}/>
       </Routes>
     </Router>
   );

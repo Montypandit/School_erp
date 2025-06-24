@@ -83,6 +83,20 @@ const AdminLogin = () => {
     setIsLoading(true);
     
     try {
+
+      const res = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${formData.email}`,{ // Pass email as query parameter
+        method:'GET',
+        headers:{
+          'Content-Type':'application/json' 
+        }
+      });
+
+      const data = await res.json();
+      if(data.role !== 'admin'){
+        toast.info(`Please login with ${data.role} portal`);
+        navigate('/');
+        return;
+      }
       const response = await fetch('http://localhost:5000/api/auth/user/login', {
         method: 'POST',
         headers: {
