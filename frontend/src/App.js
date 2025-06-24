@@ -19,34 +19,43 @@ import PrincipalHome from "./component/principal/PrincipalHome";
 import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
 
 
+import GetAllTeacher from "./teacher/GetAllTeacher";
+import GetAllStudent from "./component/Student/GetAllStudent";
+import GetAllEmployee from "./admin/EmployeeLogin";
+import GetTeacher from "./teacher/GetTeacher";
 const App = () => {
   return (
     <Router>
       <Routes>
 
-      {/* login routes */}
-        <Route path='/' element={<Home/>}/>
-        <Route path='/admin/login' element={<AdminLogin/>}/>
-        <Route path="/admin/employees" element={<EmployeeLogin/>}/>
-        <Route path="/principal/login" element={<PrincipalLogin/>}/>
+        {/* login routes */}
+        <Route path='/' element={<Home />} />
+        <Route path='/admin/login' element={<AdminLogin />} />
+        <Route path="/admin/employees" element={<EmployeeLogin />} />
+        <Route path="/principal/login" element={<PrincipalLogin />} />
 
 
 
 
-        <Route path='/admin/home' element={<AdminHome/>}/>
-        <Route path='/principal/home' element={<PrincipalHome/>}/>
-        <Route path='/principal/admission/detail/:inquiryId' element={<PrincipalAdmissionDetail/>}/>
-        <Route path='/parent/inquiry/form' element={<InquiryForm/>}/>
-        <Route path="/coordinator/home" element={<CoordinatorHome/>}/>
-        <Route path="/coordinator/login" element={<CoordinatorLogin/>}/>
-        <Route path="/admin/employee/form" element={<EmployeeForm/>}/>
-        <Route path="/parents/inquiry/form" element={<InquiryForm/>}/>
-        <Route path="/coordinator/all/fee/details" element={<FeePaid/>}/>
-        <Route path="/coordinator/fees/generate/:admissionId" element={<FeesGeneration/>}/>
-        <Route path="/teacher/login" element={<TeacherLogin/>}/>
-        <Route path="/teacher/home" element={<TeacherHome/>}/>
-        <Route path="/coordinator/enquiry/process/:inquiryId" element={<EnquiryStudent/>}/>
-        <Route path="/coordinator/enquiry" element={<EnquiryStudent/>}/>
+        <Route path='/admin/home' element={<AdminHome />} />
+        <Route path='/principal/home' element={<PrincipalHome />} />
+        <Route path='/principal/admission/detail/:inquiryId' element={<PrincipalAdmissionDetail />} />
+        <Route path='/parent/inquiry/form' element={<InquiryForm />} />
+        <Route path="/coordinator/home" element={<CoordinatorHome />} />
+        <Route path="/coordinator/login" element={<CoordinatorLogin />} />
+        <Route path="/admin/employee/form" element={<EmployeeForm />} />
+        <Route path="/parents/inquiry/form" element={<InquiryForm />} />
+        <Route path="/coordinator/all/fee/details" element={<FeePaid />} />
+        <Route path="/coordinator/fees/generate/:admissionId" element={<FeesGeneration />} />
+        <Route path="/teacher/login" element={<TeacherLogin />} />
+        <Route path="/teacher/home" element={<TeacherHome />} />
+        <Route path="/coordinator/enquiry/process/:inquiryId" element={<EnquiryStudent />} />
+        <Route path="/coordinator/enquiry" element={<EnquiryStudent />} />
+        <Route path="/admin/employees" element={<EmployeeLogin />} />
+        <Route path="/admin/allteachers" element={<GetAllTeacher />} />
+        <Route path="/admin/allstudents" element={<GetAllStudent />} />
+        <Route path="/admin/teacher/:empId" element={<GetTeacher />} />
+        <Route path="/admin/employees" element={<GetAllEmployee />} />
       </Routes>
     </Router>
   );

@@ -3,13 +3,17 @@ const Employee = require('../../models/admin/employee');
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 const router = express.Router();
-const getEmpCounter = require('../../utils/getEmpCounter');
+//const getEmpCounter = require('../../utils/getEmpCounter');
 
 
+const generateRandomEmpId = () => {
+  const randomStr = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return 'EMP' + randomStr;
+};
 // Create Employee api
 router.post('/create/employee', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     try {
-        const empId = await getEmpCounter();
+        const empId = generateRandomEmpId();
         const {
           firstName, lastName, email, phone, gender, dob, doj, qualification,
           residentalAddress, permanentAddress, role, aadharNo, panNo,
