@@ -14,6 +14,17 @@ import TeacherHome from "./teacher/TeacherHome";
 import FeePaid from './coordinator/FeePaid'
 import EnquiryStudent from "./coordinator/enquiryStudent";
 import EmployeeLogin from "./admin/EmployeeLogin";
+<<<<<<< HEAD
+import GetAllTeacher from "./teacher/GetAllTeacher";
+import ScheduleForm from "./component/teacher/ScheduleForm";
+import StudentAllotment from "./component/coordinator/Alottment_class";
+=======
+import PrincipalLogin from './principal/PrincipalLogin'
+import PrincipalHome from "./component/principal/PrincipalHome";
+import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
+>>>>>>> 7eb2883eb151ee196430caf4658a06a1eec1ed14
+
+
 import GetAllTeacher from "./teacher/GetAllTeacher";
 import GetAllStudent from "./component/Student/GetAllStudent";
 import GetAllEmployee from "./admin/EmployeeLogin";
@@ -23,6 +34,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
+<<<<<<< HEAD
         <Route path='/' element={<Home/>}/>
         <Route path='/admin/login' element={<AdminLogin/>}/>
         <Route path='/admin/home' element={<AdminHome/>}/>
@@ -42,7 +54,7 @@ const App = () => {
         <Route path="/admin/allstudents" element={<GetAllStudent/>}/>
         <Route path="/admin/teacher/:empId" element={<GetTeacher/>}/>
         <Route path="/admin/employees" element={<GetAllEmployee/>}/>
-        <Route path="/admin/examschedule" element={<ExamSchedule/>}/>
+
 
           </Routes>
     </Router>

@@ -92,7 +92,7 @@ const CoordinatorLogin = () => {
             });
       
             const data = await res.json();
-            if(data.role !== 'coordinator'){
+            if(data.role !== 'principal'){
               toast.info(`Please login with ${data.role} portal`);
               navigate('/');
               return;
@@ -120,9 +120,9 @@ const CoordinatorLogin = () => {
 
       // If response is OK, the body is the token itself (plain text)
       const token = await response.text();
-      sessionStorage.setItem('coordinatorToken', token);
+      sessionStorage.setItem('principalToken', token);
       toast.success('Login successful! Redirecting...');
-      navigate('/coordinator/home');
+      navigate('/principal/home');
 
     } catch (error) {
       console.error('Login error:', error);
@@ -148,7 +148,7 @@ const CoordinatorLogin = () => {
           <LockIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Coordinator Sign In
+          Principal Sign In
         </Typography>
         
         {/* The Alert component for loginError is removed, toasts will handle this */}

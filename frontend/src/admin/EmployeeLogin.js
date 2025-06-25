@@ -1,5 +1,7 @@
 
 import React, { useState } from "react";
+import AdminNavbar from "./AdminNavbar";
+
 
 const EmployeeLogin = ({ onClose = () => {} }) => {
   const [formData, setFormData] = useState({
@@ -74,8 +76,9 @@ const EmployeeLogin = ({ onClose = () => {} }) => {
           animation: spin 1s linear infinite;
         }
       `}</style>
+      <AdminNavbar/>
 
-      <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+      <div style={{marginTop:'20px', minHeight: "100vh", backgroundColor: "#f9fafb", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
         <div style={{ maxWidth: "450px", width: "100%", padding: "2rem", backgroundColor: "#fff", borderRadius: "12px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", border: "1px solid #e5e7eb" }}>
           <h3 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "1.5rem", textAlign: "center", color: "#1f2937" }}>
             Set Employee Login Credentials
