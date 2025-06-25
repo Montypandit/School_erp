@@ -22,140 +22,329 @@ import {
   CircularProgress,
   styled,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  InputAdornment,
+  Card,
+  CardContent,
+  Divider,
+  createTheme,
+  ThemeProvider,
+  alpha
 } from '@mui/material';
-import { deepPurple, green, red } from '@mui/material/colors';
-import { CheckCircle, Error, Add, Refresh, Edit } from '@mui/icons-material';
+import { 
+  CheckCircle, 
+  Error, 
+  Add, 
+  Refresh, 
+  Edit,
+  Person,
+  Class,
+  School,
+  FormatListNumbered,
+  Search
+} from '@mui/icons-material';
 
+// Custom theme with modern color palette
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#3f51b5',
+      light: '#6573c3',
+      dark: '#2c387e',
+      contrastText: '#ffffff',
+    },
+    secondary: {
+      main: '#f50057',
+      light: '#f73378',
+      dark: '#ab003c',
+      contrastText: '#ffffff',
+    },
+    background: {
+      default: '#f5f7fa',
+      paper: '#ffffff',
+    },
+    text: {
+      primary: '#2d3748',
+      secondary: '#718096',
+    },
+    success: {
+      main: '#4caf50',
+      light: '#81c784',
+      dark: '#388e3c',
+    },
+    error: {
+      main: '#f44336',
+      light: '#e57373',
+      dark: '#d32f2f',
+    },
+  },
+  typography: {
+    fontFamily: '"Inter", "Helvetica", "Arial", sans-serif',
+    h3: {
+      fontWeight: 700,
+      letterSpacing: '-0.5px',
+    },
+    h4: {
+      fontWeight: 600,
+    },
+    body1: {
+      fontSize: '0.95rem',
+      lineHeight: 1.6,
+    },
+  },
+  shape: {
+    borderRadius: 12,
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          fontWeight: 500,
+          padding: '10px 24px',
+          borderRadius: 8,
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: '0 4px 12px rgba(63, 81, 181, 0.25)',
+          },
+        },
+        contained: {
+          '&:hover': {
+            boxShadow: '0 4px 12px rgba(63, 81, 181, 0.35)',
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+          boxShadow: '0 4px 20px 0 rgba(0,0,0,0.05)',
+          transition: 'transform 0.2s, box-shadow 0.2s',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            boxShadow: '0 8px 24px 0 rgba(0,0,0,0.1)',
+          },
+        },
+      },
+    },
+  },
+});
+
+// Styled Components
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
-  marginTop: theme.spacing(4),
-  borderRadius: '24px',
-  boxShadow: '0 10px 30px rgba(108, 92, 231, 0.1)',
+  margin: theme.spacing(4, 0),
+  borderRadius: theme.shape.borderRadius * 2,
+  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.05)',
   backgroundColor: theme.palette.background.paper,
-  border: `1px solid ${theme.palette.divider}`,
+  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:hover': {
-    boxShadow: '0 15px 40px rgba(108, 92, 231, 0.15)',
-    transform: 'translateY(-4px)',
-    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    boxShadow: '0 12px 48px rgba(63, 81, 181, 0.15)',
+    transform: 'translateY(-2px)',
   },
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  marginTop: theme.spacing(2),
-  padding: '14px 36px',
-  borderRadius: '28px',
+  marginTop: theme.spacing(3),
+  padding: '12px 32px',
+  borderRadius: theme.shape.borderRadius,
   textTransform: 'none',
   fontWeight: 600,
-  fontSize: '16px',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-  color: '#fff',
-  backgroundColor: '#6c5ce7',
+  fontSize: '0.9375rem',
+  letterSpacing: '0.5px',
+  transition: 'all 0.2s ease-in-out',
   '&:hover': {
-    backgroundColor: '#5a4ce0',
-    transform: 'translateY(-3px)',
-    boxShadow: '0 10px 20px rgba(108, 92, 231, 0.3)',
+    transform: 'translateY(-2px)',
+    boxShadow: theme.shadows[4],
   },
-  '&:disabled': {
-    backgroundColor: '#9c8fe4',
-    color: '#fff',
-    opacity: 0.7,
+  '& .MuiButton-startIcon': {
+    marginRight: theme.spacing(1),
   },
-  '&.Mui-disabled:hover': {
-    backgroundColor: '#9c8fe4',
+  '&.primary': {
+    background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
+    color: theme.palette.primary.contrastText,
+    '&:hover': {
+      background: `linear-gradient(45deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 100%)`,
+    },
+  },
+  '&.secondary': {
+    background: `linear-gradient(45deg, ${theme.palette.secondary.main} 0%, ${theme.palette.secondary.light} 100%)`,
+    color: theme.palette.secondary.contrastText,
+    '&:hover': {
+      background: `linear-gradient(45deg, ${theme.palette.secondary.dark} 0%, ${theme.palette.secondary.main} 100%)`,
+    },
   },
   '& .MuiCircularProgress-root': {
-    color: '#fff',
-  }
+    color: 'inherit',
+    marginRight: theme.spacing(1),
+  },
 }));
 
 const ActionButton = styled(Button)(({ theme }) => ({
   padding: '6px 16px',
-  borderRadius: '16px',
+  borderRadius: 20,
   textTransform: 'none',
-  fontSize: '14px',
+  fontSize: '0.8125rem',
   fontWeight: 500,
-  minWidth: '120px',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  minWidth: '100px',
+  transition: 'all 0.2s ease',
   '&:hover': {
-    transform: 'translateY(-2px)',
-    boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
+    transform: 'translateY(-1px)',
+    boxShadow: theme.shadows[2],
   },
   '&.success': {
-    backgroundColor: '#2ed573',
-    color: '#fff',
+    backgroundColor: theme.palette.success.main,
+    color: theme.palette.success.contrastText,
     '&:hover': {
-      backgroundColor: '#27ae60',
+      backgroundColor: theme.palette.success.dark,
     },
   },
   '&.error': {
-    backgroundColor: '#ff4757',
-    color: '#fff',
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.error.contrastText,
     '&:hover': {
-      backgroundColor: '#ff3f4b',
+      backgroundColor: theme.palette.error.dark,
     },
-  }
+  },
+  '& .MuiSvgIcon-root': {
+    fontSize: '1rem',
+    marginRight: theme.spacing(0.5),
+  },
 }));
 
-const StyledTextField = styled(TextField)({
+const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.9),
+    '&:hover': {
+      backgroundColor: alpha(theme.palette.common.white, 1),
+    },
+    '&.Mui-focused': {
+      backgroundColor: alpha(theme.palette.common.white, 1),
+    },
     '& fieldset': {
-      borderColor: '#6c5ce7',
-      borderRadius: '12px',
+      borderColor: alpha(theme.palette.primary.main, 0.2),
+      transition: theme.transitions.create(['border-color', 'box-shadow']),
     },
     '&:hover fieldset': {
-      borderColor: '#5a4ce0',
+      borderColor: alpha(theme.palette.primary.main, 0.5),
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#5a4ce0',
+      borderColor: theme.palette.primary.main,
+      boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.2)}`,
     },
   },
   '& .MuiInputLabel-root': {
-    color: '#6c5ce7',
-  },
-  '& .MuiInputLabel-root.Mui-focused': {
-    color: '#5a4ce0',
-  },
-});
-
-const StyledSelect = styled(Select)({
-  '& .MuiSelect-select': {
-    fontSize: '14px',
-    color: '#6c5ce7',
-  },
-  '& .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#6c5ce7',
-    borderRadius: '12px',
-  },
-  '&:hover .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#5a4ce0',
-  },
-  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-    borderColor: '#5a4ce0',
-  },
-  '& .MuiMenuItem-root': {
-    '&:hover': {
-      backgroundColor: '#6c5ce71a',
+    color: theme.palette.text.secondary,
+    '&.Mui-focused': {
+      color: theme.palette.primary.main,
     },
   },
-});
+  '& .MuiInputAdornment-root': {
+    color: theme.palette.primary.main,
+  },
+}));
+
+const StyledSelect = styled(Select)(({ theme }) => ({
+  '& .MuiSelect-select': {
+    padding: '12.5px 14px',
+    fontSize: '0.9375rem',
+    color: theme.palette.text.primary,
+    '&:focus': {
+      backgroundColor: 'transparent',
+    },
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: alpha(theme.palette.primary.main, 0.2),
+    transition: theme.transitions.create(['border-color', 'box-shadow']),
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: alpha(theme.palette.primary.main, 0.5),
+  },
+  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+    borderColor: theme.palette.primary.main,
+    boxShadow: `0 0 0 3px ${alpha(theme.palette.primary.main, 0.2)}`,
+  },
+  '& .MuiSelect-icon': {
+    color: theme.palette.primary.main,
+  },
+}));
 
 const StyledTable = styled(Table)(({ theme }) => ({
+  minWidth: 650,
   '& .MuiTableCell-root': {
-    borderBottom: '1px solid rgba(108, 92, 231, 0.1)',
+    padding: theme.spacing(1.5, 2),
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    '&:first-of-type': {
+      paddingLeft: theme.spacing(3),
+    },
+    '&:last-child': {
+      paddingRight: theme.spacing(3),
+    },
   },
   '& .MuiTableHead-root': {
     '& .MuiTableCell-root': {
-      backgroundColor: '#f8f9fa',
-      color: '#6c5ce7',
+      backgroundColor: alpha(theme.palette.primary.main, 0.03),
+      color: theme.palette.primary.main,
       fontWeight: 600,
+      fontSize: '0.875rem',
+      letterSpacing: '0.5px',
+      textTransform: 'uppercase',
+      borderBottom: `2px solid ${theme.palette.primary.main}`,
     },
+  },
+  '& .MuiTableBody-root': {
+    '& tr:last-child td': {
+      borderBottom: 'none',
+    },
+    '& tr:hover': {
+      backgroundColor: alpha(theme.palette.primary.main, 0.02),
+    },
+  },
+}));
+
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  margin: theme.spacing(3, 0, 2),
+  paddingBottom: theme.spacing(1),
+  borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+  color: theme.palette.primary.main,
+  display: 'flex',
+  alignItems: 'center',
+  '& .MuiSvgIcon-root': {
+    marginRight: theme.spacing(1.5),
   },
 }));
 
 const StudentAllotment = () => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
+  // Theme for the component
+  const componentTheme = createTheme(theme, {
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+            fontWeight: 500,
+            padding: '10px 24px',
+            borderRadius: 8,
+            boxShadow: 'none',
+            '&:hover': {
+              boxShadow: '0 4px 12px rgba(63, 81, 181, 0.25)',
+            },
+          },
+          contained: {
+            '&:hover': {
+              boxShadow: '0 4px 12px rgba(63, 81, 181, 0.35)',
+            },
+          },
+        },
+      },
+    },
+  });
   
   // Form state
   const [formData, setFormData] = useState({
@@ -176,19 +365,43 @@ const StudentAllotment = () => {
   
   const [students, setStudents] = useState([
     // Sample data - replace with API call
-    { id: 'S001', name: 'John Doe', className: '10', section: 'A', rollNumber: '15' },
-    { id: 'S002', name: 'Jane Smith', className: '9', section: 'B', rollNumber: '22' },
+    { 
+      id: 'S001', 
+      name: 'John Doe', 
+      className: '10', 
+      section: 'A', 
+      rollNumber: '15',
+      status: 'Active',
+      lastUpdated: '2023-05-15'
+    },
+    { 
+      id: 'S002', 
+      name: 'Jane Smith', 
+      className: '9', 
+      section: 'B', 
+      rollNumber: '22',
+      status: 'Active',
+      lastUpdated: '2023-05-16'
+    },
   ]);
   
-  // Remove filtered students state since we're using students directly
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Available options
   const classes = ['Nursery', 'LKG', 'UKG', ...Array.from({ length: 12 }, (_, i) => (i + 1).toString())];
   const sections = ['A', 'B', 'C', 'D', 'E'];
+  
+  // Filter students based on search term
+  const filteredStudents = students.filter(student => 
+    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.section.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.rollNumber.includes(searchTerm)
+  );
 
   useEffect(() => {
     // In a real app, fetch students from API
@@ -292,214 +505,283 @@ const StudentAllotment = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ pt: 4 }}>
-      <Typography 
-        variant="h3" 
-        component="h1" 
-        gutterBottom 
-        sx={{ 
-          mb: 4,
-          fontWeight: 'bold',
-          color: theme.palette.primary.main,
-          textAlign: 'center',
-          textTransform: 'uppercase',
-          background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 1
-        }}
-      >
-        <Add sx={{ fontSize: 32 }} />
-        Student Class Allotment
-      </Typography>
-      
-      <StyledPaper elevation={3} sx={{ mb: 4 }}>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
-              <StyledTextField
-                fullWidth
-                label="Student Name"
-                name="studentName"
-                value={formData.studentName}
-                onChange={handleInputChange}
-                variant="outlined"
-                margin="normal"
-                required
-                error={validationErrors.studentName}
-                helperText={validationErrors.studentName ? 'Required' : ''}
-              />
+    <ThemeProvider theme={componentTheme}>
+      <Container maxWidth="xl" sx={{ py: 4, px: { xs: 2, sm: 3 } }}>
+        <Box sx={{ mb: 4, textAlign: 'center' }}>
+          <Typography 
+            variant="h3" 
+            component="h1" 
+            gutterBottom 
+            sx={{
+              fontWeight: 700,
+              color: 'primary.main',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 2,
+              background: 'linear-gradient(45deg, #3f51b5 30%, #2196F3 90%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              mb: 1,
+              '& .MuiSvgIcon-root': {
+                fontSize: '2.5rem',
+              }
+            }}
+          >
+            <School />
+            Student Class Allotment
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Manage student class assignments and sections
+          </Typography>
+        </Box>
+        
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={5} lg={4}>
+            <StyledPaper elevation={0}>
+              <SectionTitle variant="h5">
+                <Person />
+                Student Details
+              </SectionTitle>
               
-              <FormControl fullWidth margin="normal">
-                <InputLabel 
-                  id="class-label" 
-                  sx={{
-                    color: '#6c5ce7',
-                    '&.Mui-focused': {
-                      color: '#5a4ce0',
-                    }
-                  }}
-                >
-                  Class
-                </InputLabel>
-                <StyledSelect
-                  labelId="class-label"
-                  name="className"
-                  value={formData.className}
+              <form onSubmit={handleSubmit}>
+                <StyledTextField
+                  fullWidth
+                  label="Student Name"
+                  name="studentName"
+                  value={formData.studentName}
                   onChange={handleInputChange}
-                  label="Class"
+                  variant="outlined"
+                  margin="normal"
                   required
-                >
-                  {classes.map((cls, index) => (
-                    <MenuItem 
-                      key={cls} 
-                      value={cls}
-                      sx={{
-                        '&:hover': {
-                          backgroundColor: '#6c5ce71a',
-                        }
-                      }}
-                    >
-                      {index < 3 ? cls : `Class ${cls}`}
-                    </MenuItem>
-                  ))}
-                </StyledSelect>
-              </FormControl>
-              
-              <FormControl fullWidth margin="normal">
-                <InputLabel 
-                  id="section-label" 
-                  sx={{
-                    color: '#6c5ce7',
-                    '&.Mui-focused': {
-                      color: '#5a4ce0',
-                    }
+                  error={validationErrors.studentName}
+                  helperText={validationErrors.studentName ? 'Student name is required' : ''}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Person color="primary" />
+                      </InputAdornment>
+                    ),
                   }}
-                >
-                  Section
-                </InputLabel>
-                <StyledSelect
-                  labelId="section-label"
-                  name="section"
-                  value={formData.section}
-                  onChange={handleInputChange}
-                  label="Section"
-                  required
-                >
-                  {sections.map((sec) => (
-                    <MenuItem 
-                      key={sec} 
-                      value={sec}
-                      sx={{
-                        '&:hover': {
-                          backgroundColor: '#6c5ce71a',
-                        }
+                />
+                
+                <FormControl fullWidth margin="normal" required>
+                  <InputLabel id="class-label">Class</InputLabel>
+                  <StyledSelect
+                    labelId="class-label"
+                    name="className"
+                    value={formData.className}
+                    onChange={handleInputChange}
+                    label="Class"
+                    error={validationErrors.className}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <Class color="primary" />
+                      </InputAdornment>
+                    }
+                  >
+                    {classes.map((cls, index) => (
+                      <MenuItem key={cls} value={cls}>
+                        {index < 3 ? cls : `Class ${cls}`}
+                      </MenuItem>
+                    ))}
+                  </StyledSelect>
+                  {validationErrors.className && (
+                    <Typography variant="caption" color="error">
+                      Class is required
+                    </Typography>
+                  )}
+                </FormControl>
+                
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth margin="normal" required>
+                      <InputLabel id="section-label">Section</InputLabel>
+                      <StyledSelect
+                        labelId="section-label"
+                        name="section"
+                        value={formData.section}
+                        onChange={handleInputChange}
+                        label="Section"
+                        error={validationErrors.section}
+                      >
+                        {sections.map((sec) => (
+                          <MenuItem key={sec} value={sec}>
+                            Section {sec}
+                          </MenuItem>
+                        ))}
+                      </StyledSelect>
+                      {validationErrors.section && (
+                        <Typography variant="caption" color="error">
+                          Section is required
+                        </Typography>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <StyledTextField
+                      fullWidth
+                      label="Roll Number"
+                      name="rollNumber"
+                      type="number"
+                      value={formData.rollNumber}
+                      onChange={handleInputChange}
+                      variant="outlined"
+                      margin="normal"
+                      required
+                      error={validationErrors.rollNumber}
+                      helperText={validationErrors.rollNumber ? 'Roll number is required' : ''}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <FormatListNumbered color="primary" />
+                          </InputAdornment>
+                        ),
                       }}
-                    >
-                      Section {sec}
-                    </MenuItem>
-                  ))}
-                </StyledSelect>
-              </FormControl>
-              
-              <StyledTextField
-                fullWidth
-                label="Roll Number"
-                name="rollNumber"
-                type="number"
-                value={formData.rollNumber}
-                onChange={handleInputChange}
-                variant="outlined"
-                margin="normal"
-                required
-                error={validationErrors.rollNumber}
-                helperText={validationErrors.rollNumber ? 'Required' : ''}
-              />
-            </Grid>
-            
-            <Grid item xs={12}>
-              <StyledButton
-                type="submit"
-                variant="contained"
-                disabled={!formData.isValid || loading}
-                startIcon={loading ? <CircularProgress size={20} /> : <CheckCircle />}
-              >
-                Save Allotment
-              </StyledButton>
-            </Grid>
+                    />
+                  </Grid>
+                </Grid>
+                
+                <Box sx={{ mt: 4, display: 'flex', gap: 2 }}>
+                  <StyledButton
+                    type="submit"
+                    variant="contained"
+                    className="primary"
+                    disabled={loading}
+                    fullWidth={isMobile}
+                    startIcon={loading ? <CircularProgress size={20} /> : <Add />}
+                  >
+                    {loading ? 'Processing...' : 'Allot Class'}
+                  </StyledButton>
+                  
+                  <StyledButton
+                    variant="outlined"
+                    onClick={() => {
+                      setFormData({
+                        studentName: '',
+                        className: '',
+                        section: '',
+                        rollNumber: '',
+                        isValid: false
+                      });
+                      setValidationErrors({
+                        studentName: false,
+                        className: false,
+                        section: false,
+                        rollNumber: false
+                      });
+                    }}
+                    fullWidth={isMobile}
+                  >
+                    <Refresh />
+                    Reset
+                  </StyledButton>
+                </Box>
+              </form>
+            </StyledPaper>
           </Grid>
-        </form>
-      </StyledPaper>
-
-      <Typography 
-        variant="h4" 
-        component="h2" 
-        gutterBottom 
-        sx={{ 
-          mb: 3,
-          fontWeight: 'bold',
-          color: '#6c5ce7',
-          textAlign: 'center'
-        }}
-      >
-        Current Student Allotments
-      </Typography>
-
-      <StyledPaper>
-        <TableContainer>
-          <StyledTable>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Class</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Section</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Roll Number</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {students.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell>{student.name}</TableCell>
-                  <TableCell>{student.className}</TableCell>
-                  <TableCell>{student.section}</TableCell>
-                  <TableCell>{student.rollNumber}</TableCell>
-                  <TableCell>
-                    <ActionButton 
-                      onClick={() => handleSelectStudent(student)}
-                      className="success"
-                      sx={{
-                        '&:hover': {
-                          transform: 'translateY(-2px)',
-                          boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)',
-                        }
-                      }}
-                    >
-                      <Edit sx={{ mr: 1 }} />
-                      Edit
-                    </ActionButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </StyledTable>
-        </TableContainer>
-      </StyledPaper>
-      
-      <Snackbar 
-        open={openSnackbar} 
-        autoHideDuration={6000} 
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Container>
+          
+          <Grid item xs={12} md={7} lg={8}>
+            <StyledPaper elevation={0}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <SectionTitle variant="h5" sx={{ mb: 0 }}>
+                  <Class />
+                  Allotted Students
+                </SectionTitle>
+                <StyledTextField
+                  variant="outlined"
+                  size="small"
+                  placeholder="Search students..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <Search color="action" />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ width: isMobile ? '100%' : 300 }}
+                />
+              </Box>
+              
+              <TableContainer>
+                <StyledTable>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Student ID</TableCell>
+                      <TableCell>Name</TableCell>
+                      <TableCell>Class</TableCell>
+                      <TableCell>Section</TableCell>
+                      <TableCell>Roll No.</TableCell>
+                      <TableCell align="right">Actions</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredStudents.length > 0 ? (
+                      filteredStudents.map((student) => (
+                        <TableRow key={student.id} hover>
+                          <TableCell>{student.id}</TableCell>
+                          <TableCell>
+                            <Typography variant="body2" fontWeight={500}>
+                              {student.name}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>Class {student.className}</TableCell>
+                          <TableCell>Sec {student.section}</TableCell>
+                          <TableCell>{student.rollNumber}</TableCell>
+                          <TableCell align="right">
+                            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                              <ActionButton
+                                variant="contained"
+                                size="small"
+                                className="success"
+                                startIcon={<Edit />}
+                                onClick={() => handleSelectStudent(student)}
+                              >
+                                Edit
+                              </ActionButton>
+                            </Box>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                            <School color="disabled" sx={{ fontSize: 48, mb: 1 }} />
+                            <Typography variant="body1" color="textSecondary">
+                              No students found. Add a new student to get started.
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </StyledTable>
+              </TableContainer>
+            </StyledPaper>
+          </Grid>
+        </Grid>
+        
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert 
+            onClose={handleCloseSnackbar} 
+            severity={snackbarSeverity}
+            elevation={6}
+            variant="filled"
+            sx={{ width: '100%' }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Container>
+    </ThemeProvider>
   );
 };
 
