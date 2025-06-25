@@ -136,7 +136,7 @@ export default function ExamSchedule() {
                                     className="border rounded py-2 px-3"
                                 >
                                     <option value="all">All Classes</option>
-                                    {["nursery", "lkg", "ukg", "1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "10th"].map((cls) => (
+                                    {["nursery", "lkg", "ukg", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].map((cls) => (
                                         <option key={cls} value={cls}>
                                             {cls.toUpperCase()} Class
                                         </option>
@@ -245,7 +245,7 @@ export default function ExamSchedule() {
     );
 }
 
-function StatCard({ label, value, Icon, footer }) {
+ function StatCard({ label, value, Icon, footer }) {
     return (
         <div className="bg-white p-4 shadow rounded">
             <div className="flex justify-between">
