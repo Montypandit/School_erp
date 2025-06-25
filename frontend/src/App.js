@@ -18,6 +18,7 @@ import GetAllTeacher from "./teacher/GetAllTeacher";
 import GetAllStudent from "./component/Student/GetAllStudent";
 import GetAllEmployee from "./admin/EmployeeLogin";
 import GetTeacher from "./teacher/GetTeacher";
+import ExamSchedule from "./admin/ExamSchedule";
 const App = () => {
   return (
     <Router>
@@ -41,7 +42,7 @@ const App = () => {
         <Route path="/admin/allstudents" element={<GetAllStudent/>}/>
         <Route path="/admin/teacher/:empId" element={<GetTeacher/>}/>
         <Route path="/admin/employees" element={<GetAllEmployee/>}/>
-
+        <Route path="/admin/examschedule" element={<ExamSchedule/>}/>
 
           </Routes>
     </Router>

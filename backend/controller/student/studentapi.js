@@ -14,7 +14,7 @@ router.get('/getallstudent', authMiddleware, authorizeRoles('admin'), async (req
   }
 });
 
-module.exports = router;
+
 
 
 // @route   GET /api/students/getstudent/:empId

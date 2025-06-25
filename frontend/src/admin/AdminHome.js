@@ -269,9 +269,9 @@ const AdminHome = () => {
           label="All Students" 
         />
         <ActionButton 
-          to="/findstudent" 
+          to="/admin/examschedule" 
           icon="🔍" 
-          label="Find Student" 
+          label="Exam Schedule" 
         />
       </div>
 
