@@ -195,7 +195,7 @@ const Home = () => {
                         </Link>
 
                          <Link
-                            to="/principal/home"
+                            to="/principal/login"
                             style={hovered === 'principal' ? {
                                 ...linkStyle,
                                 background: 'linear-gradient(135deg,rgb(81, 56, 220), #38a169)',
