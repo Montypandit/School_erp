@@ -77,10 +77,12 @@ const PrincipalAdmissionDetail = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
-          inquiryId: admissionRecord.inquiryId, // Use the admissionId from the fetched record
-          status: selectedStatus,
+          inquiryId: admissionRecord.inquiryId,
+          admissionApproved: selectedStatus,
         }),
       });
+      console.log(admissionRecord.inquiryId);
+      console.log()
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: 'An unknown error occurred' }));

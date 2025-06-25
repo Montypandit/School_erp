@@ -256,8 +256,9 @@ const CoordinatorDashboard = () => {
                       })}</td>
                       {
                         admission.admissionApproved === 'Approved' ?
-                      <td className="py-4 px-4"><button className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700' onClick={() => {
-                        navigate(``);
+                      <td className="py-4 px-4"><button className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700' onClick={() => { // Changed onClick
+                        // Navigate to the final admission form with inquiryId and admissionId
+                        navigate(`/final/admission/form/${admission.inquiryId}/${admission.admissionId}`);
                       }}>Grant Admission</button></td> : <div className="text-xl font-bold text-red-400 align-center text-center mt-2">Not Approved</div>
                       }
                     </tr>

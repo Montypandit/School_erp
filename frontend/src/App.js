@@ -17,25 +17,29 @@ import EmployeeLogin from "./admin/EmployeeLogin";
 import PrincipalLogin from './principal/PrincipalLogin'
 import PrincipalHome from "./component/principal/PrincipalHome";
 import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
-
-
 import GetAllTeacher from "./teacher/GetAllTeacher";
 import GetAllStudent from "./component/Student/GetAllStudent";
 import GetAllEmployee from "./admin/EmployeeLogin";
 import GetTeacher from "./teacher/GetTeacher";
+import AdmissionForm from "./component/coordinator/Admission/AdmissionForm"
+import AdmissionFees from './component/coordinator/Admission/AdmissionFees'
+import Student from './component/coordinator/Student'
+import ScheduleForm from "./component/admin/ScheduleForm";
+
+
 const App = () => {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true,v7_relativeSplatPath: true }}>
       <Routes>
 
         {/* login routes */}
+
         <Route path='/' element={<Home />} />
         <Route path='/admin/login' element={<AdminLogin />} />
         <Route path="/admin/employees" element={<EmployeeLogin />} />
         <Route path="/principal/login" element={<PrincipalLogin />} />
 
-
-
+        {/* protected routes */}
 
         <Route path='/admin/home' element={<AdminHome />} />
         <Route path='/principal/home' element={<PrincipalHome />} />
@@ -55,7 +59,13 @@ const App = () => {
         <Route path="/admin/allteachers" element={<GetAllTeacher />} />
         <Route path="/admin/allstudents" element={<GetAllStudent />} />
         <Route path="/admin/teacher/:empId" element={<GetTeacher />} />
-        <Route path="/admin/employees" element={<GetAllEmployee />} />
+        <Route path="/admin/employees" element={<GetAllEmployee />} /> {/* This route is duplicated, consider removing one */}
+        <Route path="/final/admission/form/:inquiryId/:admissionId" element={<AdmissionForm/>}/>
+        <Route path="/admission/fees/:admissionId" element={<AdmissionFees/>}/>
+        <Route path="/student/page" element={<Student/>}/>
+        <Route path="/teacher/schedule" element={<ScheduleForm/>}/>
+
+
       </Routes>
     </Router>
   );

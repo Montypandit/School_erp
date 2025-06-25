@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 
 const admissionFormSchema =new  mongoose.Schema({
+    applicationId:{type:String, required:true, unique:true},
     admissionId:{type:String, required:true, unique:true},
     inquiryId:{type:String, required:true, unique:true},
+    rollNo:{type:String, unique:true},
     name: { type: String, required: true },
     gender:{type:String, required:true},
     class:{type:String, required:true},
@@ -13,11 +15,12 @@ const admissionFormSchema =new  mongoose.Schema({
     fatherName:{type:String, required:true},
     fatherQualification:{type:String},
     fatherOccupation:{type:String},
-    contactNo:{type:String},
+    fatherMobile:{type:String},
     landLineNo:{type:String},
     motherQualification:{type:String},
     motherOccupation:{type:String},
     motherName:{type:String, required:true},
+    motherMobile:{type:String},
     email:{type:String},
     residentalAddress:{type:String},
     transportFacility:{type:String, default:"No"},
