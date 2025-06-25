@@ -16,7 +16,7 @@ import EnquiryStudent from "./coordinator/enquiryStudent";
 import EmployeeLogin from "./admin/EmployeeLogin";
 import GetAllTeacher from "./teacher/GetAllTeacher";
 import ScheduleForm from "./component/teacher/ScheduleForm";
-import StudentAllotment from "./coordinator/Alottment_student";
+import StudentAllotment from "./component/coordinator/Alottment_class";
 
 const App = () => {
   return (
