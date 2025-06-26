@@ -20,6 +20,8 @@ import GetAllEmployee from "./admin/EmployeeLogin";
 import GetTeacher from "./teacher/GetTeacher";
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
+import ScheduleForm from "./component/teacher/ScheduleForm";
+import WeeklySchedule from "./admin/WeeklySchedule";
 const App = () => {
   return (
     <Router>
@@ -45,7 +47,8 @@ const App = () => {
         <Route path="/admin/employees" element={<GetAllEmployee/>}/>
         <Route path="/admin/examschedule" element={<ExamSchedule/>}/>
         <Route path="/admin/leaveapproval" element={<LeaveApproval/>}/>
-
+        <Route path="/teacher/schedule" element={<ScheduleForm/>}/>
+        <Route path="/admin/weeklyschedule" element={<WeeklySchedule/>}/>
           </Routes>
     </Router>
   );
