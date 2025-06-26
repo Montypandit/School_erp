@@ -14,17 +14,26 @@ import TeacherHome from "./teacher/TeacherHome";
 import FeePaid from './coordinator/FeePaid'
 import EnquiryStudent from "./coordinator/enquiryStudent";
 import EmployeeLogin from "./admin/EmployeeLogin";
+import PrincipalLogin from './principal/PrincipalLogin'
+import PrincipalHome from "./component/principal/PrincipalHome";
+import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
 import GetAllTeacher from "./teacher/GetAllTeacher";
 import GetAllStudent from "./component/Student/GetAllStudent";
 import GetAllEmployee from "./admin/EmployeeLogin";
 import GetTeacher from "./teacher/GetTeacher";
+import AdmissionForm from "./component/coordinator/Admission/AdmissionForm"
+import AdmissionFees from './component/coordinator/Admission/AdmissionFees'
+import Student from './component/coordinator/Student'
+import ScheduleForm from "./component/admin/ScheduleForm";
+
+
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
 import ScheduleForm from "./component/teacher/ScheduleForm";
 import WeeklySchedule from "./admin/WeeklySchedule";
 const App = () => {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true,v7_relativeSplatPath: true }}>
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/admin/login' element={<AdminLogin/>}/>
@@ -44,15 +53,18 @@ const App = () => {
         <Route path="/admin/allteachers" element={<GetAllTeacher/>}/>
         <Route path="/admin/allstudents" element={<GetAllStudent/>}/>
         <Route path="/admin/teacher/:empId" element={<GetTeacher/>}/>
-        <Route path="/admin/employees" element={<GetAllEmployee/>}/>
         <Route path="/admin/examschedule" element={<ExamSchedule/>}/>
         <Route path="/admin/leaveapproval" element={<LeaveApproval/>}/>
         <Route path="/teacher/schedule" element={<ScheduleForm/>}/>
         <Route path="/admin/weeklyschedule" element={<WeeklySchedule/>}/>
+        <Route path="/final/admission/form/:inquiryId/:admissionId" element={<AdmissionForm/>}/>
+        <Route path ="/principal/login" element={<PrincipalLogin/>}/>
+        <Route path="/principal/home" element={<PrincipalHome/>}/>
+        <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail/>}/>
+
           </Routes>
     </Router>
   );
 };
 
 export default App;
-

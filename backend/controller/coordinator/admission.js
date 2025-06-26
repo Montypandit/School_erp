@@ -3,7 +3,8 @@ const express = require('express');
 const Admission = require('../../models/coordinator/admissionForm');
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
-
+const AdmissionApproval = require('../../models/principal/admissionApproval')
+const InquiryForm = require('../../models/parents/inquiryForm')
 const router = express.Router();
 
 //  Create Admission
@@ -11,6 +12,11 @@ router.post('/create/admission', authMiddleware, authorizeRoles('admin', 'coordi
   try {
     const newAdmission = new Admission(req.body);
     const savedAdmission = await newAdmission.save();
+
+    const inquiryId = savedAdmission.inquiryId;
+    await AdmissionApproval.findOneAndDelete({inquiryId:inquiryId});
+    await InquiryForm.findOneAndDelete({inquiryId:inquiryId});
+    
     res.status(201).json({ message: 'Admission form submitted successfully', data: savedAdmission });
   } catch (error) {
     console.error(error);

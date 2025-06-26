@@ -5,6 +5,7 @@
     font-family: Arial, sans-serif;
     background: white;
     border: 2px solid #000;
+    margin-top: 20px;
   }
   
   .form-header {
@@ -827,5 +828,14 @@
       border: 2px solid #000;
       box-shadow: none;
     }
+  }
+
+  /* New style for Admission ID display */
+  .admission-id-display {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 10px 0;
+    color: #333;
   }
   

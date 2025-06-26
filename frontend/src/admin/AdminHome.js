@@ -1,6 +1,6 @@
-import React from 'react';
 import AdminNavbar from './AdminNavbar';
 import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 
 // ✅ Define StatCard
 const StatCard = ({ title, value, percentage, icon, color }) => {
@@ -47,18 +47,28 @@ function ActionButton({ to, icon, label }) {
 }
 
 const AdminHome = () => {
+  // Placeholder data for stats. In a real app, you would fetch this from an API.
+  const [stats, setStats] = useState({
+    totalStudents: 1250,
+    presentStudents: 1180,
+    absentStudents: 70,
+    totalTeachers: 75,
+    presentTeachers: 72,
+  });
+
+  // Calculate percentages, ensuring no division by zero
+  const presentStudentPercentage = stats.totalStudents > 0 ? Math.round((stats.presentStudents / stats.totalStudents) * 100) : 0;
+  const absentStudentPercentage = stats.totalStudents > 0 ? Math.round((stats.absentStudents / stats.totalStudents) * 100) : 0;
+  const presentTeacherPercentage = stats.totalTeachers > 0 ? Math.round((stats.presentTeachers / stats.totalTeachers) * 100) : 0;
+
   // ✅ Dummy stats for testing
-  const stats = {
+  const dummyStats = {
     totalStudents: 10,
     totalTeachers: 20,
     presentStudents: 2,
     absentStudents: 2,
     presentTeachers: 4,
   };
-
-  const presentStudentPercentage = (stats.presentStudents / stats.totalStudents) * 100;
-  const absentStudentPercentage = (stats.absentStudents / stats.totalStudents) * 100;
-  const presentTeacherPercentage = (stats.presentTeachers / stats.totalTeachers) * 100;
 
   return (
     <div style={{
@@ -78,36 +88,36 @@ const AdminHome = () => {
         marginBottom: '30px'
       }}>
         <StatCard 
-          title="Total Students" 
-          value={stats.totalStudents} 
+          title="Total Students"
+          value={dummyStats.totalStudents} 
           percentage={100}
           icon="👥"
           color="#4CAF50"
         />
         <StatCard 
-          title="Present Today" 
-          value={`${stats.presentStudents}/${stats.totalStudents}`}
+          title="Present Today"
+          value={`${dummyStats.presentStudents}/${dummyStats.totalStudents}`}
           percentage={presentStudentPercentage}
           icon="✅"
           color="#2196F3"
         />
         <StatCard 
-          title="Absent Today" 
-          value={`${stats.absentStudents}/${stats.totalStudents}`}
+          title="Absent Today"
+          value={`${dummyStats.absentStudents}/${dummyStats.totalStudents}`}
           percentage={absentStudentPercentage}
           icon="❌"
           color="#F44336"
         />
         <StatCard 
-          title="Teachers Present" 
-          value={`${stats.presentTeachers}/${stats.totalTeachers}`}
+          title="Teachers Present"
+          value={`${dummyStats.presentTeachers}/${dummyStats.totalTeachers}`}
           percentage={presentTeacherPercentage}
           icon="👨‍🏫"
           color="#9C27B0"
         />
         <StatCard 
           title="Total Teachers" 
-          value={stats.totalTeachers} 
+          value={dummyStats.totalTeachers} 
           percentage={100}
           icon="👨‍🏫"
           color="#4CAF50"
@@ -124,8 +134,8 @@ const AdminHome = () => {
       }}>
         <ActionButton to="/admin/employee/form" icon="👩‍🏫" label="Add New Employee" />
         <ActionButton to="/admin/employees" icon="👨‍🎓" label="All Employees" />
-        <ActionButton to="/admin/teacher/:id" icon="🔍" label="Find an Employee" />
-        <ActionButton to="/admin/allteachers" icon="👥" label="All Teachers" />
+        <ActionButton to="/admin/allteachers" icon="🔍" label="Find an Employee" />
+        <ActionButton to="/admin/allteachers" icon="👨‍🏫" label="All Teachers" />
         <ActionButton to="/admin/allstudents" icon="👥" label="All Students" />
         <ActionButton to="/admin/examschedule" icon="🔍" label="Exam Schedule" />
         <ActionButton to="/admin/attendance" icon="📅" label="Attendance" />
