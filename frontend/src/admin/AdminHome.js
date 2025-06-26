@@ -1,65 +1,50 @@
-import React, { useState } from 'react';
 import AdminNavbar from './AdminNavbar';
 import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 
-const StatCard = ({ title, value, percentage, icon, color }) => (
-  <div style={{
-    backgroundColor: 'white',
-    borderRadius: '10px',
-    padding: '20px',
-    flex: '1 1 200px',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-  }} onMouseOver={(e) => {
-    e.currentTarget.style.transform = 'translateY(-5px)';
-    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-  }} onMouseOut={(e) => {
-    e.currentTarget.style.transform = 'translateY(0)';
-    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-  }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <h3 style={{ margin: 0, color: '#555', fontSize: '1rem' }}>{title}</h3>
-      <span style={{ fontSize: '24px' }}>{icon}</span>
+// ✅ Define StatCard
+const StatCard = ({ title, value, percentage, icon, color }) => {
+  return (
+    <div style={{
+      backgroundColor: '#fff',
+      padding: '15px',
+      borderRadius: '10px',
+      boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+      flex: '1',
+      minWidth: '200px'
+    }}>
+      <div style={{ fontSize: '24px' }}>{icon}</div>
+      <h3 style={{ margin: '10px 0 5px' }}>{title}</h3>
+      <p style={{ margin: 0, fontWeight: 'bold', fontSize: '18px' }}>{value}</p>
+      {percentage !== undefined && (
+        <p style={{ color: color }}>{Math.round(percentage)}%</p>
+      )}
     </div>
-    <p style={{ fontSize: '36px', fontWeight: 'bold', margin: '10px 0', color: color }}>{value}</p>
-    <div style={{ width: '100%', backgroundColor: '#e0e0e0', borderRadius: '5px' }}>
-      <div style={{
-        width: `${percentage}%`,
-        backgroundColor: color,
-        height: '8px',
-        borderRadius: '5px'
-      }}></div>
-    </div>
-  </div>
-);
+  );
+};
 
-const ActionButton = ({ to, icon, label }) => (
-  <Link to={to} style={{
-    textDecoration: 'none',
-    color: 'inherit',
-    backgroundColor: 'white',
-    borderRadius: '10px',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-    transition: 'transform 0.2s, box-shadow 0.2s',
-  }} onMouseOver={(e) => {
-    e.currentTarget.style.transform = 'translateY(-5px)';
-    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-  }} onMouseOut={(e) => {
-    e.currentTarget.style.transform = 'translateY(0)';
-    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
-  }}>
-    <span style={{ fontSize: '36px', marginBottom: '10px' }}>{icon}</span>
-    <span style={{ fontWeight: '600', textAlign: 'center' }}>{label}</span>
-  </Link>
-);
+// ✅ Action Button Component
+function ActionButton({ to, icon, label }) {
+  return (
+    <Link to={to} style={{
+      backgroundColor: '#ffffff',
+      padding: '15px',
+      borderRadius: '10px',
+      textAlign: 'center',
+      boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+      textDecoration: 'none',
+      color: '#333',
+      fontWeight: 'bold',
+      transition: '0.2s ease-in-out',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center'
+    }}>
+      <div style={{ fontSize: '24px' }}>{icon}</div>
+      <div style={{ marginTop: '8px' }}>{label}</div>
+    </Link>
+  );
+}
 
 const AdminHome = () => {
   // Placeholder data for stats. In a real app, you would fetch this from an API.
@@ -76,18 +61,25 @@ const AdminHome = () => {
   const absentStudentPercentage = stats.totalStudents > 0 ? Math.round((stats.absentStudents / stats.totalStudents) * 100) : 0;
   const presentTeacherPercentage = stats.totalTeachers > 0 ? Math.round((stats.presentTeachers / stats.totalTeachers) * 100) : 0;
 
+  // ✅ Dummy stats for testing
+  const dummyStats = {
+    totalStudents: 10,
+    totalTeachers: 20,
+    presentStudents: 2,
+    absentStudents: 2,
+    presentTeachers: 4,
+  };
+
   return (
-     
     <div style={{
       padding: '20px',
       backgroundColor: '#f5f7fa',
       minHeight: '100vh',
     }}>
-     <AdminNavbar />
-
+      <AdminNavbar />
 
       <h1 style={{ color: '#333', marginBottom: '25px' }}>Admin Dashboard</h1>
-      
+
       {/* Stats Overview */}
       <div style={{
         display: 'flex',
@@ -97,31 +89,38 @@ const AdminHome = () => {
       }}>
         <StatCard 
           title="Total Students"
-          value={stats.totalStudents} 
+          value={dummyStats.totalStudents} 
           percentage={100}
           icon="👥"
           color="#4CAF50"
         />
         <StatCard 
           title="Present Today"
-          value={`${stats.presentStudents}/${stats.totalStudents}`}
+          value={`${dummyStats.presentStudents}/${dummyStats.totalStudents}`}
           percentage={presentStudentPercentage}
           icon="✅"
           color="#2196F3"
         />
         <StatCard 
           title="Absent Today"
-          value={`${stats.absentStudents}/${stats.totalStudents}`}
+          value={`${dummyStats.absentStudents}/${dummyStats.totalStudents}`}
           percentage={absentStudentPercentage}
           icon="❌"
           color="#F44336"
         />
         <StatCard 
           title="Teachers Present"
-          value={`${stats.presentTeachers}/${stats.totalTeachers}`}
+          value={`${dummyStats.presentTeachers}/${dummyStats.totalTeachers}`}
           percentage={presentTeacherPercentage}
           icon="👨‍🏫"
           color="#9C27B0"
+        />
+        <StatCard 
+          title="Total Teachers" 
+          value={dummyStats.totalTeachers} 
+          percentage={100}
+          icon="👨‍🏫"
+          color="#4CAF50"
         />
       </div>
 
@@ -133,38 +132,18 @@ const AdminHome = () => {
         gap: '20px',
         marginBottom: '30px'
       }}>
-        <ActionButton 
-          to="/admin/employee/form"
-          icon="👩‍🏫"
-          label="Add New Employee"
-        />
-        <ActionButton 
-          to="/admin/employees"
-          icon="👨‍🎓"
-          label="All Employees"
-        />
-          <ActionButton 
-          to="/admin/teacher/:id"
-          icon="🔍"
-          label="Find an Employee"
-        />
-        <ActionButton 
-          to="/admin/allteachers"
-          icon="👥"
-          label="All Teachers"
-        />
-        <ActionButton 
-          to="/admin/allstudents"
-          icon="👥"
-          label="All Students"
-        />
-        <ActionButton 
-          to="/findstudent"
-          icon="🔍"
-          label="Find Student"
-        />
+        <ActionButton to="/admin/employee/form" icon="👩‍🏫" label="Add New Employee" />
+        <ActionButton to="/admin/employees" icon="👨‍🎓" label="All Employees" />
+        <ActionButton to="/admin/allteachers" icon="🔍" label="Find an Employee" />
+        <ActionButton to="/admin/allteachers" icon="👨‍🏫" label="All Teachers" />
+        <ActionButton to="/admin/allstudents" icon="👥" label="All Students" />
+        <ActionButton to="/admin/examschedule" icon="🔍" label="Exam Schedule" />
+        <ActionButton to="/admin/attendance" icon="📅" label="Attendance" />
+        <ActionButton to="/admin/weeklyschedule" icon="�" label="Weekly Schedule" />
+        <ActionButton to="/admin/leaveapproval" icon="📝" label="Leave Approval" />
       </div>
 
+      {/* Recent Activity Section */}
       <div style={{
         backgroundColor: 'white',
         borderRadius: '10px',
@@ -175,7 +154,7 @@ const AdminHome = () => {
         <p style={{ color: '#666', fontStyle: 'italic' }}>Recent system activities will appear here.</p>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default AdminHome;

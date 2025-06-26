@@ -27,7 +27,7 @@ const CoordinatorNavbar = () => {
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-xl shadow-md hover:shadow-lg transition-shadow duration-200">
-                ERP
+                <Link to="/">ERP</Link>
               </div>
               <span className="ml-3 text-xl font-semibold text-gray-800 hidden sm:block">
                 Admin Portal
@@ -54,7 +54,7 @@ const CoordinatorNavbar = () => {
                 to="/admin/employees"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
-                Create User
+                Activate User
               </Link>
             </div>
           </div>

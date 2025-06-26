@@ -64,6 +64,18 @@ const CoordinatorNavbar = () => {
                 Admission
               </Link>
               <Link
+                to="/coordinator/student-allotment"
+                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+              >
+                Student Allotment
+              </Link>
+              <Link
+                to="/coordinator/student-allotment"
+                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+              >
+                Student Allotment
+              </Link>
+              <Link
                 to="/student/page"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >

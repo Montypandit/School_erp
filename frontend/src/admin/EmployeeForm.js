@@ -28,7 +28,7 @@ const EmployeeForm = () => {
 
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
-
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -115,10 +115,19 @@ const EmployeeForm = () => {
       toast.success(result.message || 'Employee added successfully');
       setFormData(initialFormData);
       setErrors({});
+      setIsSubmitted(true);
     } catch (error) {
       console.error('Add employee error:', error);
       toast.error('Something went wrong. Try again.');
     }
+  };
+  const handleActivate = () => {
+    if (!isSubmitted) {
+      toast.warning('Please add employee first!');
+      return;
+    }
+
+    navigate('/admin/employees');
   };
 
   const handleCancel = () => {
@@ -220,21 +229,35 @@ const EmployeeForm = () => {
           </div>
 
           {/* Buttons */}
-          <div style={{ display: "flex", gap: "1rem" }}>
-            <button type="submit" className="submit-btn">Add Employee</button>
-            <button type="button" onClick={handleCancel} className="cancel-btn" style={{
-              padding: "0.75rem 1.5rem",
-              borderRadius: "6px",
-              fontSize: "0.875rem",
-              fontWeight: "500",
-              border: "1px solid rgb(173, 181, 192)",
-              backgroundColor: "#f9fafb",
-              color: "#374151",
-              cursor: "pointer"
-            }}>
-              Cancel
-            </button>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "1.5rem" }}>
+            {/* Left Side: Add & Cancel */}
+            <div style={{ display: "flex", gap: "1rem" }}>
+              <button type="submit" className="submit-btn">Add Employee</button>
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="cancel-btn"
+                style={{
+                  padding: "0.75rem 1.5rem",
+                  borderRadius: "6px",
+                  fontSize: "0.875rem",
+                  fontWeight: "500",
+                  border: "1px solid rgb(173, 181, 192)",
+                  backgroundColor: "#f9fafb",
+                  color: "#374151",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+
+            {/* Right Side: Activate */}
+            <div>
+              <button type="button" onClick={handleActivate} className="submit-btn">Activate</button>
+            </div>
           </div>
+
         </form>
       </div>
     </div>
