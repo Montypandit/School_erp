@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import "./ScheduleForm.css"; // Make sure this includes your inquiry-form CSS
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-const ScheduleForm = () => {
+export default function ScheduleForm() {
   const [className, setClassName] = useState("");
   const [sections, setSections] = useState([
     {
@@ -12,28 +11,22 @@ const ScheduleForm = () => {
         {
           day: "",
           lectures: [
-            {
-              startTime: "",
-              endTime: "",
-              subject: "",
-              teacher: "",
-              room: "",
-            },
+            { startTime: "", endTime: "", subject: "", teacher: "", room: "" },
           ],
         },
       ],
     },
   ]);
 
-  const handleChange = (sectionIndex, scheduleIndex, lectureIndex, field, value) => {
+  const handleChange = (si, schi, li, field, value) => {
     const updated = [...sections];
-    updated[sectionIndex].schedule[scheduleIndex].lectures[lectureIndex][field] = value;
+    updated[si].schedule[schi].lectures[li][field] = value;
     setSections(updated);
   };
 
-  const handleSectionNameChange = (i, e) => {
+  const handleSectionNameChange = (si, value) => {
     const updated = [...sections];
-    updated[i].sectionName = e.target.value;
+    updated[si].sectionName = value;
     setSections(updated);
   };
 
@@ -41,29 +34,6 @@ const ScheduleForm = () => {
     const updated = [...sections];
     updated[si].schedule[schi].day = day;
     setSections(updated);
-  };
-
-  const addSection = () => {
-    setSections([
-      ...sections,
-      {
-        sectionName: "",
-        schedule: [
-          {
-            day: "",
-            lectures: [
-              {
-                startTime: "",
-                endTime: "",
-                subject: "",
-                teacher: "",
-                room: "",
-              },
-            ],
-          },
-        ],
-      },
-    ]);
   };
 
   const addLecture = (si, schi) => {
@@ -78,66 +48,121 @@ const ScheduleForm = () => {
     setSections(updated);
   };
 
-  const handleSubmit = (e) => {
+  const addSection = () => {
+    setSections([
+      ...sections,
+      {
+        sectionName: "",
+        schedule: [
+          {
+            day: "",
+            lectures: [
+              { startTime: "", endTime: "", subject: "", teacher: "", room: "" },
+            ],
+          },
+        ],
+      },
+    ]);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ className, sections });
+    const token = sessionStorage.getItem("adminToken");
+
+    const response = await fetch("http://localhost:5000/api/schedules/create/schedule", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ className, sections }),
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert("Schedule submitted successfully!");
+      setClassName("");
+      setSections([
+        {
+          sectionName: "",
+          schedule: [
+            {
+              day: "",
+              lectures: [
+                { startTime: "", endTime: "", subject: "", teacher: "", room: "" },
+              ],
+            },
+          ],
+        },
+      ]);
+    } else {
+      alert("Error: " + result.error);
+    }
   };
 
   return (
-    <div className="inquiry-form-container">
-      <h1>Class Schedule Form</h1>
+    <div className="max-w-5xl mx-auto p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-2xl font-semibold mb-6 text-center text-green">Create Class Schedule</h1>
 
-      <form className="inquiry-form" onSubmit={handleSubmit}>
-        <div className="form-section">
-          <div className="form-group">
-            <label>Class Name</label>
-            <input
-              type="text"
-              value={className}
-              onChange={(e) => setClassName(e.target.value)}
-              required
-            />
-          </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white p-4 rounded shadow border">
+          <label className="block font-medium mb-1">Class Name</label>
+          <input
+            type="text"
+            className="w-full border px-3 py-2 rounded"
+            value={className}
+            onChange={(e) => setClassName(e.target.value)}
+            required
+          />
         </div>
 
         {sections.map((section, si) => (
-          <div className="form-section" key={si}>
-            <h3>Section {si + 1}</h3>
+          <div
+            key={si}
+            className="bg-white p-4 rounded shadow border space-y-4"
+          >
+            <h2 className="text-lg font-semibold text-blue-600">
+              Section {si + 1}
+            </h2>
 
-            <div className="form-group">
-              <label>Section Name</label>
+            <div>
+              <label className="block font-medium mb-1">Section Name</label>
               <input
                 type="text"
+                className="w-full border px-3 py-2 rounded"
                 value={section.sectionName}
-                onChange={(e) => handleSectionNameChange(si, e)}
+                onChange={(e) => handleSectionNameChange(si, e.target.value)}
                 required
               />
             </div>
 
             {section.schedule.map((sch, schi) => (
-              <div key={schi}>
-                <div className="form-group">
-                  <label>Day</label>
-                  <select
-                    value={sch.day}
-                    onChange={(e) => handleDayChange(si, schi, e.target.value)}
-                    required
-                  >
-                    <option value="">Select Day</option>
-                    {daysOfWeek.map((day) => (
-                      <option key={day} value={day}>
-                        {day}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div key={schi} className="space-y-3">
+                <label className="block font-medium">Day</label>
+                <select
+                  className="w-full border px-3 py-2 rounded"
+                  value={sch.day}
+                  onChange={(e) => handleDayChange(si, schi, e.target.value)}
+                  required
+                >
+                  <option value="">Select Day</option>
+                  {daysOfWeek.map((day) => (
+                    <option key={day} value={day}>
+                      {day}
+                    </option>
+                  ))}
+                </select>
 
                 {sch.lectures.map((lec, li) => (
-                  <div key={li} className="form-section" style={{ background: "#fff" }}>
-                    <div className="form-group">
-                      <label>Start Time</label>
+                  <div
+                    key={li}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-4 border rounded p-3 bg-gray-50"
+                  >
+                    <div>
+                      <label className="block text-sm font-medium">Start Time</label>
                       <input
                         type="time"
+                        className="w-full border px-3 py-1 rounded"
                         value={lec.startTime}
                         onChange={(e) =>
                           handleChange(si, schi, li, "startTime", e.target.value)
@@ -146,10 +171,11 @@ const ScheduleForm = () => {
                       />
                     </div>
 
-                    <div className="form-group">
-                      <label>End Time</label>
+                    <div>
+                      <label className="block text-sm font-medium">End Time</label>
                       <input
                         type="time"
+                        className="w-full border px-3 py-1 rounded"
                         value={lec.endTime}
                         onChange={(e) =>
                           handleChange(si, schi, li, "endTime", e.target.value)
@@ -158,10 +184,11 @@ const ScheduleForm = () => {
                       />
                     </div>
 
-                    <div className="form-group">
-                      <label>Subject</label>
+                    <div>
+                      <label className="block text-sm font-medium">Subject</label>
                       <input
                         type="text"
+                        className="w-full border px-3 py-1 rounded"
                         value={lec.subject}
                         onChange={(e) =>
                           handleChange(si, schi, li, "subject", e.target.value)
@@ -170,10 +197,11 @@ const ScheduleForm = () => {
                       />
                     </div>
 
-                    <div className="form-group">
-                      <label>Teacher</label>
+                    <div>
+                      <label className="block text-sm font-medium">Teacher</label>
                       <input
                         type="text"
+                        className="w-full border px-3 py-1 rounded"
                         value={lec.teacher}
                         onChange={(e) =>
                           handleChange(si, schi, li, "teacher", e.target.value)
@@ -182,10 +210,11 @@ const ScheduleForm = () => {
                       />
                     </div>
 
-                    <div className="form-group">
-                      <label>Room</label>
+                    <div>
+                      <label className="block text-sm font-medium">Room</label>
                       <input
                         type="text"
+                        className="w-full border px-3 py-1 rounded"
                         value={lec.room}
                         onChange={(e) =>
                           handleChange(si, schi, li, "room", e.target.value)
@@ -195,7 +224,11 @@ const ScheduleForm = () => {
                   </div>
                 ))}
 
-                <button type="button" onClick={() => addLecture(si, schi)}>
+                <button
+                  type="button"
+                  className="mt-2 text-sm text-blue-600 hover:underline"
+                  onClick={() => addLecture(si, schi)}
+                >
                   + Add Lecture
                 </button>
               </div>
@@ -203,14 +236,23 @@ const ScheduleForm = () => {
           </div>
         ))}
 
-        <button type="button" onClick={addSection}>
+        <button
+          type="button"
+          className="text-sm text-green-700 hover:underline"
+          onClick={addSection}
+        >
           + Add Section
         </button>
 
-        <button type="submit">Submit Schedule</button>
+        <div>
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Submit Schedule
+          </button>
+        </div>
       </form>
     </div>
   );
-};
-
-export default ScheduleForm;
+}
