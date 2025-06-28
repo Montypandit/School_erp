@@ -138,7 +138,7 @@ const AdminHome = () => {
         <ActionButton to="/admin/allteachers" icon="👨‍🏫" label="All Teachers" />
         <ActionButton to="/admin/allstudents" icon="👥" label="All Students" />
         <ActionButton to="/admin/examschedule" icon="🔍" label="Exam Schedule" />
-        <ActionButton to="/admin/attendance" icon="📅" label="Attendance" />
+        <ActionButton to="/admin/attendence" icon="📅" label="Attendance" />
         <ActionButton to="/admin/weeklyschedule" icon="�" label="Weekly Schedule" />
         <ActionButton to="/admin/leaveapproval" icon="📝" label="Leave Approval" />
       </div>
