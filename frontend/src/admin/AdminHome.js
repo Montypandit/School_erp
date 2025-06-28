@@ -134,7 +134,7 @@ const AdminHome = () => {
       }}>
         <ActionButton to="/admin/employee/form" icon="👩‍🏫" label="Add New Employee" />
         <ActionButton to="/admin/employees" icon="👨‍🎓" label="All Employees" />
-        <ActionButton to="/admin/allteachers" icon="🔍" label="Find an Employee" />
+        <ActionButton to="/admin/teacher/:empId" icon="🔍" label="Find an Employee" />
         <ActionButton to="/admin/allteachers" icon="👨‍🏫" label="All Teachers" />
         <ActionButton to="/admin/allstudents" icon="👥" label="All Students" />
         <ActionButton to="/admin/examschedule" icon="🔍" label="Exam Schedule" />
