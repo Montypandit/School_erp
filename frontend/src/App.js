@@ -32,7 +32,6 @@ import LeaveApproval from "./admin/LeaveApproval";
 //import ScheduleForm from "./component/teacher/ScheduleForm";
 
 import WeeklySchedule from "./admin/WeeklySchedule";
-import StudentListPage from "./component/coordinator/StudentListPage";
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
 import AllotmentClass from "./component/coordinator/Alottment_class";
 import Allotments from "./component/coordinator/Allotments";
