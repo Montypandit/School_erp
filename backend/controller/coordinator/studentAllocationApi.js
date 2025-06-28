@@ -348,7 +348,7 @@ router.post('/students/bulk', authMiddleware, authorizeRoles('admin', 'coordinat
 });
 
 // 10. GET STATISTICS
-router.get('/students/stats/overview', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+router.get('/students/stats/overview', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const stats = await StudentAllocation.aggregate([
       {
