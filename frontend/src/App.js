@@ -29,7 +29,6 @@ import ScheduleForm from "./component/admin/ScheduleForm";
 
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
-import ScheduleForm from "./component/teacher/ScheduleForm";
 import WeeklySchedule from "./admin/WeeklySchedule";
 import StudentListPage from "./component/coordinator/StudentListPage";
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
