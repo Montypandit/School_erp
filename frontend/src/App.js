@@ -1,4 +1,5 @@
 import React from "react";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import Home from './Home';
@@ -24,8 +25,11 @@ import AdmissionForm from "./component/coordinator/Admission/AdmissionForm"
 import AdmissionFees from './component/coordinator/Admission/AdmissionFees'
 import Student from './component/coordinator/Student'
 import ScheduleForm from "./component/admin/ScheduleForm";
+
+
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
+import ScheduleForm from "./component/teacher/ScheduleForm";
 import WeeklySchedule from "./admin/WeeklySchedule";
 import StudentListPage from "./component/coordinator/StudentListPage";
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
@@ -34,7 +38,7 @@ import Allotments from "./component/coordinator/Allotments";
 
 const App = () => {
   return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <Router>
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/admin/login' element={<AdminLogin />} />
@@ -72,3 +76,4 @@ const App = () => {
 };
 
 export default App;
+

@@ -1,8 +1,15 @@
 const express = require('express');
-const WeeklySchedule = require('../../models/schedule/scheduleModel'); // your provided schema
-const authMiddleware = require('../../middleware/authMiddleware');
-const authorizeRoles = require('../../middleware/authorizeRoles');
 const router = express.Router();
+//const WeeklySchedule = require('../../models/schedule/scheduleModel'); // your provided schema
+// const authMiddleware = require('../../middleware/authMiddleware');
+// const authorizeRoles = require('../../middleware/authorizeRoles');
+const scheduleModel = require('../models/schedule/scheduleModel');
+const authMiddleware = require('../middleware/authMiddleware');
+const authorizeRoles = require('../middleware/authorizeRules');
+
+// const authMiddleware = require('../middleware/authMiddleware');
+// const authorizeRoles = require('../middleware/authorizeRoles');
+
 
 /**
  * CREATE Weekly Schedule (Admin, Coordinator)
@@ -11,7 +18,7 @@ router.post('/create/schedule', authMiddleware, authorizeRoles('admin', 'coordin
   try {
     const { className, sections } = req.body;
 
-    const newSchedule = new WeeklySchedule({ className, sections });
+    const newSchedule = new scheduleModel({ className, sections });
     const saved = await newSchedule.save();
 
     res.status(201).json({ message: 'Weekly schedule created', data: saved });
@@ -25,7 +32,7 @@ router.post('/create/schedule', authMiddleware, authorizeRoles('admin', 'coordin
  */
 router.get('/get/all/schedules', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
   try {
-    const schedules = await WeeklySchedule.find().sort({ className: 1 });
+    const schedules = await scheduleModel.find().sort({ className: 1 });
     res.status(200).json(schedules);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -37,7 +44,7 @@ router.get('/get/all/schedules', authMiddleware, authorizeRoles('admin', 'coordi
  */
 router.get('/get/schedule/:className', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
   try {
-    const schedule = await WeeklySchedule.findOne({ className: req.params.className });
+    const schedule = await scheduleModel.findOne({ className: req.params.className });
 
     if (!schedule) return res.status(404).json({ message: 'Schedule not found' });
 
@@ -52,7 +59,7 @@ router.get('/get/schedule/:className', authMiddleware, authorizeRoles('admin', '
  */
 router.put('/update/schedule/:scheduleId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
-    const updated = await WeeklySchedule.findByIdAndUpdate(req.params.scheduleId, req.body, { new: true });
+    const updated = await scheduleModel.findByIdAndUpdate(req.params.scheduleId, req.body, { new: true });
 
     if (!updated) return res.status(404).json({ message: 'Schedule not found' });
 
@@ -67,7 +74,7 @@ router.put('/update/schedule/:scheduleId', authMiddleware, authorizeRoles('admin
  */
 router.delete('/delete/schedule/:scheduleId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
   try {
-    const deleted = await WeeklySchedule.findByIdAndDelete(req.params.scheduleId);
+    const deleted = await scheduleModel.findByIdAndDelete(req.params.scheduleId);
 
     if (!deleted) return res.status(404).json({ message: 'Schedule not found' });
 

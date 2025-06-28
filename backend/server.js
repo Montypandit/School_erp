@@ -28,6 +28,8 @@ const studentRoutes = require('./controller/student/studentapi');
 const admissionFees = require('./controller/coordinator/admissionFeesApi')
 const examScheduleApi = require('./controller/admin/examScheduleapi');
 const leaveApi = require('./controller/admin/leaveApi');
+const scheduleApi = require('./controller/scheduleApi');
+
 const activityPlannerRoutes = require('./controller/coordinator/Activityplannerapi');
 const monthlyPlannerRoutes = require('./controller/coordinator/Monthlyplannerapi');
 
@@ -46,6 +48,7 @@ server.use('/api/students', studentRoutes);
 server.use('/api/admission/fees',admissionFees);
 server.use('/api/exams', examScheduleApi);
 server.use('/api/leaves', leaveApi);
+server.use('/api/schedules',  scheduleApi);
 server.use('/api/activity-planner', activityPlannerRoutes);
 server.use('/api/monthly/planner', monthlyPlannerRoutes);
 

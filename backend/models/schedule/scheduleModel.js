@@ -2,14 +2,13 @@ const mongoose = require('mongoose');
 
 const weeklyScheduleSchema = new mongoose.Schema({
   className: {
-    type: String, // e.g., "Nursery", "LKG", "UKG"
+    type: String,
     required: true,
   },
-  
   sections: [
     {
       sectionName: {
-        type: String, // e.g., "A", "B", "C"
+        type: String,
         required: true,
       },
       schedule: [
@@ -22,11 +21,11 @@ const weeklyScheduleSchema = new mongoose.Schema({
           lectures: [
             {
               startTime: {
-                type: String, // "09:00"
+                type: String,
                 required: true,
               },
               endTime: {
-                type: String, // "10:00"
+                type: String,
                 required: true,
               },
               subject: {
@@ -35,7 +34,7 @@ const weeklyScheduleSchema = new mongoose.Schema({
               },
               teacher: {
                 type: String,
-                required: true,
+                //required: true,
               },
               room: {
                 type: String,
@@ -48,5 +47,5 @@ const weeklyScheduleSchema = new mongoose.Schema({
   ]
 });
 
-const WeeklySchedule = mongoose.model('WeeklySchedule', weeklyScheduleSchema);
-module.exports = WeeklySchedule;
+const scheduleModel = mongoose.model('ScheduleModel', weeklyScheduleSchema);
+module.exports = scheduleModel;
