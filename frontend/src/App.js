@@ -26,8 +26,7 @@ import AdmissionFees from './component/coordinator/Admission/AdmissionFees'
 import Student from './component/coordinator/Student'
 import ScheduleForm from "./component/admin/ScheduleForm";
 import Attendence from "./admin/Attendence";
-
-
+import StudentListPage from "./component/coordinator/StudentListPage";
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
 //import ScheduleForm from "./component/teacher/ScheduleForm";
@@ -68,6 +67,8 @@ const App = () => {
         <Route path ="/principal/login" element={<PrincipalLogin/>}/>
         <Route path="/principal/home" element={<PrincipalHome/>}/>
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail/>}/>
+        <Route path="/students/page" element={<StudentListPage/>}/>
+        <Route path="/coordinator/update/student/:admissionId" element={<UpdateStudentInfo/>}/>
 
           </Routes>
     </Router>
