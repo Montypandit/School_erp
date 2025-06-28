@@ -20,7 +20,6 @@ import PrincipalHome from "./component/principal/PrincipalHome";
 import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
 import GetAllTeacher from "./teacher/GetAllTeacher";
 import GetAllStudent from "./component/Student/GetAllStudent";
-import GetAllEmployee from "./admin/EmployeeLogin";
 import GetTeacher from "./teacher/GetTeacher";
 import AdmissionForm from "./component/coordinator/Admission/AdmissionForm"
 import AdmissionFees from './component/coordinator/Admission/AdmissionFees'
@@ -33,6 +32,11 @@ import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
 //import ScheduleForm from "./component/teacher/ScheduleForm";
 import WeeklySchedule from "./admin/WeeklySchedule";
+import StudentListPage from "./component/coordinator/StudentListPage";
+import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
+import AllotmentClass from "./component/coordinator/Alottment_class";
+import Allotments from "./component/coordinator/Allotments";
+
 const App = () => {
   return (
     <Router>
@@ -63,7 +67,7 @@ const App = () => {
         <Route path ="/principal/login" element={<PrincipalLogin/>}/>
         <Route path="/principal/home" element={<PrincipalHome/>}/>
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail/>}/>
-        <Route path="/admin/attendence" element={<Attendence/>}/>
+
           </Routes>
     </Router>
   );

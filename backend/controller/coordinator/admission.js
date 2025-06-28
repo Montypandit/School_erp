@@ -24,6 +24,27 @@ router.post('/create/admission', authMiddleware, authorizeRoles('admin', 'coordi
   }
 });
 
+// Update Admission
+router.put('/update/admission/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try {
+    const { admissionId } = req.params;
+    const updatedAdmission = await Admission.findOneAndUpdate(
+      { admissionId },
+      req.body,
+      { new: true }
+    );
+
+    if (!updatedAdmission) {
+      return res.status(404).json({ message: 'Admission not found' });
+    }
+
+    res.status(200).json({ message: 'Admission updated successfully', data: updatedAdmission });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to update admission', error });
+  }
+});
+
 // Get All Admissions
 router.get('/get/all/admissions', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
@@ -41,7 +62,7 @@ router.get('/get/student/:admissionId',authMiddleware, authorizeRoles('admin', '
   try{
     const student = await Admission.findOne({ admissionId: req.params.admissionId });
     if (!student) return res.status(404).json({ message: 'Student not found' });
-    res.status(200).json(student);
+    res.status(200).json({ data: student });
   } catch (error) {
     res.status(500).json({ error: error.message })
   }

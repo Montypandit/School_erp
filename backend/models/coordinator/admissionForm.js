@@ -22,7 +22,7 @@ const admissionFormSchema =new  mongoose.Schema({
     motherName:{type:String, required:true},
     motherMobile:{type:String},
     email:{type:String},
-    residentalAddress:{type:String},
+    residentialAddress:{type:String},
     transportFacility:{type:String, default:"No"},
     emergencyContactName:{type:String},
     emergencyContactPhoneNo:{type:String},

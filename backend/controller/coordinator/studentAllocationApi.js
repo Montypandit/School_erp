@@ -2,98 +2,28 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const StudentAllocation = require('../../models/coordinator/studentAllocation'); // Import your existing model
 const router = express.Router();
-
-// MIDDLEWARE FOR AUTHENTICATION
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (token == null) {
-    return res.status(401).json({ 
-      success: false, 
-      message: 'Access token required' 
-    });
-  }
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) {
-      return res.status(403).json({ 
-        success: false, 
-        message: 'Invalid or expired token' 
-      });
-    }
-    req.user = user;
-    next();
-  });
-};
-
-// MIDDLEWARE FOR ADMIN AND COORDINATOR AUTHORIZATION
-const authorizeAdminCoordinator = (req, res, next) => {
-  if (req.user.role !== 'admin' && req.user.role !== 'coordinator') {
-    return res.status(403).json({
-      success: false,
-      message: 'Access denied. Admin or Coordinator privileges required.'
-    });
-  }
-  next();
-};
-
-// UTILITY FUNCTION FOR ERROR HANDLING
-const handleError = (res, error, message = 'Server error') => {
-  console.error(error);
-  if (error.name === 'ValidationError') {
-    const validationErrors = Object.values(error.errors).map(err => err.message);
-    return res.status(400).json({
-      success: false,
-      message: 'Validation failed',
-      errors: validationErrors
-    });
-  }
-  if (error.code === 11000) {
-    const field = Object.keys(error.keyPattern)[0];
-    return res.status(400).json({
-      success: false,
-      message: `${field} already exists`
-    });
-  }
-  res.status(500).json({
-    success: false,
-    message,
-    error: process.env.NODE_ENV === 'development' ? error.message : undefined
-  });
-};
-
-// ==========================
-// STUDENT ALLOCATION ROUTES
-// ==========================
+const authMiddleware = require('../../middleware/authMiddleware');
+const authorizeRoles = require('../../middleware/authorizeRules');
 
 // 1. CREATE NEW STUDENT ALLOCATION
-router.post('/students', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+router.post('/students/allocate', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const {
       admissionId,
-      name,
       section,
-      class: studentClass,
-      totalCapacity,
-      currentCapacity
     } = req.body;
 
     // Validate required fields
-    if (!admissionId || !name || !section || !studentClass || !totalCapacity) {
+    if (!admissionId || !section ) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: admissionId, name, section, class, totalCapacity'
+        message: 'Missing required fields: admissionId, section'
       });
     }
 
     const studentAllocation = new StudentAllocation({
       admissionId,
-      name,
       section,
-      class: studentClass,
-      totalCapacity,
-      currentCapacity: currentCapacity || 0
     });
 
     const savedStudent = await studentAllocation.save();
@@ -110,7 +40,7 @@ router.post('/students', authenticateToken, authorizeAdminCoordinator, async (re
 });
 
 // 2. GET ALL STUDENT ALLOCATIONS WITH PAGINATION AND FILTERING
-router.get('/students', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+router.get('/students', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const {
       page = 1,
@@ -166,7 +96,7 @@ router.get('/students', authenticateToken, authorizeAdminCoordinator, async (req
 });
 
 // 3. GET SINGLE STUDENT ALLOCATION BY ID
-router.get('/students/:id', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+router.get('/students/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const student = await StudentAllocation.findById(req.params.id);
 
@@ -194,7 +124,7 @@ router.get('/students/:id', authenticateToken, authorizeAdminCoordinator, async 
 });
 
 // 4. GET STUDENT BY ADMISSION ID
-router.get('/students/admission/:admissionId', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+router.get('/students/admission/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const student = await StudentAllocation.findOne({ 
       admissionId: req.params.admissionId 
@@ -218,7 +148,7 @@ router.get('/students/admission/:admissionId', authenticateToken, authorizeAdmin
 });
 
 // 5. GET STUDENT BY ROLL NUMBER
-router.get('/students/roll/:rollNumber', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+router.get('/students/roll/:rollNumber',authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const student = await StudentAllocation.findOne({ 
       rollNumber: req.params.rollNumber 
@@ -242,7 +172,7 @@ router.get('/students/roll/:rollNumber', authenticateToken, authorizeAdminCoordi
 });
 
 // 6. UPDATE STUDENT ALLOCATION
-router.put('/students/:id', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+router.put('/students/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const allowedUpdates = [
       'name', 'section', 'class', 'totalCapacity', 'currentCapacity'
@@ -293,7 +223,7 @@ router.put('/students/:id', authenticateToken, authorizeAdminCoordinator, async 
 });
 
 // 7. UPDATE CURRENT CAPACITY
-router.patch('/students/:id/capacity', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+router.patch('/students/:id/capacity', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const { currentCapacity } = req.body;
 
@@ -341,7 +271,7 @@ router.patch('/students/:id/capacity', authenticateToken, authorizeAdminCoordina
 });
 
 // 8. DELETE STUDENT ALLOCATION
-router.delete('/students/:id', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+router.delete('/students/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const student = await StudentAllocation.findByIdAndDelete(req.params.id);
 
@@ -370,7 +300,7 @@ router.delete('/students/:id', authenticateToken, authorizeAdminCoordinator, asy
 });
 
 // 9. BULK CREATE STUDENT ALLOCATIONS
-router.post('/students/bulk', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+router.post('/students/bulk', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const { students } = req.body;
 

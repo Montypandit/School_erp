@@ -48,13 +48,14 @@ const CoordinatorNavbar = () => {
                 Admission
               </Link>
               <Link
-                to="/coordinator/student-allotment"
+                to="/coordinator/student/allotments"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
-                Student Allotment
+                Allotments
               </Link>
+              
               <Link
-                to="/student/page"
+                to="/students/page"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Students
@@ -155,7 +156,7 @@ const CoordinatorNavbar = () => {
               Student Allotment
             </Link>
             <Link
-              to="/student/page"
+              to="/students/page"
               className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
