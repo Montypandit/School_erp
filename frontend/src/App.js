@@ -1,4 +1,5 @@
 import React from "react";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import Home from './Home';
@@ -26,16 +27,14 @@ import AdmissionFees from './component/coordinator/Admission/AdmissionFees'
 import Student from './component/coordinator/Student'
 import ScheduleForm from "./component/admin/ScheduleForm";
 
+
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
-//import ScheduleForm from "./component/teacher/ScheduleForm";
+import ScheduleForm from "./component/teacher/ScheduleForm";
 import WeeklySchedule from "./admin/WeeklySchedule";
-
-import Attendence from "./admin/Attendence";
-
 const App = () => {
   return (
-    <Router future={{ v7_startTransition: true,v7_relativeSplatPath: true }}>
+    <Router>
       <Routes>
         <Route path='/' element={<Home/>}/>
         <Route path='/admin/login' element={<AdminLogin/>}/>
@@ -63,11 +62,11 @@ const App = () => {
         <Route path ="/principal/login" element={<PrincipalLogin/>}/>
         <Route path="/principal/home" element={<PrincipalHome/>}/>
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail/>}/>
-        <Route path="/admin/schedule" element={<ScheduleForm/>}/>
-        <Route path="/admin/attendance" element={<Attendence/>}/>
+
           </Routes>
     </Router>
   );
 };
 
 export default App;
+

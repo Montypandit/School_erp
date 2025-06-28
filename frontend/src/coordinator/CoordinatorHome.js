@@ -10,7 +10,6 @@ const CoordinatorDashboard = () => {
 
   const navigate = useNavigate();
 
-
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -51,7 +50,6 @@ const CoordinatorDashboard = () => {
           throw new Error('Fetch failed');
         }
 
-
         const inquiryData = await inquiryRes.json();
         const admissionData = await admissionRes.json();
         
@@ -78,33 +76,89 @@ const CoordinatorDashboard = () => {
     fetchDashboardData();
   }, []);
 
-  const DashboardCard = ({ title, value, color = "blue", icon }) => (
-    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">{title}</h3>
-          <p className={`text-4xl font-bold text-${color}-600`}>{value}</p>
-        </div>
-        {icon && (
-          <div className={`text-4xl text-${color}-500 opacity-20`}>
-            {icon}
+  const DashboardCard = ({ title, value, color = "blue", icon }) => {
+    // Map color prop to styles
+    const colorMap = {
+      blue: { text: "#2563eb", icon: "#3b82f6" },
+      emerald: { text: "#059669", icon: "#10b981" },
+      yellow: { text: "#d97706", icon: "#f59e0b" },
+      red: { text: "#dc2626", icon: "#ef4444" },
+      gray: { text: "#4b5563", icon: "#6b7280" },
+    };
+    const colorClass = colorMap[color] || colorMap.blue;
+
+    return (
+      <div 
+        style={{
+          backgroundColor: 'white',
+          padding: '24px',
+          borderRadius: '12px',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #f3f4f6',
+          transition: 'all 0.3s',
+          transform: 'translateY(0)',
+          cursor: 'pointer'
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.boxShadow = '0 25px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
+          e.target.style.transform = 'translateY(-4px)';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
+          e.target.style.transform = 'translateY(0)';
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>{title}</h3>
+            <p style={{ fontSize: '36px', fontWeight: 'bold', color: colorClass.text }}>{value}</p>
           </div>
-        )}
+          {icon && (
+            <div style={{ fontSize: '36px', color: colorClass.icon, opacity: 0.2 }}>
+              {icon}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const SearchBar = ({ placeholder, onSearch }) => (
-    <div className="mb-6">
-      <div className="relative">
+    <div style={{ marginBottom: '24px' }}>
+      <div style={{ position: 'relative' }}>
         <input
           type="text"
           placeholder={placeholder}
           onChange={(e) => onSearch(e.target.value)}
-          className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm"
+          style={{
+            width: '100%',
+            padding: '12px 12px 12px 48px',
+            border: '1px solid #d1d5db',
+            borderRadius: '8px',
+            outline: 'none',
+            transition: 'all 0.2s',
+            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)'
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = '#3b82f6';
+            e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = '#d1d5db';
+            e.target.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.05)';
+          }}
         />
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div style={{
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          bottom: '0',
+          paddingLeft: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          pointerEvents: 'none'
+        }}>
+          <svg style={{ height: '20px', width: '20px', color: '#9ca3af' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
@@ -114,25 +168,35 @@ const CoordinatorDashboard = () => {
 
   const StatusBadge = ({ status }) => {
     const getStatusStyle = (status) => {
-      if (!status || typeof status !== 'string') return 'bg-gray-100 text-gray-800 border-gray-200';
+      if (!status || typeof status !== 'string') return { backgroundColor: '#f3f4f6', color: '#1f2937', borderColor: '#e5e7eb' };
       switch (status.toLowerCase()) {
         case 'pending':
-          return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+          return { backgroundColor: '#fef3c7', color: '#92400e', borderColor: '#fcd34d' };
         case 'processed':
-          return 'bg-green-100 text-green-800 border-green-200';
+          return { backgroundColor: '#d1fae5', color: '#065f46', borderColor: '#34d399' };
         case 'forwarded':
-          return 'bg-blue-100 text-blue-800 border-blue-200';
+          return { backgroundColor: '#dbeafe', color: '#1e40af', borderColor: '#60a5fa' };
         case 'approved':
-          return 'bg-green-100 text-green-800 border-green-200';
+          return { backgroundColor: '#d1fae5', color: '#065f46', borderColor: '#34d399' };
         case 'rejected':
-          return 'bg-red-100 text-red-800 border-red-200';
+          return { backgroundColor: '#fee2e2', color: '#991b1b', borderColor: '#f87171' };
         default:
-          return 'bg-gray-100 text-gray-800 border-gray-200';
+          return { backgroundColor: '#f3f4f6', color: '#1f2937', borderColor: '#e5e7eb' };
       }
     };
 
+    const style = getStatusStyle(status);
+
     return (
-      <span className={`px-3 py-1 rounded-full text-sm font-medium border ${getStatusStyle(status)}`}>
+      <span style={{
+        padding: '4px 12px',
+        borderRadius: '9999px',
+        fontSize: '14px',
+        fontWeight: '500',
+        border: `1px solid ${style.borderColor}`,
+        backgroundColor: style.backgroundColor,
+        color: style.color
+      }}>
         {status}
       </span>
     );
@@ -154,42 +218,85 @@ const CoordinatorDashboard = () => {
     const handleShowMore = () => setVisibleCount((prev) => prev + 5);
 
     return (
-      <div className="mt-10">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+      <div style={{ marginTop: '40px' }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #f3f4f6',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            padding: '16px 24px',
+            borderBottom: '1px solid #e5e7eb',
+            background: 'linear-gradient(to right, #eff6ff, #e0e7ff)'
+          }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>{title}</h2>
           </div>
-          <div className="p-6">
+          <div style={{ padding: '24px' }}>
             <SearchBar placeholder="Search inquiries..." onSearch={setSearchQuery} />
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ minWidth: '100%', width: '100%' }}>
                 <thead>
-                  <tr className="border-b border-gray-200" >
-                    <th className="py-4 px-4">ID</th>
-                    <th className="py-4 px-4">Name</th>
-                    <th className="py-4 px-4">Father Name</th>
-                    <th className="py-4 px-4">Class</th>
-                    <th className="py-4 px-4">Date</th>
-                    <th className="py-4 px-4">Action</th>
+                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>ID</th>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>Name</th>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>Father Name</th>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>Class</th>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>Date</th>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredInquiries.map((i) => (
-                    <tr key={i._id} className="hover:bg-gray-50 text-center">
-                      <td className="py-4 px-4 ">{i.inquiryId}</td>
-                      <td className="py-4 px-4">{i.name}</td>
-                      <td className="py-4 px-4">{i.fatherName}</td>
-                      <td className="py-4 px-4">{i.currentClass}</td>
-                      <td className="py-4 px-4">{new Date(i.createdAt).toLocaleDateString('en-IN', {
+                    <tr 
+                      key={i._id} 
+                      style={{ textAlign: 'center', transition: 'background-color 0.2s' }}
+                      onMouseEnter={(e) => e.target.parentElement.style.backgroundColor = '#f9fafb'}
+                      onMouseLeave={(e) => e.target.parentElement.style.backgroundColor = 'transparent'}
+                    >
+                      <td style={{ padding: '16px' }}>{i.inquiryId}</td>
+                      <td style={{ padding: '16px' }}>{i.name}</td>
+                      <td style={{ padding: '16px' }}>{i.fatherName}</td>
+                      <td style={{ padding: '16px' }}>{i.currentClass}</td>
+                      <td style={{ padding: '16px' }}>{new Date(i.createdAt).toLocaleDateString('en-IN', {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',
                       })}</td>
                       {
                         i.createdAt === i.updatedAt ?
-                      <td className="py-4 px-4"><button className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700' onClick={() => {
-                        navigate(`/coordinator/enquiry/process/${i.inquiryId}`);
-                      }}>Forward</button></td> : <td className='bg-yellow-100 text-yellow-800 border-yellow-400 rounded-lg text-xl font-300 '>Forwarded</td>
+                        <td style={{ padding: '16px' }}>
+                          <button 
+                            style={{
+                              padding: '12px 24px',
+                              backgroundColor: '#2563eb',
+                              color: 'white',
+                              borderRadius: '8px',
+                              border: 'none',
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}
+                            onClick={() => {
+                              navigate(`/coordinator/enquiry/process/${i.inquiryId}`);
+                            }}
+                          >
+                            Forward
+                          </button>
+                        </td> : 
+                        <td style={{
+                          backgroundColor: '#fef3c7',
+                          color: '#92400e',
+                          border: '1px solid #fcd34d',
+                          borderRadius: '8px',
+                          fontSize: '20px',
+                          fontWeight: '300',
+                          padding: '16px'
+                        }}>
+                          Forwarded
+                        </td>
                       }
                     </tr>
                   ))}
@@ -197,8 +304,21 @@ const CoordinatorDashboard = () => {
               </table>
             </div>
             {visibleCount < inquiries.length && (
-              <div className="mt-6 text-center">
-                <button onClick={handleShowMore} className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <div style={{ marginTop: '24px', textAlign: 'center' }}>
+                <button 
+                  onClick={handleShowMore} 
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: '#2563eb',
+                    color: 'white',
+                    borderRadius: '8px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}
+                >
                   Show More
                 </button>
               </div>
@@ -225,41 +345,83 @@ const CoordinatorDashboard = () => {
     const handleShowMore = () => setVisibleCount((prev) => prev + 5);
 
     return (
-      <div className="mt-10">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
-            <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
+      <div style={{ marginTop: '40px' }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #f3f4f6',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            padding: '16px 24px',
+            borderBottom: '1px solid #e5e7eb',
+            background: 'linear-gradient(to right, #ecfdf5, #d1fae5)'
+          }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1f2937' }}>{title}</h2>
           </div>
-          <div className="p-6">
+          <div style={{ padding: '24px' }}>
             <SearchBar placeholder="Search admissions..." onSearch={setSearchQuery} />
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ minWidth: '100%', width: '100%' }}>
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="py-4 px-4">ID</th>
-                    <th className="py-4 px-4">Name</th>
-                    <th className="py-4 px-4">Approval Status</th>
-                    <th className='py-4 px-4'>Forwarded Date</th>
-                    <th className="py-4 px-4">Action</th>
+                  <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>ID</th>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>Name</th>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>Approval Status</th>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>Forwarded Date</th>
+                    <th style={{ padding: '16px', textAlign: 'center', fontWeight: '600', color: '#374151' }}>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAdmissions.map((admission) => (
-                    <tr key={admission._id} className="hover:bg-gray-50 text-center">
-                      <td className="py-4 px-4">{admission.admissionId}</td>
-                      <td className="py-4 px-4">{admission.name}</td>
-                      <td className="py-4 px-4"><StatusBadge status={admission.admissionApproved} /></td>
-                      <td className="py-4 px-4">{new Date(admission.createdAt).toLocaleDateString('en-IN', {
+                    <tr 
+                      key={admission._id} 
+                      style={{ textAlign: 'center', transition: 'background-color 0.2s' }}
+                      onMouseEnter={(e) => e.target.parentElement.style.backgroundColor = '#f9fafb'}
+                      onMouseLeave={(e) => e.target.parentElement.style.backgroundColor = 'transparent'}
+                    >
+                      <td style={{ padding: '16px' }}>{admission.admissionId}</td>
+                      <td style={{ padding: '16px' }}>{admission.name}</td>
+                      <td style={{ padding: '16px' }}><StatusBadge status={admission.admissionApproved} /></td>
+                      <td style={{ padding: '16px' }}>{new Date(admission.createdAt).toLocaleDateString('en-IN', {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',
                       })}</td>
                       {
                         admission.admissionApproved === 'Approved' ?
-                      <td className="py-4 px-4"><button className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700' onClick={() => { // Changed onClick
-                        // Navigate to the final admission form with inquiryId and admissionId
-                        navigate(`/final/admission/form/${admission.inquiryId}/${admission.admissionId}`);
-                      }}>Grant Admission</button></td> : <div className="text-xl font-bold text-red-400 align-center text-center mt-2">Not Approved</div>
+                        <td style={{ padding: '16px' }}>
+                          <button 
+                            style={{
+                              padding: '12px 24px',
+                              backgroundColor: '#2563eb',
+                              color: 'white',
+                              borderRadius: '8px',
+                              border: 'none',
+                              cursor: 'pointer',
+                              transition: 'background-color 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.target.style.backgroundColor = '#1d4ed8'}
+                            onMouseLeave={(e) => e.target.style.backgroundColor = '#2563eb'}
+                            onClick={() => { // Changed onClick
+                              // Navigate to the final admission form with inquiryId and admissionId
+                              navigate(`/final/admission/form/${admission.inquiryId}/${admission.admissionId}`);
+                            }}
+                          >
+                            Grant Admission
+                          </button>
+                        </td> : 
+                        <td style={{ padding: '16px' }}>
+                          <div style={{
+                            fontSize: '20px',
+                            fontWeight: 'bold',
+                            color: '#f87171',
+                            textAlign: 'center'
+                          }}>
+                            Not Approved
+                          </div>
+                        </td>
                       }
                     </tr>
                   ))}
@@ -267,8 +429,21 @@ const CoordinatorDashboard = () => {
               </table>
             </div>
             {visibleCount < admissions.length && (
-              <div className="mt-6 text-center">
-                <button onClick={handleShowMore} className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700">
+              <div style={{ marginTop: '24px', textAlign: 'center' }}>
+                <button 
+                  onClick={handleShowMore} 
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: '#059669',
+                    color: 'white',
+                    borderRadius: '8px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.backgroundColor = '#047857'}
+                  onMouseLeave={(e) => e.target.style.backgroundColor = '#059669'}
+                >
                   Show More
                 </button>
               </div>
@@ -279,21 +454,32 @@ const CoordinatorDashboard = () => {
     );
   };
 
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(to bottom right, #f9fafb, #f3f4f6)'
+    }}>
       <CoordinatorNavbar />
-      <div className="p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold mb-2 text-gray-900">Coordinator Dashboard</h1>
-          <p className="text-lg text-gray-600">Manage inquiries and admissions efficiently</p>
+      <div style={{ padding: '16px' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+          <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '8px', color: '#111827' }}>
+            Coordinator Dashboard
+          </h1>
+          <p style={{ fontSize: '18px', color: '#4b5563' }}>
+            Manage inquiries and admissions efficiently
+          </p>
 
           {/* Loading state */}
           {loading ? (
-            <p className="mt-10 text-center text-gray-500">Loading data...</p>
+            <p style={{ marginTop: '40px', textAlign: 'center', color: '#6b7280' }}>Loading data...</p>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-10">
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+                gap: '24px',
+                margin: '40px 0'
+              }}>
                 <DashboardCard title="Total Inquiries" value={inquiries.length} color="blue" icon="📝" />
                 <DashboardCard title="Approved Admissions" value={admissions.filter(a => a.admissionApproved === "Approved").length} color="emerald" icon="🎓" />
                 <DashboardCard title="Pending Reviews" value={admissions.filter(a => a.admissionApproved === "Pending").length} color="yellow" icon="⏳" />

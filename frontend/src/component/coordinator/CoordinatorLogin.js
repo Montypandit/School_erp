@@ -2,23 +2,23 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { 
-  Container, 
-  Paper, 
-  Typography, 
-  TextField, 
-  Button, 
-  Box, 
-  CssBaseline, 
-  Avatar, 
-  InputAdornment, 
+import {
+  Container,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Box,
+  CssBaseline,
+  Avatar,
+  InputAdornment,
   IconButton,
   CircularProgress
 } from '@mui/material';
-import { 
-  Lock as LockIcon, 
-  Visibility, 
-  VisibilityOff 
+import {
+  Lock as LockIcon,
+  Visibility,
+  VisibilityOff
 } from '@mui/icons-material';
 
 
@@ -58,13 +58,13 @@ const CoordinatorLogin = () => {
 
   const validate = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
@@ -77,26 +77,26 @@ const CoordinatorLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validate()) return;
-    
+
     setIsLoading(true);
-    
+
     try {
 
-       const res = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${formData.email}`,{ // Pass email as query parameter
-              method:'GET',
-              headers:{
-                'Content-Type':'application/json' 
-              }
-            });
-      
-            const data = await res.json();
-            if(data.role !== 'coordinator'){
-              toast.info(`Please login with ${data.role} portal`);
-              navigate('/');
-              return;
-            }
+      const res = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${formData.email}`, { // Pass email as query parameter
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await res.json();
+      if (data.role !== 'coordinator') {
+        toast.info(`Please login with ${data.role} portal`);
+        navigate('/');
+        return;
+      }
 
       const response = await fetch('http://localhost:5000/api/auth/user/login', {
         method: 'POST',
@@ -112,9 +112,9 @@ const CoordinatorLogin = () => {
       if (!response.ok) {
         const errorText = await response.text();
         let errorData = { message: errorText || `HTTP error! status: ${response.status}` };
-        
-        const err = new Error(errorData.message); 
-        err.response = { status: response.status, data: errorData }; 
+
+        const err = new Error(errorData.message);
+        err.response = { status: response.status, data: errorData };
         throw err;
       }
 
@@ -150,52 +150,50 @@ const CoordinatorLogin = () => {
         <Typography component="h1" variant="h5">
           Coordinator Sign In
         </Typography>
-        
+
         {/* The Alert component for loginError is removed, toasts will handle this */}
-        
+
         <Paper elevation={3} sx={{ p: 4, mt: 3, width: '100%' }}>
           <Box component="form" onSubmit={handleSubmit} noValidate>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={formData.email}
-              onChange={handleChange}
-              error={!!errors.email}
-              helperText={errors.email}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type={formData.showPassword ? 'text' : 'password'}
-              id="password"
-              autoComplete="current-password"
-              value={formData.password}
-              onChange={handleChange}
-              error={!!errors.password}
-              helperText={errors.password}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      edge="end"
-                    >
-                      {formData.showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
+            <Box mb={2}>
+              <label>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                style={{ width: '100%', padding: '10px', marginTop: '5px', border: '1px solid #ccc', borderRadius: '4px' }}
+              />
+              {errors.email && <span style={{ color: 'red', fontSize: '0.8rem' }}>{errors.email}</span>}
+            </Box>
+
+            <Box mb={2}>
+              <label>Password</label>
+              <Box display="flex" alignItems="center" position="relative">
+                <input
+                  type={formData.showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  style={{ width: '100%', padding: '10px', marginTop: '5px', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+                <span
+                  onClick={handleClickShowPassword}
+                  style={{
+                    position: 'absolute',
+                    right: 10,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    fontSize: '1.2rem'
+                  }}
+                >
+                  {formData.showPassword ? <VisibilityOff /> : <Visibility />}
+                </span>
+              </Box>
+              {errors.password && <span style={{ color: 'red', fontSize: '0.8rem' }}>{errors.password}</span>}
+            </Box>
+
             <Button
               type="submit"
               fullWidth
@@ -203,11 +201,7 @@ const CoordinatorLogin = () => {
               disabled={isLoading}
               sx={{ mt: 3, mb: 2, py: 1.5 }}
             >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                'Sign In'
-              )}
+              {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
             </Button>
           </Box>
         </Paper>

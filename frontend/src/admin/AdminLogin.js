@@ -2,26 +2,21 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { 
-  Container, 
-  Paper, 
-  Typography, 
-  TextField, 
-  Button, 
-  Box, 
-  CssBaseline, 
-  Avatar, 
-  InputAdornment, 
-  IconButton,
+import {
+  Container,
+  Paper,
+  Typography,
+  Button,
+  Box,
+  CssBaseline,
+  Avatar,
   CircularProgress
 } from '@mui/material';
-import { 
-  Lock as LockIcon, 
-  Visibility, 
-  VisibilityOff 
+import {
+  Lock as LockIcon,
+  Visibility,
+  VisibilityOff
 } from '@mui/icons-material';
-
-
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -31,7 +26,6 @@ const AdminLogin = () => {
     showPassword: false,
   });
   const [errors, setErrors] = useState({});
-  // loginError state is no longer needed as we'll use toasts
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -40,7 +34,7 @@ const AdminLogin = () => {
       ...formData,
       [name]: value,
     });
-    // Clear error when user types
+
     if (errors[name]) {
       setErrors({
         ...errors,
@@ -58,13 +52,13 @@ const AdminLogin = () => {
 
   const validate = () => {
     const newErrors = {};
-    
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
@@ -77,26 +71,26 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validate()) return;
-    
-    setIsLoading(true);
-    
-    try {
 
-      const res = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${formData.email}`,{ // Pass email as query parameter
-        method:'GET',
-        headers:{
-          'Content-Type':'application/json' 
+    if (!validate()) return;
+
+    setIsLoading(true);
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${formData.email}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
         }
       });
 
       const data = await res.json();
-      if(data.role !== 'admin'){
+      if (data.role !== 'admin') {
         toast.info(`Please login with ${data.role} portal`);
         navigate('/');
         return;
       }
+
       const response = await fetch('http://localhost:5000/api/auth/user/login', {
         method: 'POST',
         headers: {
@@ -111,13 +105,12 @@ const AdminLogin = () => {
       if (!response.ok) {
         const errorText = await response.text();
         let errorData = { message: errorText || `HTTP error! status: ${response.status}` };
-        
-        const err = new Error(errorData.message); 
-        err.response = { status: response.status, data: errorData }; 
+
+        const err = new Error(errorData.message);
+        err.response = { status: response.status, data: errorData };
         throw err;
       }
 
-      // If response is OK, the body is the token itself (plain text)
       const token = await response.text();
       sessionStorage.setItem('adminToken', token);
       sessionStorage.setItem('adminEmail', formData.email);
@@ -129,20 +122,17 @@ const AdminLogin = () => {
       let errorMessage = 'Login failed. Please try again.';
 
       if (error.response && error.response.data) {
-        // Handle errors where server responded with error data (e.g., from response.json() if !response.ok)
         if (error.response.status === 401) {
           errorMessage = 'Invalid email or password';
         } else if (error.response.data.message) {
           errorMessage = error.response.data.message;
-        } else if (error.response.status) { // Fallback if data.message is not there but status is
-            errorMessage = `Login failed: ${error.response.data.error || `Server error ${error.response.status}`}`;
+        } else if (error.response.status) {
+          errorMessage = `Login failed: ${error.response.data.error || `Server error ${error.response.status}`}`;
         }
       } else if (error.message && (error.message.includes('Failed to fetch') || error.name === 'TypeError')) {
-        // Handle network errors (e.g., server down, CORS issues if not configured on server)
         errorMessage = 'Unable to connect to the server. Please check your connection or API configuration.';
       } else if (error.response && error.response.status) {
-        // Fallback for other HTTP errors if data wasn't JSON or error.response.data was not set
-         errorMessage = `Login failed with status: ${error.response.status}`;
+        errorMessage = `Login failed with status: ${error.response.status}`;
       }
 
       toast.error(errorMessage);
@@ -168,52 +158,48 @@ const AdminLogin = () => {
         <Typography component="h1" variant="h5">
           Admin Sign In
         </Typography>
-        
-        {/* The Alert component for loginError is removed, toasts will handle this */}
-        
+
         <Paper elevation={3} sx={{ p: 4, mt: 3, width: '100%' }}>
           <Box component="form" onSubmit={handleSubmit} noValidate>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={formData.email}
-              onChange={handleChange}
-              error={!!errors.email}
-              helperText={errors.email}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type={formData.showPassword ? 'text' : 'password'}
-              id="password"
-              autoComplete="current-password"
-              value={formData.password}
-              onChange={handleChange}
-              error={!!errors.password}
-              helperText={errors.password}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      edge="end"
-                    >
-                      {formData.showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
+            <Box mb={2}>
+              <label>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                style={{ width: '100%', padding: '10px', marginTop: '5px', border: '1px solid #ccc', borderRadius: '4px' }}
+              />
+              {errors.email && <span style={{ color: 'red', fontSize: '0.8rem' }}>{errors.email}</span>}
+            </Box>
+
+            <Box mb={2}>
+              <label>Password</label>
+              <Box display="flex" alignItems="center" position="relative">
+                <input
+                  type={formData.showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  style={{ width: '100%', padding: '10px', marginTop: '5px', border: '1px solid #ccc', borderRadius: '4px' }}
+                />
+                <span
+                  onClick={handleClickShowPassword}
+                  style={{
+                    position: 'absolute',
+                    right: 10,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    cursor: 'pointer',
+                    fontSize: '1.2rem'
+                  }}
+                >
+                  {formData.showPassword ? <VisibilityOff /> : <Visibility />}
+                </span>
+              </Box>
+              {errors.password && <span style={{ color: 'red', fontSize: '0.8rem' }}>{errors.password}</span>}
+            </Box>
+
             <Button
               type="submit"
               fullWidth
@@ -221,11 +207,7 @@ const AdminLogin = () => {
               disabled={isLoading}
               sx={{ mt: 3, mb: 2, py: 1.5 }}
             >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                'Sign In'
-              )}
+              {isLoading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
             </Button>
           </Box>
         </Paper>

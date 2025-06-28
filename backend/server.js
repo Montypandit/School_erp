@@ -29,8 +29,13 @@ const admissionFees = require('./controller/coordinator/admissionFeesApi')
 
 const examScheduleApi = require('./controller/admin/examScheduleapi');
 const leaveApi = require('./controller/admin/leaveApi');
+<<<<<<< HEAD
 const scheduleApi = require('./controller/scheduleApi');
 
+=======
+const activityPlannerRoutes = require('./controller/coordinator/Activityplannerapi');
+const monthlyPlannerRoutes = require('./controller/coordinator/Monthlyplannerapi');
+>>>>>>> 7f8460670ea78282a28c8a9240d521bf7a30c14c
 // Use APIs (with consistent route prefix)
 server.use('/api/auth', userLoginApi);
 server.use('/api/inquiry', inquiryApi);
@@ -45,7 +50,13 @@ server.use('/api/students', studentRoutes);
 server.use('/api/admission/fees',admissionFees);
 server.use('/api/exams', examScheduleApi);
 server.use('/api/leaves', leaveApi);
+<<<<<<< HEAD
 server.use('/api/schedules',  scheduleApi);
+=======
+server.use('/api/activity-planner', activityPlannerRoutes);
+server.use('/api/monthly/planner', monthlyPlannerRoutes);
+
+>>>>>>> 7f8460670ea78282a28c8a9240d521bf7a30c14c
 
 // Start server
 server.listen(port, () => {
