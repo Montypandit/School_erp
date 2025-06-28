@@ -1,0 +1,76 @@
+.student-container {
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.student-card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  align-items: center;
+  text-align: center;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.student-table {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1.2fr 0.8fr 1.5fr;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  
+}
+
+.table-header {
+  font-weight: bold;
+  background-color: #f9f9f9;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+.actions button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.actions button:first-child {
+  background-color: #f39c12;
+  color: #fff;
+}
+
+.actions button:last-child {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.loading,
+.no-data {
+  text-align: center;
+  margin: 20px 0;
+  font-weight: bold;
+}

@@ -26,11 +26,12 @@ const studentAllocationApi = require('./controller/coordinator/studentAllocation
 const teacherRoutes = require('./controller/teacher/teacherapi');
 const studentRoutes = require('./controller/student/studentapi');
 const admissionFees = require('./controller/coordinator/admissionFeesApi')
-
 const examScheduleApi = require('./controller/admin/examScheduleapi');
 const leaveApi = require('./controller/admin/leaveApi');
 const activityPlannerRoutes = require('./controller/coordinator/Activityplannerapi');
 const monthlyPlannerRoutes = require('./controller/coordinator/Monthlyplannerapi');
+
+
 // Use APIs (with consistent route prefix)
 server.use('/api/auth', userLoginApi);
 server.use('/api/inquiry', inquiryApi);
@@ -39,7 +40,7 @@ server.use('/api/admissions', admissionApprovalApi);
 server.use('/api/fees', feesRoutes);
 server.use('/api/employees', addEmployeeRoutes);
 server.use('/api/final/admission', finalAdmission);
-server.use('/api/student-allocation', studentAllocationApi);
+server.use('/api/student/allocation', studentAllocationApi);
 server.use('/api/teachers', teacherRoutes);
 server.use('/api/students', studentRoutes);
 server.use('/api/admission/fees',admissionFees);

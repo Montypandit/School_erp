@@ -17,22 +17,19 @@ const StudentAllocationSchema = new mongoose.Schema({
   section: {
     type: String,
     required: true,
+    enum: ['A', 'B', 'C', 'D'],
   },
   class: {
     type: String,
     required: true,
   },
-  totalCapacity: {
-    type: Number,
-    required: true,
-  },
-  currentCapacity: {
-    type: Number,
-    default: 0,
-  }
-});
+  alloted:{type: Boolean, default: false},
+  academicYear:{type:String, required:true}
+}, {timestamps:true});
 
-                                                    //FOR AUTOMATIC ROLL NUMBER.
+
+
+//FOR AUTOMATIC ROLL NUMBER.
 
 StudentAllocationSchema.pre('save', async function (next) {
   if (!this.rollNumber) {
