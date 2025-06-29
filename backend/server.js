@@ -30,10 +30,7 @@ const examScheduleApi = require('./controller/admin/examScheduleapi');
 const leaveApi = require('./controller/admin/leaveApi');
 const scheduleApi = require('./controller/scheduleApi');
 
-<<<<<<< HEAD
-=======
 
->>>>>>> c2e097d54d946f6da53816c587c0db7adcaf7c5e
 const activityPlannerRoutes = require('./controller/coordinator/Activityplannerapi');
 const monthlyPlannerRoutes = require('./controller/coordinator/Monthlyplannerapi');
 

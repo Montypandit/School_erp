@@ -29,7 +29,8 @@ import Attendence from "./admin/Attendence";
 import StudentListPage from "./component/coordinator/StudentListPage";
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
-//import ScheduleForm from "./component/teacher/ScheduleForm";
+import TeacherDashboard from "./component/teacher/TeacherDashboard";
+import GetAttendence from "./component/teacher/GetAttendence";
 
 import WeeklySchedule from "./admin/WeeklySchedule";
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
@@ -51,7 +52,7 @@ const App = () => {
         <Route path="/coordinator/all/fee/details" element={<FeePaid/>}/>
         <Route path="/coordinator/fees/generate/:admissionId" element={<FeesGeneration/>}/>
         <Route path="/teacher/login" element={<TeacherLogin/>}/>
-        <Route path="/teacher/home" element={<TeacherHome/>}/>
+        <Route path="/teacher/home" element={<TeacherDashboard/>}/>
         <Route path="/coordinator/enquiry/process/:inquiryId" element={<EnquiryStudent/>}/>
         <Route path="/coordinator/enquiry" element={<EnquiryStudent/>}/>
         <Route path="/admin/employees" element={<EmployeeLogin/>}/>
@@ -68,7 +69,7 @@ const App = () => {
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail/>}/>
         <Route path="/students/page" element={<StudentListPage/>}/>
         <Route path="/coordinator/update/student/:admissionId" element={<UpdateStudentInfo/>}/>
-
+        <Route path="/teacher/attendence" element={<GetAttendence/>}/>
           </Routes>
     </Router>
   );

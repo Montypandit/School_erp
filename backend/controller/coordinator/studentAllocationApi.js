@@ -171,6 +171,33 @@ router.get('/students/roll/:rollNumber',authMiddleware, authorizeRoles('admin', 
   }
 });
 
+// Get Student by class
+router.get('/students/byClass/:classId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try { 
+    const classId = req.params.classId;
+    const students = await StudentAllocation.find({ class: classId });
+    if (!students || students.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No students found for this class' 
+      });
+    }
+    res.json({
+      success: true,
+      data: students
+    });
+  } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid class ID format'
+      });
+    }
+    handleError(res, error, 'Failed to fetch students by class');
+  }
+});
+
+
 // 6. UPDATE STUDENT ALLOCATION
 router.put('/students/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
