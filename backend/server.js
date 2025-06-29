@@ -31,11 +31,8 @@ const leaveApi = require('./controller/admin/leaveApi');
 const scheduleApi = require('./controller/scheduleApi');
 const activityplannerApi = require('./controller/coordinator/Activityplannerapi');
 const monthlyplannerApi = require('./controller/coordinator/Monthlyplannerapi');
-
-
 const activityPlannerRoutes = require('./controller/coordinator/Activityplannerapi');
 const monthlyPlannerRoutes = require('./controller/coordinator/Monthlyplannerapi');
-
 
 // Use APIs (with consistent route prefix)
 server.use('/api/auth', userLoginApi);

@@ -35,7 +35,8 @@ import WeeklySchedule from "./admin/WeeklySchedule";
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
 import AllotmentClass from "./component/coordinator/Alottment_class";
 import Allotments from "./component/coordinator/Allotments";
-import PTMManagement from "./component/coordinator/PTMManagement";
+import PTMManagement from "./component/teacher/PTMMangement";
+import ActivityPlanner from "./coordinator/ActivityPlanner";
 
 const App = () => {
   return (
@@ -70,6 +71,7 @@ const App = () => {
         <Route path="/students/page" element={<StudentListPage/>}/>
         <Route path="/coordinator/update/student/:admissionId" element={<UpdateStudentInfo/>}/>
         <Route path="/coordinator/ptm" element={<PTMManagement/>}/>
+        <Route path="/coordinator/activity/planner" element={<ActivityPlanner/>}/>
 
           </Routes>
     </Router>

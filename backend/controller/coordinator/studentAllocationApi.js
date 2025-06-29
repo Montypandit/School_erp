@@ -11,6 +11,8 @@ router.post('/students/allocate', authMiddleware, authorizeRoles('admin', 'coord
     const {
       admissionId,
       section,
+      academicYear,
+      alloted
     } = req.body;
 
     // Validate required fields
@@ -22,8 +24,10 @@ router.post('/students/allocate', authMiddleware, authorizeRoles('admin', 'coord
     }
 
     const studentAllocation = new StudentAllocation({
-      admissionId,
-      section,
+      admissionId: admissionId,
+      section:section,
+      academicYear:academicYear,
+      alloted:alloted
     });
 
     const savedStudent = await studentAllocation.save();
@@ -35,70 +39,33 @@ router.post('/students/allocate', authMiddleware, authorizeRoles('admin', 'coord
     });
 
   } catch (error) {
-    handleError(res, error, 'Failed to create student allocation');
+    console.log(error);
+    res.status(500).json({message:"Internal server serror"});
   }
 });
 
 // 2. GET ALL STUDENT ALLOCATIONS WITH PAGINATION AND FILTERING
-router.get('/students', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.get('/get/all/students/allocations', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 10,
-      class: studentClass,
-      section,
-      search,
-      sortBy = 'createdAt',
-      sortOrder = 'desc'
-    } = req.query;
+    const data = await StudentAllocation.find();
 
-    // Build filter object
-    const filter = {};
-    if (studentClass) filter.class = studentClass;
-    if (section) filter.section = section;
-    if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { admissionId: { $regex: search, $options: 'i' } },
-        { rollNumber: { $regex: search, $options: 'i' } }
-      ];
+    if(!data){
+      return res.status(404).json({message:"No student allocations found"});
     }
-
-    // Calculate pagination
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-    const sortDirection = sortOrder === 'desc' ? -1 : 1;
-
-    // Execute query
-    const students = await StudentAllocation
-      .find(filter)
-      .sort({ [sortBy]: sortDirection })
-      .skip(skip)
-      .limit(parseInt(limit));
-
-    const totalStudents = await StudentAllocation.countDocuments(filter);
-    const totalPages = Math.ceil(totalStudents / parseInt(limit));
-
-    res.json({
-      success: true,
-      data: students,
-      pagination: {
-        currentPage: parseInt(page),
-        totalPages,
-        totalStudents,
-        hasNextPage: parseInt(page) < totalPages,
-        hasPrevPage: parseInt(page) > 1
-      }
+    res.status(200).json({
+      message: 'Student allocations fetched successfully',
+      data:data
     });
-
   } catch (error) {
-    handleError(res, error, 'Failed to fetch student allocations');
+    console.log(error);
+    res.status(500).json({message:"Internal server error"});
   }
 });
 
 // 3. GET SINGLE STUDENT ALLOCATION BY ID
-router.get('/students/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.get('/get/student/allocation/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
-    const student = await StudentAllocation.findById(req.params.id);
+    const student = await StudentAllocation.findOne({admissionId:req.params.admissionId});
 
     if (!student) {
       return res.status(404).json({
@@ -113,13 +80,8 @@ router.get('/students/:id', authMiddleware, authorizeRoles('admin', 'coordinator
     });
 
   } catch (error) {
-    if (error.name === 'CastError') {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid student ID format'
-      });
-    }
-    handleError(res, error, 'Failed to fetch student allocation');
+    console.log(error);
+    res.status(500).json({message:"Internal server error"});
   }
 });
 
