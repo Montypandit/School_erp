@@ -1,83 +1,39 @@
 const express = require('express');
 const router = express.Router();
-const ActivityPlanner = require('../../models/coordinator/Activityplanner');
-const jwt = require('jsonwebtoken');
+const ActivityPlanner = require('../../models/coordinator/ActivityPlanner');
+const authMiddleware = require('../../middleware/authMiddleware');
+const authorizeRoles = require('../../middleware/authorizeRules');
 
-
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-  
-  if (!token) return res.status(401).json({ message: 'Token missing' });
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ message: 'Invalid token' });
-    req.user = user;
-    next();
-  });
-};
-
-
-const authorizeAdminCoordinator = (req, res, next) => {
-  const allowedRoles = ['admin', 'coordinator'];
-  if (allowedRoles.includes(req.user.userType)) {
-    next();
-  } else {
-    return res.status(403).json({ message: 'Access denied: Only admin/coordinator allowed' });
-  }
-};
-
-
-router.post('/activities', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
+//  POST: Create Activity
+router.post('/create/new/activity', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
-    const newActivity = new ActivityPlanner(req.body);
-    const saved = await newActivity.save();
-    res.status(201).json(saved);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    const activity = new ActivityPlanner(req.body);
+    await activity.save();
+    res.status(201).json({ message: 'Activity created successfully', data: activity });
+  } catch (error) {
+    res.status(400).json({ message: 'Failed to create activity', error: error.message });
   }
 });
 
-
-router.get('/activities', authenticateToken, async (req, res) => {
+//  GET: All Activities
+router.get('/get/all/activities', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher', 'principal'), async (req, res) => {
   try {
-    const activities = await ActivityPlanner.find();
-    res.json(activities);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const activities = await ActivityPlanner.find().sort({ startDate: 1 });
+    res.status(200).json({ data: activities });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Failed to fetch activities', error: error.message });
   }
 });
 
-
-router.get('/activities/:id', authenticateToken, async (req, res) => {
+//  GET: Activity by ID
+router.get('/get/activity/by/:id', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher', 'principal'), async (req, res) => {
   try {
     const activity = await ActivityPlanner.findById(req.params.id);
     if (!activity) return res.status(404).json({ message: 'Activity not found' });
-    res.json(activity);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-
-router.put('/activities/:id', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
-  try {
-    const updated = await ActivityPlanner.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updated) return res.status(404).json({ message: 'Activity not found' });
-    res.json(updated);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-
-router.delete('/activities/:id', authenticateToken, authorizeAdminCoordinator, async (req, res) => {
-  try {
-    const deleted = await ActivityPlanner.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: 'Activity not found' });
-    res.json({ message: 'Activity deleted successfully' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(200).json({ data: activity });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch activity', error: error.message });
   }
 });
 
