@@ -9,6 +9,8 @@ const monthlyPlannerSchema = new mongoose.Schema({
     maxlength: 200
   },
 
+  class:{type:String},
+
   description: {
     type: String,
     trim: true,
@@ -40,7 +42,6 @@ const monthlyPlannerSchema = new mongoose.Schema({
     required: true
   },
 
-
   eventType: {
     type: String,
     required: true,
@@ -68,44 +69,6 @@ const monthlyPlannerSchema = new mongoose.Schema({
   academicYear: {
     type: String,
     required: true
-  },
-
-  semester: {
-    type: String,
-    enum: ['1st', '2nd', 'summer'],
-    required: function () {
-      return this.eventType === 'academic' || this.eventType === 'exam';
-    }
-  },
-
-
-  targetAudience: {
-    classes: [{
-      type: String,
-      trim: true
-    }],
-    sections: [{
-      type: String,
-      trim: true
-    }],
-    departments: [{
-      type: String,
-      trim: true
-    }],
-    specific_users: [{
-      type: mongoose.Schema.Types.ObjectId,
-      refPath: 'targetAudience.userType'
-    }],
-    userType: {
-      type: String,
-      enum: ['Student', 'Teacher', 'Parent', 'Admin', 'Coordinator', 'Principal']
-    }
-  },
-
-  
-  location: {
-    type: String,
-    trim: true
   },
 
   venue: {

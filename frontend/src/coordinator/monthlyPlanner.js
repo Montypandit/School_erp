@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
-import { toast } from 'react-toastify';
+import {toast} from 'react-toastify';
 import CoordinatorNavbar from '../component/coordinator/CoordinatorNavbar';
 import { useNavigate } from 'react-router-dom';
 
-// Styled Components (reuse from monthlyPlanner.js)
+// Styled Components
 const PlannerContainer = styled.div`
   max-width: 1200px;
   margin: 2rem auto;
@@ -44,8 +44,16 @@ const NavButton = styled.button`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  &:hover { background: #357abd; transform: translateY(-1px);}
-  &:disabled { background: #bdc3c7; cursor: not-allowed;}
+  
+  &:hover {
+    background: #357abd;
+    transform: translateY(-1px);
+  }
+  
+  &:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+  }
 `;
 
 const MonthSelector = styled.div`
@@ -76,8 +84,8 @@ const DayHeader = styled.div`
 
 const DayCell = styled(motion.div)`
   aspect-ratio: 1;
-  background: ${({ $isCurrentMonth, $isToday }) => 
-    $isToday ? '#e3f2fd' : $isCurrentMonth ? 'white' : '#f9f9f9'};
+  background: ${({ isCurrentMonth, isToday }) => 
+    isToday ? '#e3f2fd' : isCurrentMonth ? 'white' : '#f9f9f9'};
   border: 1px solid #eee;
   border-radius: 8px;
   padding: 0.5rem;
@@ -85,6 +93,7 @@ const DayCell = styled(motion.div)`
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -93,8 +102,8 @@ const DayCell = styled(motion.div)`
 
 const DayNumber = styled.div`
   font-weight: 600;
-  color: ${({ $isCurrentMonth, $isToday }) => 
-    $isToday ? '#1e88e5' : $isCurrentMonth ? '#2c3e50' : '#bdc3c7'};
+  color: ${({ isCurrentMonth, isToday }) => 
+    isToday ? '#1e88e5' : isCurrentMonth ? '#2c3e50' : '#bdc3c7'};
   margin-bottom: 0.5rem;
 `;
 
@@ -111,11 +120,33 @@ const Event = styled(motion.div)`
   cursor: pointer;
 `;
 
+const AddEventButton = styled.button`
+  width: 100%;
+  margin-top: 0.5rem;
+  background: #e3f2fd;
+  border: 1px dashed #4a90e2;
+  color: #4a90e2;
+  border-radius: 4px;
+  padding: 0.3rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #bbdefb;
+  }
+`;
+
 const ModalOverlay = styled(motion.div)`
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  display: flex; justify-content: center; align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
 `;
 
@@ -124,7 +155,7 @@ const ModalContent = styled(motion.div)`
   padding: 2rem;
   border-radius: 12px;
   width: 100%;
-  max-width: 540px;
+  max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
 `;
@@ -147,6 +178,7 @@ const Input = styled.input`
   border-radius: 6px;
   font-size: 1rem;
   transition: border 0.2s ease;
+  
   &:focus {
     outline: none;
     border-color: #4a90e2;
@@ -163,6 +195,7 @@ const TextArea = styled.textarea`
   min-height: 100px;
   resize: vertical;
   transition: border 0.2s ease;
+  
   &:focus {
     outline: none;
     border-color: #4a90e2;
@@ -185,89 +218,118 @@ const Button = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  
   &.primary {
     background: #4a90e2;
     color: white;
-    &:hover { background: #357abd; }
+    
+    &:hover {
+      background: #357abd;
+    }
   }
+  
   &.secondary {
     background: #f5f5f5;
     color: #2c3e50;
-    &:hover { background: #e0e0e0; }
+    
+    &:hover {
+      background: #e0e0e0;
+    }
+  }
+  
+  &.danger {
+    background: #e74c3c;
+    color: white;
+    
+    &:hover {
+      background: #c0392b;
+    }
   }
 `;
 
-const activityTypes = [
-  'Sports', 'Cultural', 'Academic', 'Workshop', 'Seminar', 'Competition', 'Field Trip', 'Exhibition', 'Meeting', 'Celebration', 'Training', 'Other'
+const EventColors = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+`;
+
+const ColorOption = styled.div`
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: ${({ color }) => color};
+  cursor: pointer;
+  border: 2px solid ${({ selected, color }) => (selected ? '#2c3e50' : 'transparent')};
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const eventTypes = [
+  'academic', 'exam', 'holiday', 'meeting', 'event', 'assignment', 'project', 'extracurricular', 'maintenance', 'other'
 ];
-const statuses = ['planned', 'approved', 'ongoing', 'completed', 'cancelled', 'postponed'];
+const semesters = ['1st', '2nd', 'summer'];
+const statuses = ['planned', 'ongoing', 'completed', 'cancelled', 'postponed'];
+
 const classOptions = [
   'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
 ];
-const sectionOptions = ['A', 'B', 'C', 'D'];
 
-const ActivityPlanner = () => {
+// Component
+const MonthlyPlanner = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [activities, setActivities] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
+    class: '',
     description: '',
-    activityType: 'Sports',
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear(),
     startDate: format(new Date(), 'yyyy-MM-dd'),
     endDate: format(new Date(), 'yyyy-MM-dd'),
-    time: {
-      startTime: String,
-      endTime: String
-    },
-    venue: '',
-    classesInvolved: [],
-    status: 'planned'
+    eventType: 'academic',
+    status: 'planned',
+    academicYear: `${currentDate.getFullYear()}-${currentDate.getFullYear() + 1}`,
+    venue: ''
   });
   const [loading, setLoading] = useState(false);
+  const [hoveredDay, setHoveredDay] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
 
+  // Fetch all plans for the month
+  useEffect(() => {
+    const fetchPlans = async () => {
+      setLoading(true);
+      try {
+        const token = sessionStorage.getItem('coordinatorToken');
+        const res = await fetch('http://localhost:5000/api/monthly/planner/get/all/monthly/planners', {
+          method:'GET',
+          headers: { 
+            'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setPlans(data.data || []);
+      } catch (err) {
+        console.log(err);
+        toast.error('Failed to update planner')
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPlans();
+  }, [showModal]);
+
+  // Filter plans for current month
+  const monthPlans = plans.filter(
+    plan => plan.month === (currentDate.getMonth() + 1) && plan.year === currentDate.getFullYear()
+  );
+  
   const navigate = useNavigate();
 
-  // Fetch all activities
-  const fetchActivities = async () => {
-    setLoading(true);
-    try {
-      const token = sessionStorage.getItem('coordinatorToken');
-      if(!token){
-        toast.error('Please login to continue');
-        navigate('/');
-        return;
-      }
-      const res = await fetch('http://localhost:5000/api/activity/planner/get/all/activities', {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if(!res.ok) throw new Error('Failed to fetch activities');
-      const data = await res.json();
-      setActivities(data.data || []);
-    } catch (err) {
-      toast.error('Failed to fetch activities');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchActivities();
-    // eslint-disable-next-line
-  }, [currentDate, showModal]);
-
-  // Filter activities for current month (show if any part of activity is in this month)
-  const monthActivities = activities.filter(act => {
-    const start = parseISO(act.startDate);
-    const end = parseISO(act.endDate);
-    const monthStartDate = startOfMonth(currentDate);
-    const monthEndDate = endOfMonth(currentDate);
-    return (start <= monthEndDate && end >= monthStartDate);
-  });
-
-  // Calendar logic
+  // Calendar logic (same as before)
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
@@ -292,11 +354,11 @@ const ActivityPlanner = () => {
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
 
-  // Get activities for a specific day
-  const getActivitiesForDay = (day) => {
-    return monthActivities.filter(act => {
-      const start = format(parseISO(act.startDate), 'yyyy-MM-dd');
-      const end = format(parseISO(act.endDate), 'yyyy-MM-dd');
+  // Get plans for a specific day
+  const getPlansForDay = (day) => {
+    return monthPlans.filter(plan => {
+      const start = format(parseISO(plan.startDate), 'yyyy-MM-dd');
+      const end = format(parseISO(plan.endDate), 'yyyy-MM-dd');
       const d = format(day, 'yyyy-MM-dd');
       return d >= start && d <= end;
     });
@@ -305,117 +367,81 @@ const ActivityPlanner = () => {
   // Modal handlers
   const openModal = (day) => {
     setFormData({
-      title: '',
-      description: '',
-      activityType: 'Sports',
+      ...formData,
       startDate: format(day, 'yyyy-MM-dd'),
       endDate: format(day, 'yyyy-MM-dd'),
-      time: {
-        startTime: String,
-        endTime: String
-      },
-      venue: '',
-      classesInvolved: [],
-      status: 'planned'
+      month: day.getMonth() + 1,
+      year: day.getFullYear()
     });
     setShowModal(true);
   };
 
-  // Handle form changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'startTime' || name === 'endTime') {
-      setFormData(prev => ({
-        ...prev,
-        time: { ...prev.time, [name]: value }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
-
-  // Handle classes involved (multi-select)
-  const handleClassSectionChange = (idx, field, value) => {
-    setFormData(prev => {
-      const updated = [...prev.classesInvolved];
-      updated[idx] = { ...updated[idx], [field]: value };
-      return { ...prev, classesInvolved: updated };
-    });
-  };
-
-  const addClassSection = () => {
     setFormData(prev => ({
       ...prev,
-      classesInvolved: [...prev.classesInvolved, { class: '', section: '' }]
+      [name]: value
     }));
   };
 
-  const removeClassSection = (idx) => {
-    setFormData(prev => ({
-      ...prev,
-      classesInvolved: prev.classesInvolved.filter((_, i) => i !== idx)
-    }));
-  };
-
-  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const token = sessionStorage.getItem('coordinatorToken');
-      if (!token) {
+      if(!token){
         toast.error('Please login to continue');
         navigate('/');
         return;
       }
-
-      // Prepare the payload
-      const payload = {
-        ...formData,
-        time: {
-          startTime: formData.time.startTime,
-          endTime: formData.time.endTime
-        }
-        // ...add coordinator/createdBy if needed
-      };
-
-      const res = await fetch('http://localhost:5000/api/activity/planner/create/new/activity', {
+      const res = await fetch('http://localhost:5000/api/monthly/planner/create/monthly/planner', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(formData)
       });
-      if (!res.ok) throw new Error('Failed to create activity');
-      toast.success('Activity Created Successfully');
+      if (!res.ok) throw new Error('Failed to create plan');
+      toast.success('Planner Created Successfully');
       setShowModal(false);
-      fetchActivities();
     } catch (err) {
-      toast.error('Failed to create activity');
+      console.log(err);
+      toast.error('Failed to create plan');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this activity?')) return;
+    if (!window.confirm('Are you sure you want to delete this plan?')) return;
     setLoading(true);
     try {
       const token = sessionStorage.getItem('coordinatorToken');
-      const res = await fetch(`http://localhost:5000/api/activity/planner/delete/activity/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/monthly/planner/delete/monthly/plan/by/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('Failed to delete activity');
-      toast.success('Activity deleted successfully');
-      fetchActivities();
+      if (!res.ok) throw new Error('Failed to delete plan');
+      toast.success('Plan deleted successfully');
       setSelectedDay(null); // Optionally close the popup after delete
+      // Refetch plans
+      const fetchPlans = async () => {
+        try {
+          const token = sessionStorage.getItem('coordinatorToken');
+          const res = await fetch('http://localhost:5000/api/monthly/planner/get/all/monthly/planners', {
+            method:'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const data = await res.json();
+          setPlans(data.data || []);
+        } catch (err) {
+          toast.error('Failed to update planner');
+        }
+      };
+      fetchPlans();
     } catch (err) {
-      toast.error('Failed to delete activity');
+      toast.error('Failed to delete plan');
     } finally {
       setLoading(false);
     }
@@ -426,13 +452,13 @@ const ActivityPlanner = () => {
       <CoordinatorNavbar />
       <PlannerContainer>
         <Header>
-          <Title>Activity Planner (Class-wise)</Title>
+          <Title>Monthly Planner (Class-wise)</Title>
           <MonthSelector>
             <NavButton onClick={prevMonth}><span>‹</span> Previous</NavButton>
             <MonthTitle>{format(currentDate, 'MMMM yyyy')}</MonthTitle>
             <NavButton onClick={nextMonth}>Next <span>›</span></NavButton>
           </MonthSelector>
-          <NavButton onClick={() => openModal(new Date())}>+ Create Activity</NavButton>
+          <NavButton onClick={() => openModal(new Date())}>+ Create Plan</NavButton>
         </Header>
 
         <DaysGrid>
@@ -440,44 +466,104 @@ const ActivityPlanner = () => {
             <DayHeader key={day}>{day}</DayHeader>
           ))}
           {days.map((day, i) => {
-            const dayActs = getActivitiesForDay(day);
+            const dayPlans = getPlansForDay(day);
             const isCurrentMonth = isSameMonth(day, currentDate);
             const isToday = isSameDay(day, new Date());
             return (
               <DayCell
                 key={i}
-                $isCurrentMonth={isCurrentMonth}
-                $isToday={isToday}
+                isCurrentMonth={isCurrentMonth}
+                isToday={isToday}
                 onClick={() => setSelectedDay(format(day, 'yyyy-MM-dd'))}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: i * 0.01 }}
                 style={{ position: 'relative' }}
               >
-                <DayNumber $isCurrentMonth={isCurrentMonth} $isToday={isToday}>
+                <DayNumber isCurrentMonth={isCurrentMonth} isToday={isToday}>
                   {format(day, 'd')}
                 </DayNumber>
                 <AnimatePresence>
-                  {dayActs.map(act => (
+                  {dayPlans.map(plan => (
                     <Event
-                      key={act._id}
-                      color="#43a047"
+                      key={plan._id}
+                      color="#4a90e2"
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       layout
                     >
-                      <div style={{ fontWeight: 600 }}>{act.title}</div>
-                      <div style={{ fontSize: '0.7em' }}>{act.activityType}</div>
+                      <div style={{ fontWeight: 600 }}>{plan.title}</div>
+                      <div style={{ fontSize: '0.7em' }}>{plan.class}</div>
                     </Event>
                   ))}
                 </AnimatePresence>
+                {/* Tooltip for all tasks on hover */}
+                {hoveredDay === format(day, 'yyyy-MM-dd') && dayPlans.length > 0 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 'calc(100% + 10px)',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      zIndex: 200,
+                      background: '#fff',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+                      borderRadius: 10,
+                      minWidth: 240,
+                      maxWidth: 340,
+                      maxHeight: 260,
+                      overflowY: 'auto',
+                      padding: '1rem',
+                      fontSize: '0.97em',
+                      border: '1px solid #e3e3e3',
+                      textAlign: 'left',
+                      pointerEvents: 'auto'
+                    }}
+                  >
+                    {/* Arrow */}
+                    <div style={{
+                      position: 'absolute',
+                      left: '50%',
+                      bottom: -10,
+                      transform: 'translateX(-50%)',
+                      width: 0,
+                      height: 0,
+                      borderLeft: '10px solid transparent',
+                      borderRight: '10px solid transparent',
+                      borderTop: '10px solid #fff',
+                      filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.08))'
+                    }} />
+                    <div style={{ fontWeight: 700, marginBottom: 8, color: '#1976d2', fontSize: '1.05em' }}>
+                      Scheduled Tasks ({dayPlans.length})
+                    </div>
+                    {dayPlans.map(plan => (
+                      <div key={plan._id} style={{ marginBottom: 10, borderBottom: '1px solid #f0f0f0', paddingBottom: 6 }}>
+                        <div style={{ fontWeight: 600, color: '#333' }}>{plan.title}</div>
+                        <div style={{ fontSize: '0.9em', color: '#1976d2', fontWeight: 500 }}>{plan.class}</div>
+                        <div style={{ fontSize: '0.85em', color: '#888' }}>
+                          {plan.eventType} | {plan.status}
+                        </div>
+                        {plan.venue && (
+                          <div style={{ fontSize: '0.85em', color: '#888' }}>
+                            Venue: {plan.venue}
+                          </div>
+                        )}
+                        {plan.description && (
+                          <div style={{ fontSize: '0.85em', color: '#555', marginTop: 2 }}>
+                            {plan.description}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </DayCell>
             );
           })}
         </DaysGrid>
 
-        {/* Modal for creating an activity */}
+        {/* Modal for creating a plan */}
         <AnimatePresence>
           {showModal && (
             <ModalOverlay
@@ -492,7 +578,7 @@ const ActivityPlanner = () => {
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={e => e.stopPropagation()}
               >
-                <h2>Create Activity</h2>
+                <h2>Create Monthly Plan</h2>
                 <form onSubmit={handleSubmit}>
                   <FormGroup>
                     <Label>Title</Label>
@@ -504,106 +590,41 @@ const ActivityPlanner = () => {
                     />
                   </FormGroup>
                   <FormGroup>
+                    <Label>Class</Label>
+                    <select
+                      name="class"
+                      value={formData.class}
+                      onChange={handleInputChange}
+                      required
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: 6, border: '1px solid #ddd' }}
+                    >
+                      <option value="">Select Class</option>
+                      {classOptions.map(cls => (
+                        <option key={cls} value={cls}>{cls}</option>
+                      ))}
+                    </select>
+                  </FormGroup>
+                  <FormGroup>
                     <Label>Description</Label>
                     <TextArea
                       name="description"
                       value={formData.description}
                       onChange={handleInputChange}
-                      required
                     />
                   </FormGroup>
                   <FormGroup>
-                    <Label>Activity Type</Label>
+                    <Label>Event Type</Label>
                     <select
-                      name="activityType"
-                      value={formData.activityType}
+                      name="eventType"
+                      value={formData.eventType}
                       onChange={handleInputChange}
                       required
                       style={{ width: '100%', padding: '0.75rem', borderRadius: 6, border: '1px solid #ddd' }}
                     >
-                      {activityTypes.map(type => (
+                      {eventTypes.map(type => (
                         <option key={type} value={type}>{type}</option>
                       ))}
                     </select>
-                  </FormGroup>
-                  <FormGroup>
-                    <Label>Start Date</Label>
-                    <Input
-                      type="date"
-                      name="startDate"
-                      value={formData.startDate}
-                      min={format(new Date(), 'yyyy-MM-dd')}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label>End Date</Label>
-                    <Input
-                      type="date"
-                      name="endDate"
-                      value={formData.endDate}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label>Start Time</Label>
-                    <Input
-                      type="time"
-                      name="startTime"
-                      value={formData.time.startTime}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label>End Time</Label>
-                    <Input
-                      type="time"
-                      name="endTime"
-                      value={formData.time.endTime}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label>Venue</Label>
-                    <Input
-                      name="venue"
-                      value={formData.venue}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label>Classes Involved</Label>
-                    {formData.classesInvolved.map((cls, idx) => (
-                      <div key={idx} style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-                        <select
-                          value={cls.class}
-                          onChange={e => handleClassSectionChange(idx, 'class', e.target.value)}
-                          required
-                        >
-                          <option value="">Class</option>
-                          {classOptions.map(c => (
-                            <option key={c} value={c}>{c}</option>
-                          ))}
-                        </select>
-                        <select
-                          value={cls.section}
-                          onChange={e => handleClassSectionChange(idx, 'section', e.target.value)}
-                          required
-                        >
-                          <option value="">Section</option>
-                          {sectionOptions.map(s => (
-                            <option key={s} value={s}>{s}</option>
-                          ))}
-                        </select>
-                        <Button type="button" className="danger" onClick={() => removeClassSection(idx)} style={{ padding: '0 10px' }}>×</Button>
-                      </div>
-                    ))}
-                    <Button type="button" className="secondary" onClick={addClassSection}>+ Add Class/Section</Button>
                   </FormGroup>
                   <FormGroup>
                     <Label>Status</Label>
@@ -619,6 +640,43 @@ const ActivityPlanner = () => {
                       ))}
                     </select>
                   </FormGroup>
+                  <FormGroup>
+                    <Label>Academic Year</Label>
+                    <Input
+                      name="academicYear"
+                      value={formData.academicYear}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Start Date</Label>
+                    <Input
+                      type="date"
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>End Date</Label>
+                    <Input
+                      type="date"
+                      name="endDate"
+                      value={formData.endDate}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Venue</Label>
+                    <Input
+                      name="venue"
+                      value={formData.venue}
+                      onChange={handleInputChange}
+                    />
+                  </FormGroup>
                   <ButtonGroup>
                     <Button type="button" className="secondary" onClick={() => setShowModal(false)}>
                       Cancel
@@ -633,8 +691,7 @@ const ActivityPlanner = () => {
           )}
         </AnimatePresence>
 
-        {/* Popup for viewing all activities on a day */}
-        {selectedDay && getActivitiesForDay(new Date(selectedDay)).length > 0 && (
+        {selectedDay && getPlansForDay(new Date(selectedDay)).length > 0 && (
           <div
             style={{
               position: 'fixed',
@@ -646,8 +703,8 @@ const ActivityPlanner = () => {
               boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
               borderRadius: 14,
               minWidth: 320,
-              maxWidth: 480,
-              maxHeight: 420,
+              maxWidth: 420,
+              maxHeight: 400,
               overflowY: 'auto',
               padding: '1.5rem 2rem',
               fontSize: '1em',
@@ -658,7 +715,7 @@ const ActivityPlanner = () => {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div style={{ fontWeight: 700, color: '#1976d2', fontSize: '1.15em' }}>
-                Activities for {format(new Date(selectedDay), 'dd MMM yyyy')} ({getActivitiesForDay(new Date(selectedDay)).length})
+                Scheduled Tasks for {format(new Date(selectedDay), 'dd MMM yyyy')} ({getPlansForDay(new Date(selectedDay)).length})
               </div>
               <button
                 onClick={() => setSelectedDay(null)}
@@ -676,29 +733,28 @@ const ActivityPlanner = () => {
                 &times;
               </button>
             </div>
-            {getActivitiesForDay(new Date(selectedDay)).map(act => (
-              <div key={act._id} style={{ marginBottom: 16, borderBottom: '1px solid #f0f0f0', paddingBottom: 8, position: 'relative' }}>
-                <div style={{ fontWeight: 600, color: '#333', fontSize: '1.05em' }}>{act.title}</div>
-                <div style={{ fontSize: '0.95em', color: '#1976d2', fontWeight: 500 }}>{act.activityType}</div>
+            {getPlansForDay(new Date(selectedDay)).map(plan => (
+              <div key={plan._id} style={{ marginBottom: 16, borderBottom: '1px solid #f0f0f0', paddingBottom: 8, position: 'relative' }}>
+                <div style={{ fontWeight: 600, color: '#333', fontSize: '1.05em' }}>{plan.title}</div>
+                <div style={{ fontSize: '0.95em', color: '#1976d2', fontWeight: 500 }}>Class: {plan.class}</div>
                 <div style={{ fontSize: '0.92em', color: '#888' }}>
-                  {format(parseISO(act.startDate), 'dd MMM yyyy')} {act.time?.startTime} - {format(parseISO(act.endDate), 'dd MMM yyyy')} {act.time?.endTime}
+                  Type: {plan.eventType} 
                 </div>
                 <div style={{ fontSize: '0.92em', color: '#888' }}>
-                  Venue: {act.venue}
+                  Status: {plan.status}
                 </div>
-                <div style={{ fontSize: '0.92em', color: '#888' }}>
-                  Status: {act.status}
-                </div>
-                <div style={{ fontSize: '0.92em', color: '#888' }}>
-                  Classes: {act.classesInvolved?.map(c => `${c.class}${c.section ? '-' + c.section : ''}`).join(', ')}
-                </div>
-                {act.description && (
+                {plan.venue && (
+                  <div style={{ fontSize: '0.92em', color: '#888' }}>
+                    Venue: {plan.venue}
+                  </div>
+                )}
+                {plan.description && (
                   <div style={{ fontSize: '0.92em', color: '#555', marginTop: 2 }}>
-                    {act.description}
+                    {plan.description}
                   </div>
                 )}
                 <button
-      onClick={() => handleDelete(act._id)}
+      onClick={() => handleDelete(plan._id)}
       style={{
         position: 'absolute',
         top: 8,
@@ -724,4 +780,4 @@ const ActivityPlanner = () => {
   );
 };
 
-export default ActivityPlanner;
+export default MonthlyPlanner;

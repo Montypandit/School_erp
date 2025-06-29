@@ -29,14 +29,15 @@ import Attendence from "./admin/Attendence";
 import StudentListPage from "./component/coordinator/StudentListPage";
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
-//import ScheduleForm from "./component/teacher/ScheduleForm";
-
+import TeacherDashboard from "./component/teacher/TeacherDashboard";
+import GetAttendence from "./component/teacher/GetAttendence";
 import WeeklySchedule from "./admin/WeeklySchedule";
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
 import AllotmentClass from "./component/coordinator/Alottment_class";
 import Allotments from "./component/coordinator/Allotments";
 import PTMManagement from "./component/teacher/PTMMangement";
 import ActivityPlanner from "./coordinator/ActivityPlanner";
+import MonthlyPlanner from "./coordinator/monthlyPlanner";
 
 const App = () => {
   return (
@@ -53,9 +54,12 @@ const App = () => {
         <Route path="/coordinator/all/fee/details" element={<FeePaid/>}/>
         <Route path="/coordinator/fees/generate/:admissionId" element={<FeesGeneration/>}/>
         <Route path="/teacher/login" element={<TeacherLogin/>}/>
-        <Route path="/teacher/home" element={<TeacherHome/>}/>
+        <Route path="/teacher/home" element={<TeacherDashboard/>}/>
         <Route path="/coordinator/enquiry/process/:inquiryId" element={<EnquiryStudent/>}/>
         <Route path="/coordinator/enquiry" element={<EnquiryStudent/>}/>
+        <Route path="/coordinator/student" element={<Student/>}/>
+        <Route path="/coordinator/monthly/planner" element={<MonthlyPlanner/>}/>
+        <Route path="/admin/attendence" element={<Attendence/>}/>
         <Route path="/admin/employees" element={<EmployeeLogin/>}/>
         <Route path="/admin/allteachers" element={<GetAllTeacher/>}/>
         <Route path="/admin/allstudents" element={<GetAllStudent/>}/>
@@ -72,6 +76,8 @@ const App = () => {
         <Route path="/coordinator/update/student/:admissionId" element={<UpdateStudentInfo/>}/>
         <Route path="/coordinator/ptm" element={<PTMManagement/>}/>
         <Route path="/coordinator/activity/planner" element={<ActivityPlanner/>}/>
+        <Route path="/coordinator/allotment" element={<Allotments/>}/>
+        <Route path="/coordinator/allotment/class" element={<AllotmentClass/>}/>
 
           </Routes>
     </Router>

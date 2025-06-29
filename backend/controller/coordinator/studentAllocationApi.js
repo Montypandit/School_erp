@@ -6,7 +6,7 @@ const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 
 // 1. CREATE NEW STUDENT ALLOCATION
-router.post('/students/allocate', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.post('/students/allocate/section', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const {
       admissionId,
@@ -132,6 +132,33 @@ router.get('/students/roll/:rollNumber',authMiddleware, authorizeRoles('admin', 
     handleError(res, error, 'Failed to fetch student by roll number');
   }
 });
+
+// Get Student by class
+router.get('/students/byClass/:classId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try { 
+    const classId = req.params.classId;
+    const students = await StudentAllocation.find({ class: classId });
+    if (!students || students.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No students found for this class' 
+      });
+    }
+    res.json({
+      success: true,
+      data: students
+    });
+  } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid class ID format'
+      });
+    }
+    handleError(res, error, 'Failed to fetch students by class');
+  }
+});
+
 
 // 6. UPDATE STUDENT ALLOCATION
 router.put('/students/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {

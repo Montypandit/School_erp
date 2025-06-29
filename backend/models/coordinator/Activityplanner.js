@@ -87,45 +87,7 @@ const activityPlannerSchema = new mongoose.Schema({
     }
   }],
   
-  createdBy: {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: [true, 'Creator ID is required']
-    },
-    userType: {
-      type: String,
-      required: [true, 'Creator type is required'],
-      enum: ['admin', 'coordinator', 'teacher', 'principal']
-    }
-  },
-  
-  participants: [{
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true
-    },
-    userType: {
-      type: String,
-      required: true,
-      enum: ['student', 'teacher', 'parent']
-    }
-  }],
-  
-  coordinator: {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: [true, 'Coordinator ID is required']
-    },
-    name: {
-      type: String,
-      required: [true, 'Coordinator name is required']
-    },
-    userType: {
-      type: String,
-      required: [true, 'Coordinator type is required'],
-      enum: ['coordinator', 'teacher', 'admin']
-    }
-  },
+
   
   status: {
     type: String,
@@ -133,7 +95,7 @@ const activityPlannerSchema = new mongoose.Schema({
     enum: ['planned', 'approved', 'ongoing', 'completed', 'cancelled', 'postponed'],
     default: 'planned'
   }
-});
+},{timestamps:true});
 
 const ActivityPlanner = mongoose.model('ActivityPlanner', activityPlannerSchema);
 
