@@ -1,13 +1,34 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+/**
+ * CoordinatorNavbar component
+ *
+ * A responsive navigation bar for the Coordinator Portal.
+ * Features a logo, desktop navigation links, a user icon, and a logout button.
+ * Includes a mobile-friendly hamburger menu.
+ *
+ * @component
+ * @example
+ * return (
+ *   <CoordinatorNavbar />
+ * )
+ */
 const CoordinatorNavbar = () => {
+  /**
+   * State to manage the visibility of the mobile navigation menu.
+   * @type {[boolean, function(boolean): void]}
+   */
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
+  /**
+   * Handles the user logout process.
+   * Removes the coordinator's token from session storage and navigates to the login page.
+   */
   const handleLogout = () => {
     sessionStorage.removeItem('coordinatorToken');
-    navigate('/coordinator/login');
+    navigate('/');
   };
 
   return (
@@ -28,7 +49,7 @@ const CoordinatorNavbar = () => {
 
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex flex-1 justify-center ">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center">
               <Link
                 to="/coordinator/home"
                 className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
@@ -59,6 +80,12 @@ const CoordinatorNavbar = () => {
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Students
+              </Link>
+              <Link
+                to="/coordinator/teacher/page"
+                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+              >
+                Teachers
               </Link>
             </div>
           </div>
@@ -135,25 +162,25 @@ const CoordinatorNavbar = () => {
               Dashboard
             </Link>
             <Link
-              to="/reports"
+              to="/coordinator/activity/planner"
               className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Reports
+              Activity Planner
             </Link>
             <Link
-              to="/admission-status"
+              to="/coordinator/monthly/planner"
               className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Admission Status
+              Monthly Planner
             </Link>
             <Link
-              to="/coordinator/student-allotment"
+              to="/coordinator/allotment"
               className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Student Allotment
+              Allotments
             </Link>
             <Link
               to="/students/page"
@@ -161,6 +188,13 @@ const CoordinatorNavbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               Students
+            </Link>
+            <Link
+              to="/coordinator/teacher/page"
+              className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Teachers
             </Link>
             <hr className="my-2 border-gray-200" />
             <button

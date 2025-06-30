@@ -31,7 +31,8 @@ const leaveApi = require('./controller/admin/leaveApi');
 const scheduleApi = require('./controller/scheduleApi');
 const activityPlannerRoutes = require('./controller/coordinator/Activityplannerapi');
 const monthlyPlannerRoutes = require('./controller/coordinator/Monthlyplannerapi');
-
+const teachingSchedule = require('./controller/coordinator/teachingScheduleApi');
+const homeworkRoutes = require('./controller/teacher/homeworkapi');
 
 // Use APIs (with consistent route prefix)
 server.use('/api/auth', userLoginApi);
@@ -51,6 +52,9 @@ server.use('/api/schedules',  scheduleApi);
 server.use('/api/activity/planner', activityPlannerRoutes);
 server.use('/api/monthly/planner', monthlyPlannerRoutes);
 server.use('/api/coordinator/students/allocate', studentAllocationApi);
+server.use('/api/teaching/schedule',teachingSchedule);
+server.use('/api/homework/for/students', homeworkRoutes);
+
 
 // Start server
 server.listen(port, () => {

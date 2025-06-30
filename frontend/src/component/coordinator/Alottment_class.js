@@ -43,6 +43,7 @@ import {
   FormatListNumbered,
   Search
 } from '@mui/icons-material';
+import CoordinatorNavbar from './CoordinatorNavbar';
 
 // Custom theme with modern color palette
 const theme = createTheme({
@@ -317,6 +318,16 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
   },
 }));
 
+/**
+ * StudentAllotment Component
+ *
+ * A page for coordinators to manage student class allotments.
+ * It provides a form to add or edit a student's class, section, and roll number.
+ * A table displays the list of all currently allotted students, with search and edit functionality.
+ * The component is built with Material-UI for a modern look and feel.
+ *
+ * @component
+ */
 const StudentAllotment = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -346,7 +357,10 @@ const StudentAllotment = () => {
     },
   });
   
-  // Form state
+  /**
+   * State for the student allotment form.
+   * @type {[Object, function(Object): void]}
+   */
   const [formData, setFormData] = useState({
     studentName: '',
     className: '',
@@ -355,7 +369,10 @@ const StudentAllotment = () => {
     isValid: false
   });
   
-  // Validation state
+  /**
+   * State for tracking validation errors in the form fields.
+   * @type {[Object, function(Object): void]}
+   */
   const [validationErrors, setValidationErrors] = useState({
     studentName: false,
     className: false,
@@ -363,6 +380,11 @@ const StudentAllotment = () => {
     rollNumber: false
   });
   
+  /**
+   * State for the list of allotted students.
+   * In a real application, this would be fetched from an API.
+   * @type {[Array<Object>, function(Array<Object>): void]}
+   */
   const [students, setStudents] = useState([
     // Sample data - replace with API call
     { 
@@ -385,17 +407,25 @@ const StudentAllotment = () => {
     },
   ]);
   
+  /** @type {[boolean, function(boolean): void]} State to control the visibility of the snackbar notification. */
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  /** @type {[string, function(string): void]} State for the message displayed in the snackbar. */
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  /** @type {['success'|'error'|'info'|'warning', function('success'|'error'|'info'|'warning'): void]} State for the severity/color of the snackbar. */
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  /** @type {[boolean, function(boolean): void]} State to indicate when an API call (or simulation) is in progress. */
   const [loading, setLoading] = useState(false);
+  /** @type {[string, function(string): void]} State for the search term used to filter the students table. */
   const [searchTerm, setSearchTerm] = useState('');
 
   // Available options
   const classes = ['Nursery', 'LKG', 'UKG', ...Array.from({ length: 12 }, (_, i) => (i + 1).toString())];
   const sections = ['A', 'B', 'C', 'D', 'E'];
   
-  // Filter students based on search term
+  /**
+   * Filters the list of students based on the search term.
+   * @type {Array<Object>}
+   */
   const filteredStudents = students.filter(student => 
     student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.className.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -403,6 +433,10 @@ const StudentAllotment = () => {
     student.rollNumber.includes(searchTerm)
   );
 
+  /**
+   * Effect hook for fetching initial data. Currently commented out.
+   * In a real application, this would fetch the list of students from the backend.
+   */
   useEffect(() => {
     // In a real app, fetch students from API
     // fetchStudents();
@@ -410,6 +444,11 @@ const StudentAllotment = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    /**
+     * Handles changes in form input fields.
+     * Updates the form data state and corresponding validation state.
+     * @param {React.ChangeEvent<HTMLInputElement>} e - The event object.
+     */
     
     // Update form data
     setFormData(prev => ({
@@ -433,6 +472,11 @@ const StudentAllotment = () => {
     setFormData(prev => ({ ...prev, isValid: isFormValid }));
   };
 
+  /**
+   * Populates the form with the details of a selected student from the table,
+   * allowing the coordinator to edit their allotment.
+   * @param {Object} student - The student object to be edited.
+   */
   const handleSelectStudent = (student) => {
     setFormData({
       studentName: student.name,
@@ -442,6 +486,12 @@ const StudentAllotment = () => {
     });
   };
 
+  /**
+   * Handles the form submission for allotting a class to a student.
+   * Validates the form, shows a loading indicator, and simulates an API call.
+   * On success, it adds the new student to the list and shows a success message.
+   * @param {React.FormEvent<HTMLFormElement>} e - The form event.
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -500,12 +550,16 @@ const StudentAllotment = () => {
     }, 1000);
   };
 
+  /**
+   * Closes the snackbar notification.
+   */
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
 
   return (
     <ThemeProvider theme={componentTheme}>
+      <CoordinatorNavbar />
       <Container maxWidth="xl" sx={{ py: 4, px: { xs: 2, sm: 3 } }}>
         <Box sx={{ mb: 4, textAlign: 'center' }}>
           <Typography 

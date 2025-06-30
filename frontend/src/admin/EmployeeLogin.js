@@ -1,6 +1,8 @@
 
 import React, { useState } from "react";
 import AdminNavbar from "./AdminNavbar";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 
 const EmployeeLogin = ({ onClose = () => {} }) => {
@@ -32,26 +34,39 @@ const EmployeeLogin = ({ onClose = () => {} }) => {
     setMessage("");
   };
 
+  const navigate = useNavigate();
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setLoading(true);
 
     try {
-      // Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const token = sessionStorage.getItem('adminToken');
+      if(!token){
+        toast.error('Please login as admin to continue');
+        navigate('/');
+        return;
+      }
+      const res = await fetch('http://localhost:5000/api/auth/create/user', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':`Bearer ${token}`
+        },
+        body:JSON.stringify(formData)
+      } );
 
-      if (Math.random() > 0.3) {
-        setMessage("Credentials created successfully!");
+      if(!res.ok){
+        throw new Error('Failed to create user, Please try again later');
+      }
+      const data = await res.json();
+        setMessage(data.message);
         setIsSuccess(true);
         setFormData({
           email: "",
           password: "",
           role: "",
         });
-      } else {
-        throw new Error("Failed to create user. Please try again.");
-      }
     } catch (err) {
       setMessage(err.message);
       setIsSuccess(false);

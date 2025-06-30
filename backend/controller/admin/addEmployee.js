@@ -49,11 +49,12 @@ router.post('/create/employee', authMiddleware, authorizeRoles('admin'), async (
 });
 
 // Get All Employees 
-router.get('/get/all/employees', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/get/all/employees', authMiddleware, authorizeRoles('admin','coordinator'), async (req, res) => {
   try {
     const all = await Employee.find().sort({ createdAt: -1 });
     res.status(200).json(all);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -66,6 +67,19 @@ router.get('/get/employee/:empId', authMiddleware, authorizeRoles('admin'), asyn
 
     res.status(200).json(employee);
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// get employee by email
+router.get('/get/employee/email/:email', authMiddleware, authorizeRoles('admin','teacher'), async (req, res) => {
+  try {
+    const employee = await Employee.findOne({ email: req.params.email });
+    if (!employee) return res.status(404).json({ message: 'Employee not found' });
+
+    res.status(200).json(employee);
+  } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });

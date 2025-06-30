@@ -83,6 +83,23 @@ const TeacherLogin = () => {
     setIsLoading(true);
     
     try {
+
+      const res = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${formData.email}`, { 
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+      
+            const data = await res.json();
+            if (data.role !== 'teacher') {
+              toast.info(`Please login with ${data.role} portal`);
+              navigate('/');
+              return;
+            }
+
+
+
       const response = await fetch('http://localhost:5000/api/auth/user/login', {
         method: 'POST',
         headers: {
