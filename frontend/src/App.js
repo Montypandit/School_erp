@@ -48,6 +48,7 @@ import AdmissionFees from './component/coordinator/Admission/AdmissionFees';
 // Teacher Components
 import TeacherLogin from "./teacher/TeacherLogin";
 import TeacherDashboard from "./component/teacher/TeacherDashboard";
+import HomeWork from "./teacher/HomeWork";
 import GetAttendence from "./component/teacher/GetAttendence";
 import TeacherSchedulePage from "./teacher/TeachingSchedule";
 import PTMManagement from "./component/teacher/PTMMangement";
@@ -106,6 +107,7 @@ const App = () => {
         <Route path="/teacher/schedule" element={<ScheduleForm/>}/>
         <Route path="/teaching/schedule" element={<TeacherSchedulePage/>}/>
         <Route path="/teacher/ptm" element={<PTMManagement/>}/>
+        <Route path="/teacher/homework" element={<HomeWork/>}/>
 
         {/* ==================== Principal Module ==================== */}
         <Route path ="/principal/login" element={<PrincipalLogin/>}/>
