@@ -5,7 +5,7 @@ const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 
 // Create Homework
-router.post('/create/homework', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.post('/create/homework', authMiddleware, authorizeRoles('admin', 'coordinator','teacher'), async (req, res) => {
   try {
     const homework = new Homework(req.body);
     const saved = await homework.save();
