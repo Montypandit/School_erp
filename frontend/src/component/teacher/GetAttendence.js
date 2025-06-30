@@ -13,11 +13,17 @@ import {
 } from "lucide-react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import TeacherNavBar from "./TeacherNavbar"; // Ensure this path is correct
+// import  teacherNavBar from "./TeacherNavbar";
 
 
 const AttendancePage = () => {
   const [selectedClass, setSelectedClass] = useState("");
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
+  const [selectedDate, setSelectedDate] = useState(() => {
+  const today = new Date();
+  return today.toISOString().split("T")[0]; 
+});
+
   const [students, setStudents] = useState([]);
   const [attendance, setAttendance] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,28 +31,63 @@ const AttendancePage = () => {
 
   // Fetch all students initially
   useEffect(() => {
-    const fetchAllStudents = async () => {
-      try {
-        const token = sessionStorage.getItem("teacherToken");
-        const res = await fetch("http://localhost:5000/api/final/admission/get/all/admissions", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
-        if (res.ok) {
-          setStudents(data.data);
-          const initial = {};
-          data.data.forEach((s) => (initial[s._id] = "present"));
-          setAttendance(initial);
+  const fetchAllStudentsAndAttendance = async () => {
+    try {
+      const token = sessionStorage.getItem("teacherToken");
+
+      // Fetch all students
+      const res = await fetch("http://localhost:5000/api/final/admission/get/all/admissions", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setStudents(data.data);
+
+        // Fetch saved attendance for selected class and date
+        if (selectedClass && selectedDate) {
+          const res2 = await fetch(
+            `http://localhost:5000/api/final/admission/get/attendance?class=${selectedClass}&date=${selectedDate}`,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+
+          const saved = await res2.json();
+
+          if (res2.ok && saved.students.length > 0) {
+            // Set attendance from DB
+            const newAttendance = {};
+            saved.students.forEach((s) => {
+              newAttendance[s.studentId] = s.status;
+            });
+            setAttendance(newAttendance);
+          } else {
+            // No saved attendance, set default to "present"
+            const defaultAttendance = {};
+            data.data.forEach((student) => {
+              if (student.class === selectedClass) {
+                defaultAttendance[student._id] = "present";
+              }
+            });
+            setAttendance(defaultAttendance);
+          }
         }
-      } catch (error) {
-        console.error("Failed to fetch all students:", error);
       }
-    };
-    fetchAllStudents();
-  }, []);
+    } catch (err) {
+      console.error("Error loading students or attendance", err);
+    }
+  };
+
+  fetchAllStudentsAndAttendance();
+}, [selectedClass, selectedDate]);
+
 
   const handleAttendanceChange = (studentId, status) => {
     setAttendance((prev) => ({
@@ -95,12 +136,12 @@ const handleSaveAttendance = async () => {
 
     const data = await res.json();
     if (res.ok) {
-      toast.success("✅ Attendance saved successfully!");
+      toast.success(" Attendance saved successfully!");
     } else {
-      toast.error("❌ Failed to save: " + data.message);
+      toast.error(" Failed to save: " + data.message);
     }
   } catch (err) {
-    toast.error("❌ Error while saving attendance");
+    toast.error(" Error while saving attendance");
     console.error(err);
   }
 
@@ -118,14 +159,18 @@ const handleSaveAttendance = async () => {
     );
 
   const stats = {
-    total: Object.keys(attendance).length,
+    total: Object.keys(students).length,
     present: Object.values(attendance).filter((s) => s === "present").length,
     absent: Object.values(attendance).filter((s) => s === "absent").length,
     late: Object.values(attendance).filter((s) => s === "late").length,
   };
 
   return (
+    // add teachernavbar
+    <>
+    <TeacherNavBar />
     <div className="min-h-screen bg-gray-100 p-6">
+
       <div className="flex items-center gap-3 mb-6">
         <a href="/teacher/home" className="text-blue-600">
           <ArrowLeft />
@@ -142,6 +187,9 @@ const handleSaveAttendance = async () => {
             className="w-full p-2 border rounded"
           >
             <option value="">All Classes</option>
+            <option value="nursery">Class Nursery</option>
+            <option value="LKG">Class LKG</option>
+            <option value="ukg">Class UKG</option>
             <option value="1">Class 1</option>
             <option value="2">Class 2</option>
             <option value="3">Class 3</option>
@@ -241,6 +289,7 @@ const handleSaveAttendance = async () => {
         </table>
       </div>
     </div>
+    </>
   );
 };
 
