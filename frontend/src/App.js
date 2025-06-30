@@ -74,7 +74,7 @@ const App = () => {
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail/>}/>
         <Route path="/students/page" element={<StudentListPage/>}/>
         <Route path="/coordinator/update/student/:admissionId" element={<UpdateStudentInfo/>}/>
-
+        <Route path="/teacher/attendence" element={<GetAttendence/>}/>
           </Routes>
     </Router>
   );

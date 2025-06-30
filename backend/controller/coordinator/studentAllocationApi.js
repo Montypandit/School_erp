@@ -5,25 +5,40 @@ const router = express.Router();
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 
+const handleError = (res, error, message = "Internal Server Error", status = 500) => {
+  console.error(message, error); // logs in console
+  res.status(status).json({
+    success: false,
+    message,
+    error: error?.message || "Something went wrong"
+  });
+};
+
 // 1. CREATE NEW STUDENT ALLOCATION
 router.post('/students/allocate', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const {
       admissionId,
+      name,
+      class: studentClass,
       section,
+      academicYear
     } = req.body;
 
     // Validate required fields
-    if (!admissionId || !section ) {
+    if (!admissionId || !name || !studentClass || !section || !academicYear) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields: admissionId, section'
+        message: 'Missing required fields: admissionId, name, class, section, academicYear'
       });
     }
 
     const studentAllocation = new StudentAllocation({
       admissionId,
+      name,
+      class: studentClass,
       section,
+      academicYear
     });
 
     const savedStudent = await studentAllocation.save();
@@ -38,6 +53,7 @@ router.post('/students/allocate', authMiddleware, authorizeRoles('admin', 'coord
     handleError(res, error, 'Failed to create student allocation');
   }
 });
+
 
 // 2. GET ALL STUDENT ALLOCATIONS WITH PAGINATION AND FILTERING
 router.get('/students', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {

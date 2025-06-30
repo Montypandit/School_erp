@@ -1,24 +1,42 @@
 const mongoose = require('mongoose');
 
-// Individual student attendance
-const studentStatusSchema = new mongoose.Schema({
-  rollNo: { type: String, required: true },
-  studentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true },
-  name: { type: String, required: true },
-  fatherName: { type: String },
-  status: { type: String, enum: ['Present', 'Absent', 'Leave'], required: true }
-}, { _id: false });
+const studentAttendanceSchema = new mongoose.Schema({
+  studentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Admission'
+  },
+  name: {
+    type: String,
+    required: true
+  },
+  fatherName: {
+    type: String
+  },
+  admissionId: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['present', 'absent', 'late'],
+    default: 'absent'
+  }
+}, { _id: false }); // Prevents subdocument _id for each student entry
 
-// Full attendance record for a class & subject on a given day
 const attendanceSchema = new mongoose.Schema({
-  teacherId: { type: mongoose.Schema.Types.ObjectId, ref: 'Teacher', required: true },
-  subjectName: { type: String, required: true },
-  courseCode: { type: String, required: true },
-  class: { type: String, required: true },
-  section: { type: String, required: true },
-  date: { type: Date, required: true },
-  students: [studentStatusSchema]
+  class: {
+    type: String,
+    required: true
+  },
+  section: {
+    type: String // optional
+  },
+  date: {
+    type: String,
+    required: true // stored as YYYY-MM-DD string
+  },
+  students: [studentAttendanceSchema]
 }, { timestamps: true });
 
-const Attendance = mongoose.model('Attendance', attendanceSchema);
-module.exports = Attendance;
+module.exports = mongoose.model('Attendance', attendanceSchema);
