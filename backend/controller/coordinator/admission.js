@@ -3,12 +3,12 @@ const express = require('express');
 const Admission = require('../../models/coordinator/admissionForm');
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
-const AdmissionApproval = require('../../models/principal/admissionApproval')
-const InquiryForm = require('../../models/parents/inquiryForm')
+const AdmissionApproval = require('../../models/principal/admissionApproval');
+const InquiryForm = require('../../models/parents/inquiryForm');
 const Attendance = require('../../models/teacher/attendanceSchema');
 const router = express.Router();
 
-// POST /api/attendance/save
+// ======================= SAVE ATTENDANCE =======================
 router.post('/save/attendence', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
   try {
     const { class: className, section, date, students } = req.body;
@@ -17,45 +17,91 @@ router.post('/save/attendence', authMiddleware, authorizeRoles('admin', 'coordin
       return res.status(400).json({ message: "Class, date, and students are required" });
     }
 
-    const filter = {
-      class: className,
-      date: new Date(date).toISOString().split('T')[0]
-    };
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) {
+      return res.status(400).json({ message: "Invalid date format" });
+    }
+
+    const formattedDate = parsedDate.toISOString().split('T')[0];
+
+    const filter = { class: className, date: formattedDate };
     if (section) filter.section = section;
 
-    // Delete old attendance if already saved
-    await Attendance.deleteOne(filter);
+    const updatedAttendance = await Attendance.findOneAndUpdate(
+      filter,
+      {
+        class: className,
+        section,
+        date: formattedDate,
+        students,
+      },
+      { upsert: true, new: true }
+    );
 
-    // Save new attendance
-    const newAttendance = new Attendance({
-      class: className,
-      section,
-      date,
-      students
-    });
-
-    const saved = await newAttendance.save();
-    res.status(201).json({ message: "✅ Attendance saved successfully", data: saved });
+    res.status(201).json({ message: "✅ Attendance saved successfully", data: updatedAttendance });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "❌ Failed to save attendance", error: err.message });
   }
 });
 
+// ======================= GET ATTENDANCE =======================
+router.get('/get/attendance', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
+  try {
+    const { class: className, date } = req.query;
+
+    if (!className || !date) {
+      return res.status(400).json({ message: "Class and date are required" });
+    }
+
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate)) {
+      return res.status(400).json({ message: "Invalid date format" });
+    }
+
+    const formattedDate = parsedDate.toISOString().split("T")[0];
+
+    const attendanceRecord = await Attendance.findOne({ class: className, date: formattedDate });
+
+    if (!attendanceRecord) {
+      return res.status(200).json({ message: "No attendance found", students: [] });
+    }
+
+    res.status(200).json({ message: "Attendance found", students: attendanceRecord.students });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Failed to fetch attendance", error: error.message });
+  }
+});
+
+// ✅ GET all attendance records for a specific date (e.g., today)
+router.get('/get/all-attendance', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
+  try {
+    const { date } = req.query;
+    if (!date) return res.status(400).json({ message: "Date is required" });
+
+    const formattedDate = new Date(date).toISOString().split("T")[0];
+
+    const allAttendance = await Attendance.find({ date: formattedDate });
+
+    res.status(200).json({ message: "All attendance fetched", data: allAttendance });
+  } catch (err) {
+    console.error("Error in /get/all-attendance", err);
+    res.status(500).json({ message: "Failed to fetch attendance", error: err.message });
+  }
+});
 
 
-
-
-//  Create Admission
+// ======================= CREATE ADMISSION =======================
 router.post('/create/admission', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const newAdmission = new Admission(req.body);
     const savedAdmission = await newAdmission.save();
 
     const inquiryId = savedAdmission.inquiryId;
-    await AdmissionApproval.findOneAndDelete({inquiryId:inquiryId});
-    await InquiryForm.findOneAndDelete({inquiryId:inquiryId});
-    
+    await AdmissionApproval.findOneAndDelete({ inquiryId });
+    await InquiryForm.findOneAndDelete({ inquiryId });
+
     res.status(201).json({ message: 'Admission form submitted successfully', data: savedAdmission });
   } catch (error) {
     console.error(error);
@@ -63,7 +109,7 @@ router.post('/create/admission', authMiddleware, authorizeRoles('admin', 'coordi
   }
 });
 
-// Update Admission
+// ======================= UPDATE ADMISSION =======================
 router.put('/update/admission/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const { admissionId } = req.params;
@@ -84,7 +130,7 @@ router.put('/update/admission/:admissionId', authMiddleware, authorizeRoles('adm
   }
 });
 
-// Get All Admissions
+// ======================= GET ALL ADMISSIONS =======================
 router.get('/get/all/admissions', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const admissions = await Admission.find().sort({ createdAt: -1 });
@@ -95,22 +141,18 @@ router.get('/get/all/admissions', authMiddleware, authorizeRoles('admin', 'coord
   }
 });
 
-// get student by admissionId
-
-router.get('/get/student/:admissionId',authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
-  try{
+// ======================= GET STUDENT BY ADMISSION ID =======================
+router.get('/get/student/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try {
     const student = await Admission.findOne({ admissionId: req.params.admissionId });
     if (!student) return res.status(404).json({ message: 'Student not found' });
     res.status(200).json({ data: student });
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
 });
 
-
-
-
- // get all student by class
+// ======================= GET STUDENTS BY CLASS =======================
 router.get('/get/students/byClass/:classId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const { classId } = req.params;
@@ -126,6 +168,5 @@ router.get('/get/students/byClass/:classId', authMiddleware, authorizeRoles('adm
     res.status(500).json({ message: 'Failed to fetch students', error });
   }
 });
-
 
 module.exports = router;
