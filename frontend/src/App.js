@@ -77,6 +77,8 @@ const App = () => {
         <Route path="/students/page" element={<StudentListPage/>}/>
         <Route path="/coordinator/update/student/:admissionId" element={<UpdateStudentInfo/>}/>
         <Route path="/coordinator/teacher/page" element={<Teacher/>}/>
+        <Route path="/coordinator/activity/planner" element={<ActivityPlanner/>}/>
+        <Route path="/coordinator/allotment" element={<Allotments/>}/>
         
           </Routes>
     </Router>
