@@ -43,7 +43,8 @@ router.get('/get/teaching/schedule',authMiddleware, authorizeRoles('admin','coor
     }
 });
 
-router.get('/get/teaching/schedule/:empId',authMiddleware,authorizeRoles('admin','coordinator'), async (req,res)=>{
+
+router.get('/get/teaching/schedule/:empId',authMiddleware,authorizeRoles('admin','coordinator','teacher'), async (req,res)=>{
     try{
         const empId = req.params.empId;
         const schedule = await TeachingSchedule.find({empId:empId});

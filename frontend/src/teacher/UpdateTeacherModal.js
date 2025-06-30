@@ -23,11 +23,42 @@ const modalStyle = {
     borderRadius: '12px',
 };
 
+/**
+ * A modal component for updating teacher information.
+ *
+ * This component provides a form within a Material-UI Modal to edit details
+ * of a teacher, including personal, contact, and professional information.
+ * It handles form state, image previews, and submission to an update API endpoint.
+ *
+ * @param {object} props - The component props.
+ * @param {boolean} props.open - Controls whether the modal is open or closed.
+ * @param {function} props.onClose - Callback function to close the modal.
+ * @param {object} props.teacherData - The initial data of the teacher to be updated.
+ * @param {function} props.onUpdateSuccess - Callback function executed after a successful update.
+ * @returns {JSX.Element|null} The rendered modal or null if no teacher data is provided.
+ */
 const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => {
+    /**
+     * State to hold the form data for the teacher being edited.
+     * @type {[object, function(object): void]}
+     */
     const [formData, setFormData] = useState({});
+    /**
+     * State to manage the loading spinner during form submission.
+     * @type {[boolean, function(boolean): void]}
+     */
     const [loading, setLoading] = useState(false);
+    /**
+     * State to hold the URL for the image preview.
+     * This can be an existing URL from `teacherData` or a local object URL for a newly selected file.
+     * @type {[string|null, function(string|null): void]}
+     */
     const [previewImage, setPreviewImage] = useState(null);
 
+    /**
+     * Effect hook to populate the form with teacher data whenever the `teacherData` prop changes.
+     * It resets the form if `teacherData` is null.
+     */
     useEffect(() => {
         if (teacherData) {
             setFormData({
@@ -58,11 +89,20 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
         }
     }, [teacherData]);
 
+    /**
+     * Handles changes to form input fields and updates the `formData` state.
+     * @param {React.ChangeEvent<HTMLInputElement>} e - The input change event.
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    /**
+     * Handles the selection of a new image file.
+     * It updates the form state with the file and creates a local URL for preview.
+     * @param {React.ChangeEvent<HTMLInputElement>} e - The file input change event.
+     */
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -71,6 +111,12 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
         }
     };
 
+    /**
+     * Handles the form submission to update the teacher's data.
+     * It sends a PUT request to the backend API.
+     * Note: Image upload is not handled here; this implementation assumes image URLs are managed separately or not updated via this form.
+     * @param {React.FormEvent<HTMLFormElement>} e - The form submission event.
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -110,6 +156,8 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
                     errorData = JSON.parse(errorText);
                 } catch (e) {
                     // If parsing fails, errorText is likely the direct message
+                    console.log(e);
+                    
                 }
                 throw new Error(errorData?.message || errorData?.error || errorText || 'Failed to update teacher');
             }
@@ -127,7 +175,8 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
         }
     };
 
-    if (!teacherData) return null; // Don't render modal content if no teacher data
+    // Don't render the modal if there's no teacher data to display
+    if (!teacherData) return null;
 
     return (
         <Modal
@@ -154,6 +203,7 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
                 </Typography>
                 <form onSubmit={handleSubmit}>
                     <Grid container spacing={3}>
+                        {/* Image Upload Section */}
                         <Grid item xs={12} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <Avatar
                                 src={previewImage || formData.imageUrl}
@@ -169,7 +219,7 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
                             </Button>
                         </Grid>
 
-                        {/* Personal Information */}
+                        {/* Personal Information Fields */}
                         <Grid item xs={12} sm={6}>
                             <TextField name="firstName" label="First Name" value={formData.firstName || ''} onChange={handleChange} fullWidth required />
                         </Grid>
@@ -189,7 +239,7 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
                             <TextField name="teacherId" label="Teacher ID (Employee ID)" value={formData.teacherId || ''} onChange={handleChange} fullWidth required disabled /* Usually empId is not editable */ />
                         </Grid>
 
-                        {/* Address Information */}
+                        {/* Address Information Fields */}
                         <Grid item xs={12} sm={6}>
                             <TextField name="village" label="Village/Street" value={formData.village || ''} onChange={handleChange} fullWidth />
                         </Grid>
@@ -209,7 +259,7 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
                             <TextField name="aadhar" label="Aadhar Number" value={formData.aadhar || ''} onChange={handleChange} fullWidth />
                         </Grid>
 
-                        {/* Professional Information */}
+                        {/* Professional Information Fields */}
                         <Grid item xs={12} sm={6}>
                             <TextField name="designation" label="Designation" value={formData.designation || ''} onChange={handleChange} fullWidth />
                         </Grid>
@@ -239,6 +289,7 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
                             </FormControl>
                         </Grid>
 
+                        {/* Form Action Buttons */}
                         <Grid item xs={12} sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                             <Button onClick={onClose} variant="outlined" color="secondary" disabled={loading}>
                                 Cancel

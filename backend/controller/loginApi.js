@@ -7,7 +7,6 @@ const authMiddleware = require('../middleware/authMiddleware');
 const authorizeRoles = require('../middleware/authorizeRules');
 const bcrypt = require('bcryptjs');
 
-
 router.post('/user/login', async (req, res) => {
     const { email, password } = req.body;
 
