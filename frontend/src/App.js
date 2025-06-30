@@ -38,6 +38,7 @@ import Allotments from "./component/coordinator/Allotments";
 import PTMManagement from "./component/teacher/PTMMangement";
 import ActivityPlanner from "./coordinator/ActivityPlanner";
 import MonthlyPlanner from "./coordinator/monthlyPlanner";
+import Teacher from './component/coordinator/Teacher';
 
 const App = () => {
   return (
@@ -75,6 +76,7 @@ const App = () => {
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail/>}/>
         <Route path="/students/page" element={<StudentListPage/>}/>
         <Route path="/coordinator/update/student/:admissionId" element={<UpdateStudentInfo/>}/>
+        <Route path="/coordinator/teacher/page" element={<Teacher/>}/>
         
           </Routes>
     </Router>

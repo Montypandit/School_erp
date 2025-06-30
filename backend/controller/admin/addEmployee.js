@@ -49,11 +49,12 @@ router.post('/create/employee', authMiddleware, authorizeRoles('admin'), async (
 });
 
 // Get All Employees 
-router.get('/get/all/employees', authMiddleware, authorizeRoles('admin'), async (req, res) => {
+router.get('/get/all/employees', authMiddleware, authorizeRoles('admin','coordinator'), async (req, res) => {
   try {
     const all = await Employee.find().sort({ createdAt: -1 });
     res.status(200).json(all);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });
