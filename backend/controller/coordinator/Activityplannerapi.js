@@ -11,6 +11,7 @@ router.post('/create/new/activity', authMiddleware, authorizeRoles('admin', 'coo
     await activity.save();
     res.status(201).json({ message: 'Activity created successfully', data: activity });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: 'Failed to create activity', error: error.message });
   }
 });
@@ -34,6 +35,18 @@ router.get('/get/activity/by/:id', authMiddleware, authorizeRoles('admin', 'coor
     res.status(200).json({ data: activity });
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch activity', error: error.message });
+  }
+});
+// DELETE: Delete Activity by ID
+router.delete('/delete/activity/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try {
+    const activity = await ActivityPlanner.findByIdAndDelete(req.params.id);
+    if (!activity) {
+      return res.status(404).json({ message: 'Activity not found' });
+    }
+    res.status(200).json({ message: 'Activity deleted successfully', data: activity });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete activity', error: error.message });
   }
 });
 

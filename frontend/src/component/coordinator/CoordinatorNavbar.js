@@ -36,19 +36,19 @@ const CoordinatorNavbar = () => {
                 Dashboard
               </Link>
               <Link
-                to="/reports"
+                to="/coordinator/activity/planner"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
-                Reports
+                Activity Planner
               </Link>
               <Link
-                to="/admission-status"
+                to="/coordinator/monthly/planner"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
-                Admission
+                Monthly Planner
               </Link>
               <Link
-                to="/coordinator/student/allotments"
+                to="/coordinator/allotment"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Allotments
@@ -79,7 +79,7 @@ const CoordinatorNavbar = () => {
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="flex items-center  mb-4 gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+              className="flex items-center   gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
             >
               <svg
                 className="w-4 h-4"

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Users, BookOpen, Search, Save, Edit, ChevronDown, ChevronUp, School } from 'lucide-react';
+import { Users, BookOpen, Search, Save, Edit, ChevronDown, ChevronUp, School, Shirt } from 'lucide-react';
+import CoordinatorNavbar from './CoordinatorNavbar';
 
 
 
@@ -10,9 +11,16 @@ const StudentAllotmentManager = () => {
   const [selectedClass, setSelectedClass] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAllotmentModal, setShowAllotmentModal] = useState(false);
+  const [showBooksModal, setShowBooksModal] = useState(false);
+  const [showUniformModal, setShowUniformModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [classStats, setClassStats] = useState({});
   const [expandedClass, setExpandedClass] = useState(null);
+  const [allotmentData, setAllotmentData] = useState({
+    section: '',
+    books: [],
+    academicYear: ''
+  });
 
   const classes = ['LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8'];
   const sections = ['A', 'B', 'C', 'D'];
@@ -20,12 +28,6 @@ const StudentAllotmentManager = () => {
     'Mathematics', 'English', 'Hindi', 'Science', 'Social Studies',
     'Computer Science', 'Art & Craft', 'Physical Education'
   ];
-
-  const [allotmentData, setAllotmentData] = useState({
-    section: '',
-    books: [],
-    academicYear: ''
-  });
 
   // Toast notification function
   const toast = {
@@ -125,34 +127,79 @@ const StudentAllotmentManager = () => {
     setAllotmentData({
       section: student.section || '',
       books: student.books || [],
-      academicYear:student.academicYear || ''
+      academicYear: student.academicYear || ''
     });
     setShowAllotmentModal(true);
   };
 
+  // New: Allocate Books
+  const handleAllocateBooks = (student) => {
+    setSelectedStudent(student);
+    setAllotmentData({
+      books: student.books || [],
+      academicYear: student.academicYear || ''
+    });
+    setShowBooksModal(true);
+  };
+
+  // New: Allocate Uniform
+  const handleAllocateUniform = (student) => {
+    setSelectedStudent(student);
+    setAllotmentData({
+      uniform: student.uniform || '',
+      academicYear: student.academicYear || ''
+    });
+    setShowUniformModal(true);
+  };
+
+  // Save section/academicYear/allocated to backend
   const saveAllotment = async () => {
+    if (!allotmentData.academicYear || !allotmentData.section) {
+      toast.error('Please select section and enter academic year.');
+      return;
+    }
     try {
-      const updatedStudent = {
-        ...selectedStudent,
-        section: allotmentData.section,
-        books: allotmentData.books,
-        academicYear: allotmentData.academicYear,
-        allocated:true
-      };
-
-      // Update local state
-      const updatedStudents = students.map(student =>
-        student.id === selectedStudent.id ? updatedStudent : student
-      );
-      setStudents(updatedStudents);
-      calculateClassStats(updatedStudents);
-
+      const token = sessionStorage.getItem('coordinatorToken');
+      if(!token){
+        toast.info('Please login to continue');
+        navigate('/coordinator/login');
+        return;
+      }
+      const res = await fetch('http://localhost:5000/api/coordinator/students/allocate/students/allocate/section', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          admissionId: selectedStudent.admissionId || selectedStudent.studentId || selectedStudent.id,
+          section: allotmentData.section,
+          academicYear: allotmentData.academicYear,
+          alloted: true
+        })
+      });
+      if (!res.ok) throw new Error('Failed to save allotment');
       toast.success('Allotment saved successfully!');
       setShowAllotmentModal(false);
+      // Optionally refetch students here
     } catch (error) {
-      console.log(error);
+      console.error('Error saving allotment:', error);
       toast.error('Failed to save allotment');
     }
+  };
+
+  // Dummy save for books (implement your logic)
+  const saveBooksAllotment = async () => {
+    toast.success('Books allocated!');
+    setShowBooksModal(false);
+    // Optionally call your backend here
+  };
+
+  // Dummy save for uniform (implement your logic)
+  const saveUniformAllotment = async () => {
+    toast.success('Uniform allocated!');
+    setShowUniformModal(false);
+    // Optionally call your backend here
   };
 
   const toggleBookSelection = (book) => {
@@ -329,7 +376,7 @@ const StudentAllotmentManager = () => {
     button: {
       backgroundColor: '#2563eb',
       color: 'white',
-      padding: '8px 16px',
+      padding: '8px 8px',
       border: 'none',
       borderRadius: '6px',
       fontSize: '14px',
@@ -416,6 +463,8 @@ const StudentAllotmentManager = () => {
   };
 
   return (
+    <div>
+    <CoordinatorNavbar/>
     <div style={styles.container}>
       <div style={styles.maxWidth}>
         {/* Header */}
@@ -599,13 +648,27 @@ const StudentAllotmentManager = () => {
                           {getStatusText(student)}
                         </span>
                       </td>
-                      <td style={styles.td}>
+                      <td style={styles.td} className='flex gap-2'>
                         <button
                           onClick={() => handleAllotment(student)}
                           style={styles.button}
                         >
                           <Edit size={14} />
-                          Allot
+                          Allot Section
+                        </button>
+                        <button
+                          onClick={() => handleAllocateBooks(student)}
+                          style={{ ...styles.button, backgroundColor: '#55c2da', marginLeft: 8 }}
+                        >
+                          <BookOpen size={14} />
+                          Allocate Books
+                        </button>
+                        <button
+                          onClick={() => handleAllocateUniform(student)}
+                          style={{ ...styles.button, backgroundColor: '#43a047', marginLeft: 8 }}
+                        >
+                          <Shirt size={14} />
+                          Allocate Uniform
                         </button>
                       </td>
                     </tr>
@@ -626,7 +689,6 @@ const StudentAllotmentManager = () => {
                 </h3>
                 <p style={{ fontSize: '14px', color: '#6b7280', margin: '4px 0 0 0' }}>Class: {selectedStudent?.class || selectedStudent?.grade}</p>
               </div>
-
               <div style={styles.modalBody}>
                 <div style={styles.formGroup}>
                   <label style={styles.label}>Assign Section</label>
@@ -641,28 +703,16 @@ const StudentAllotmentManager = () => {
                     ))}
                   </select>
                 </div>
-
-
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>
-                    Assign Books ({allotmentData.books.length} selected)
-                  </label>
-                  <div style={styles.bookGrid}>
-                    {books.map(book => (
-                      <label key={book} style={styles.bookItem}>
-                        <input
-                          type="checkbox"
-                          checked={allotmentData.books.includes(book)}
-                          onChange={() => toggleBookSelection(book)}
-                        />
-                        <BookOpen size={16} color="#6b7280" />
-                        <span style={{ fontSize: '14px', color: '#374151' }}>{book}</span>
-                      </label>
-                    ))}
-                  </div>
+                  <label style={styles.label}>Academic Year</label>
+                  <input
+                    style={styles.input}
+                    value={allotmentData.academicYear}
+                    onChange={(e) => setAllotmentData(prev => ({ ...prev, academicYear: e.target.value }))}
+                    placeholder="Academic Year"
+                  />
                 </div>
               </div>
-
               <div style={styles.modalFooter}>
                 <button
                   onClick={() => setShowAllotmentModal(false)}
@@ -676,6 +726,93 @@ const StudentAllotmentManager = () => {
                 >
                   <Save size={16} />
                   Save Allotment
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Books Modal */}
+        {showBooksModal && (
+          <div style={styles.modal}>
+            <div style={styles.modalContent}>
+              <div style={styles.modalHeader}>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>
+                  Allocate Books - {selectedStudent?.name}
+                </h3>
+              </div>
+              <div style={styles.modalBody}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>
+                    Assign Books ({allotmentData.books?.length || 0} selected)
+                  </label>
+                  <div style={styles.bookGrid}>
+                    {books.map(book => (
+                      <label key={book} style={styles.bookItem}>
+                        <input
+                          type="checkbox"
+                          checked={allotmentData.books?.includes(book)}
+                          onChange={() => toggleBookSelection(book)}
+                        />
+                        <BookOpen size={16} color="#6b7280" />
+                        <span style={{ fontSize: '14px', color: '#374151' }}>{book}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div style={styles.modalFooter}>
+                <button
+                  onClick={() => setShowBooksModal(false)}
+                  style={styles.cancelButton}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveBooksAllotment}
+                  style={styles.button}
+                >
+                  <Save size={16} />
+                  Save Books
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Uniform Modal */}
+        {showUniformModal && (
+          <div style={styles.modal}>
+            <div style={styles.modalContent}>
+              <div style={styles.modalHeader}>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>
+                  Allocate Uniform - {selectedStudent?.name}
+                </h3>
+              </div>
+              <div style={styles.modalBody}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Uniform Details</label>
+                  <input
+                    style={styles.input}
+                    value={allotmentData.uniform || ''}
+                    onChange={(e) => setAllotmentData(prev => ({ ...prev, uniform: e.target.value }))}
+                    placeholder="Uniform details"
+                  />
+                </div>
+              </div>
+              <div style={styles.modalFooter}>
+                <button
+                  onClick={() => setShowUniformModal(false)}
+                  style={styles.cancelButton}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveUniformAllotment}
+                  style={styles.button}
+                >
+                  <Save size={16} />
+                  Save Uniform
                 </button>
               </div>
             </div>
@@ -707,6 +844,7 @@ const StudentAllotmentManager = () => {
                     }
                 `}
       </style>
+    </div>
     </div>
   );
 };

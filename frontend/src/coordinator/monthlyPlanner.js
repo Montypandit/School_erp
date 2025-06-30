@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
+import {toast} from 'react-toastify';
+import CoordinatorNavbar from '../component/coordinator/CoordinatorNavbar';
+import { useNavigate } from 'react-router-dom';
 
 // Styled Components
 const PlannerContainer = styled.div`
@@ -264,61 +267,81 @@ const ColorOption = styled.div`
   }
 `;
 
+const eventTypes = [
+  'academic', 'exam', 'holiday', 'meeting', 'event', 'assignment', 'project', 'extracurricular', 'maintenance', 'other'
+];
+const semesters = ['1st', '2nd', 'summer'];
+const statuses = ['planned', 'ongoing', 'completed', 'cancelled', 'postponed'];
+
+const classOptions = [
+  'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'
+];
+
 // Component
 const MonthlyPlanner = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState(() => {
-    // Load events from localStorage if available
-    const savedEvents = localStorage.getItem('plannerEvents');
-    return savedEvents ? JSON.parse(savedEvents) : [];
-  });
+  const [plans, setPlans] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
+    class: '',
     description: '',
-    color: '#4a90e2',
-    date: format(new Date(), 'yyyy-MM-dd'),
+    month: currentDate.getMonth() + 1,
+    year: currentDate.getFullYear(),
+    startDate: format(new Date(), 'yyyy-MM-dd'),
+    endDate: format(new Date(), 'yyyy-MM-dd'),
+    eventType: 'academic',
+    status: 'planned',
+    academicYear: `${currentDate.getFullYear()}-${currentDate.getFullYear() + 1}`,
+    venue: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [hoveredDay, setHoveredDay] = useState(null);
+  const [selectedDay, setSelectedDay] = useState(null);
 
-  const colorOptions = [
-    '#4a90e2', // blue
-    '#e74c3c', // red
-    '#2ecc71', // green
-    '#f39c12', // orange
-    '#9b59b6', // purple
-    '#1abc9c', // teal
-  ];
-
-  // Save events to localStorage whenever they change
+  // Fetch all plans for the month
   useEffect(() => {
-    localStorage.setItem('plannerEvents', JSON.stringify(events));
-  }, [events]);
+    const fetchPlans = async () => {
+      setLoading(true);
+      try {
+        const token = sessionStorage.getItem('coordinatorToken');
+        const res = await fetch('http://localhost:5000/api/monthly/planner/get/all/monthly/planners', {
+          method:'GET',
+          headers: { 
+            'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setPlans(data.data || []);
+      } catch (err) {
+        console.log(err);
+        toast.error('Failed to update planner')
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPlans();
+  }, [showModal]);
 
+  // Filter plans for current month
+  const monthPlans = plans.filter(
+    plan => plan.month === (currentDate.getMonth() + 1) && plan.year === currentDate.getFullYear()
+  );
+  
+  const navigate = useNavigate();
+
+  // Calendar logic (same as before)
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
-  
-  // Calculate the day of the week the month starts on (0 = Sunday, 1 = Monday, etc.)
   const startDay = monthStart.getDay();
-  
-  // Create array of days to display, including days from previous/next month to fill the grid
   const days = [];
-  
-  // Add days from previous month
   for (let i = 0; i < startDay; i++) {
     const date = new Date(monthStart);
     date.setDate(-startDay + i + 1);
     days.push(date);
   }
-  
-  // Add days of current month
   days.push(...daysInMonth);
-  
-  // Add days from next month to complete the grid (if needed)
-  const remainingDays = 42 - days.length; // 6 rows of 7 days
+  const remainingDays = 42 - days.length;
   if (remainingDays > 0) {
     const lastDay = new Date(monthEnd);
     for (let i = 1; i <= remainingDays; i++) {
@@ -328,40 +351,28 @@ const MonthlyPlanner = () => {
     }
   }
 
-  const nextMonth = () => {
-    setCurrentDate(addMonths(currentDate, 1));
-  };
+  const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+  const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
 
-  const prevMonth = () => {
-    setCurrentDate(subMonths(currentDate, 1));
-  };
-
-  const handleDayClick = (day) => {
-    setSelectedDate(day);
-    setFormData({
-      title: '',
-      description: '',
-      color: '#4a90e2',
-      date: format(day, 'yyyy-MM-dd'),
+  // Get plans for a specific day
+  const getPlansForDay = (day) => {
+    return monthPlans.filter(plan => {
+      const start = format(parseISO(plan.startDate), 'yyyy-MM-dd');
+      const end = format(parseISO(plan.endDate), 'yyyy-MM-dd');
+      const d = format(day, 'yyyy-MM-dd');
+      return d >= start && d <= end;
     });
-    setSelectedEvent(null);
-    setIsEditMode(false);
-    setShowModal(true);
   };
 
-  const handleEventClick = (event, day) => {
-    // Prevent event click from triggering day click
-    event.stopPropagation();
-    
-    setSelectedDate(day);
-    setSelectedEvent(event);
+  // Modal handlers
+  const openModal = (day) => {
     setFormData({
-      title: event.title,
-      description: event.description || '',
-      color: event.color,
-      date: format(parseISO(event.date), 'yyyy-MM-dd'),
+      ...formData,
+      startDate: format(day, 'yyyy-MM-dd'),
+      endDate: format(day, 'yyyy-MM-dd'),
+      month: day.getMonth() + 1,
+      year: day.getFullYear()
     });
-    setIsEditMode(true);
     setShowModal(true);
   };
 
@@ -373,215 +384,399 @@ const MonthlyPlanner = () => {
     }));
   };
 
-  const handleColorSelect = (color) => {
-    setFormData(prev => ({
-      ...prev,
-      color
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!formData.title.trim()) return;
-    
-    if (isEditMode && selectedEvent) {
-      // Update existing event
-      setEvents(prev => 
-        prev.map(evt => 
-          evt.id === selectedEvent.id 
-            ? { ...formData, id: selectedEvent.id, date: formData.date }
-            : evt
-        )
-      );
-    } else {
-      // Add new event
-      const newEvent = {
-        ...formData,
-        id: Date.now().toString(),
-      };
-      setEvents(prev => [...prev, newEvent]);
-    }
-    
-    setShowModal(false);
-  };
-
-  const handleDelete = () => {
-    if (selectedEvent) {
-      setEvents(prev => prev.filter(evt => evt.id !== selectedEvent.id));
+    setLoading(true);
+    try {
+      const token = sessionStorage.getItem('coordinatorToken');
+      if(!token){
+        toast.error('Please login to continue');
+        navigate('/');
+        return;
+      }
+      const res = await fetch('http://localhost:5000/api/monthly/planner/create/monthly/planner', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+      if (!res.ok) throw new Error('Failed to create plan');
+      toast.success('Planner Created Successfully');
       setShowModal(false);
+    } catch (err) {
+      console.log(err);
+      toast.error('Failed to create plan');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getEventsForDay = (day) => {
-    return events.filter(event => {
-      const eventDate = parseISO(event.date);
-      return isSameDay(eventDate, day);
-    });
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this plan?')) return;
+    setLoading(true);
+    try {
+      const token = sessionStorage.getItem('coordinatorToken');
+      const res = await fetch(`http://localhost:5000/api/monthly/planner/delete/monthly/plan/by/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to delete plan');
+      toast.success('Plan deleted successfully');
+      setSelectedDay(null); // Optionally close the popup after delete
+      // Refetch plans
+      const fetchPlans = async () => {
+        try {
+          const token = sessionStorage.getItem('coordinatorToken');
+          const res = await fetch('http://localhost:5000/api/monthly/planner/get/all/monthly/planners', {
+            method:'GET',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const data = await res.json();
+          setPlans(data.data || []);
+        } catch (err) {
+          toast.error('Failed to update planner');
+        }
+      };
+      fetchPlans();
+    } catch (err) {
+      toast.error('Failed to delete plan');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <PlannerContainer>
-      <Header>
-        <Title>Monthly Planner</Title>
-        <MonthSelector>
-          <NavButton onClick={prevMonth}>
-            <span>‹</span> Previous
-          </NavButton>
-          <MonthTitle>{format(currentDate, 'MMMM yyyy')}</MonthTitle>
-          <NavButton onClick={nextMonth}>
-            Next <span>›</span>
-          </NavButton>
-        </MonthSelector>
-      </Header>
-      
-      <DaysGrid>
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <DayHeader key={day}>{day}</DayHeader>
-        ))}
-        
-        {days.map((day, i) => {
-          const dayEvents = getEventsForDay(day);
-          const isCurrentMonth = isSameMonth(day, currentDate);
-          const isToday = isSameDay(day, new Date());
-          
-          return (
-            <DayCell 
-              key={i}
-              onClick={() => handleDayClick(day)}
-              isCurrentMonth={isCurrentMonth}
-              isToday={isToday}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2, delay: i * 0.01 }}
-            >
-              <DayNumber isCurrentMonth={isCurrentMonth} isToday={isToday}>
-                {format(day, 'd')}
-              </DayNumber>
-              
-              <AnimatePresence>
-                {dayEvents.map(event => (
-                  <Event
-                    key={event.id}
-                    color={event.color}
-                    onClick={(e) => handleEventClick(event, day)}
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    layout
-                  >
-                    {event.title}
-                  </Event>
-                ))}
-              </AnimatePresence>
-              
-              {isCurrentMonth && (
-                <AddEventButton onClick={(e) => {
-                  e.stopPropagation();
-                  handleDayClick(day);
-                }}>
-                  +
-                </AddEventButton>
-              )}
-            </DayCell>
-          );
-        })}
-      </DaysGrid>
-      
-      {/* Event Modal */}
-      <AnimatePresence>
-        {showModal && (
-          <ModalOverlay
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowModal(false)}
-          >
-            <ModalContent
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2>{isEditMode ? 'Edit Event' : 'Add New Event'}</h2>
-              <form onSubmit={handleSubmit}>
-                <FormGroup>
-                  <Label>Title</Label>
-                  <Input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    placeholder="Event title"
-                    required
-                  />
-                </FormGroup>
-                
-                <FormGroup>
-                  <Label>Date</Label>
-                  <Input
-                    type="date"
-                    name="date"
-                    value={formData.date}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </FormGroup>
-                
-                <FormGroup>
-                  <Label>Description</Label>
-                  <TextArea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    placeholder="Add event details..."
-                  />
-                </FormGroup>
-                
-                <FormGroup>
-                  <Label>Color</Label>
-                  <EventColors>
-                    {colorOptions.map(color => (
-                      <ColorOption
-                        key={color}
-                        color={color}
-                        selected={formData.color === color}
-                        onClick={() => handleColorSelect(color)}
-                      />
-                    ))}
-                  </EventColors>
-                </FormGroup>
-                
-                <ButtonGroup>
-                  {isEditMode && (
-                    <Button 
-                      type="button" 
-                      className="danger"
-                      onClick={handleDelete}
+    <>
+      <CoordinatorNavbar />
+      <PlannerContainer>
+        <Header>
+          <Title>Monthly Planner (Class-wise)</Title>
+          <MonthSelector>
+            <NavButton onClick={prevMonth}><span>‹</span> Previous</NavButton>
+            <MonthTitle>{format(currentDate, 'MMMM yyyy')}</MonthTitle>
+            <NavButton onClick={nextMonth}>Next <span>›</span></NavButton>
+          </MonthSelector>
+          <NavButton onClick={() => openModal(new Date())}>+ Create Plan</NavButton>
+        </Header>
+
+        <DaysGrid>
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <DayHeader key={day}>{day}</DayHeader>
+          ))}
+          {days.map((day, i) => {
+            const dayPlans = getPlansForDay(day);
+            const isCurrentMonth = isSameMonth(day, currentDate);
+            const isToday = isSameDay(day, new Date());
+            return (
+              <DayCell
+                key={i}
+                isCurrentMonth={isCurrentMonth}
+                isToday={isToday}
+                onClick={() => setSelectedDay(format(day, 'yyyy-MM-dd'))}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: i * 0.01 }}
+                style={{ position: 'relative' }}
+              >
+                <DayNumber isCurrentMonth={isCurrentMonth} isToday={isToday}>
+                  {format(day, 'd')}
+                </DayNumber>
+                <AnimatePresence>
+                  {dayPlans.map(plan => (
+                    <Event
+                      key={plan._id}
+                      color="#4a90e2"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      layout
                     >
-                      Delete
+                      <div style={{ fontWeight: 600 }}>{plan.title}</div>
+                      <div style={{ fontSize: '0.7em' }}>{plan.class}</div>
+                    </Event>
+                  ))}
+                </AnimatePresence>
+                {/* Tooltip for all tasks on hover */}
+                {hoveredDay === format(day, 'yyyy-MM-dd') && dayPlans.length > 0 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: 'calc(100% + 10px)',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      zIndex: 200,
+                      background: '#fff',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+                      borderRadius: 10,
+                      minWidth: 240,
+                      maxWidth: 340,
+                      maxHeight: 260,
+                      overflowY: 'auto',
+                      padding: '1rem',
+                      fontSize: '0.97em',
+                      border: '1px solid #e3e3e3',
+                      textAlign: 'left',
+                      pointerEvents: 'auto'
+                    }}
+                  >
+                    {/* Arrow */}
+                    <div style={{
+                      position: 'absolute',
+                      left: '50%',
+                      bottom: -10,
+                      transform: 'translateX(-50%)',
+                      width: 0,
+                      height: 0,
+                      borderLeft: '10px solid transparent',
+                      borderRight: '10px solid transparent',
+                      borderTop: '10px solid #fff',
+                      filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.08))'
+                    }} />
+                    <div style={{ fontWeight: 700, marginBottom: 8, color: '#1976d2', fontSize: '1.05em' }}>
+                      Scheduled Tasks ({dayPlans.length})
+                    </div>
+                    {dayPlans.map(plan => (
+                      <div key={plan._id} style={{ marginBottom: 10, borderBottom: '1px solid #f0f0f0', paddingBottom: 6 }}>
+                        <div style={{ fontWeight: 600, color: '#333' }}>{plan.title}</div>
+                        <div style={{ fontSize: '0.9em', color: '#1976d2', fontWeight: 500 }}>{plan.class}</div>
+                        <div style={{ fontSize: '0.85em', color: '#888' }}>
+                          {plan.eventType} | {plan.status}
+                        </div>
+                        {plan.venue && (
+                          <div style={{ fontSize: '0.85em', color: '#888' }}>
+                            Venue: {plan.venue}
+                          </div>
+                        )}
+                        {plan.description && (
+                          <div style={{ fontSize: '0.85em', color: '#555', marginTop: 2 }}>
+                            {plan.description}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </DayCell>
+            );
+          })}
+        </DaysGrid>
+
+        {/* Modal for creating a plan */}
+        <AnimatePresence>
+          {showModal && (
+            <ModalOverlay
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowModal(false)}
+            >
+              <ModalContent
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+              >
+                <h2>Create Monthly Plan</h2>
+                <form onSubmit={handleSubmit}>
+                  <FormGroup>
+                    <Label>Title</Label>
+                    <Input
+                      name="title"
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Class</Label>
+                    <select
+                      name="class"
+                      value={formData.class}
+                      onChange={handleInputChange}
+                      required
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: 6, border: '1px solid #ddd' }}
+                    >
+                      <option value="">Select Class</option>
+                      {classOptions.map(cls => (
+                        <option key={cls} value={cls}>{cls}</option>
+                      ))}
+                    </select>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Description</Label>
+                    <TextArea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleInputChange}
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Event Type</Label>
+                    <select
+                      name="eventType"
+                      value={formData.eventType}
+                      onChange={handleInputChange}
+                      required
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: 6, border: '1px solid #ddd' }}
+                    >
+                      {eventTypes.map(type => (
+                        <option key={type} value={type}>{type}</option>
+                      ))}
+                    </select>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Status</Label>
+                    <select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleInputChange}
+                      required
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: 6, border: '1px solid #ddd' }}
+                    >
+                      {statuses.map(status => (
+                        <option key={status} value={status}>{status}</option>
+                      ))}
+                    </select>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Academic Year</Label>
+                    <Input
+                      name="academicYear"
+                      value={formData.academicYear}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Start Date</Label>
+                    <Input
+                      type="date"
+                      name="startDate"
+                      value={formData.startDate}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>End Date</Label>
+                    <Input
+                      type="date"
+                      name="endDate"
+                      value={formData.endDate}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label>Venue</Label>
+                    <Input
+                      name="venue"
+                      value={formData.venue}
+                      onChange={handleInputChange}
+                    />
+                  </FormGroup>
+                  <ButtonGroup>
+                    <Button type="button" className="secondary" onClick={() => setShowModal(false)}>
+                      Cancel
                     </Button>
-                  )}
-                  <Button 
-                    type="button" 
-                    className="secondary"
-                    onClick={() => setShowModal(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    className="primary"
-                  >
-                    {isEditMode ? 'Update' : 'Add'} Event
-                  </Button>
-                </ButtonGroup>
-              </form>
-            </ModalContent>
-          </ModalOverlay>
+                    <Button type="submit" className="primary" disabled={loading}>
+                      {loading ? 'Saving...' : 'Create'}
+                    </Button>
+                  </ButtonGroup>
+                </form>
+              </ModalContent>
+            </ModalOverlay>
+          )}
+        </AnimatePresence>
+
+        {selectedDay && getPlansForDay(new Date(selectedDay)).length > 0 && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 80,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 9999,
+              background: '#fff',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+              borderRadius: 14,
+              minWidth: 320,
+              maxWidth: 420,
+              maxHeight: 400,
+              overflowY: 'auto',
+              padding: '1.5rem 2rem',
+              fontSize: '1em',
+              border: '1px solid #e3e3e3',
+              textAlign: 'left',
+              pointerEvents: 'auto'
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ fontWeight: 700, color: '#1976d2', fontSize: '1.15em' }}>
+                Scheduled Tasks for {format(new Date(selectedDay), 'dd MMM yyyy')} ({getPlansForDay(new Date(selectedDay)).length})
+              </div>
+              <button
+                onClick={() => setSelectedDay(null)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: '1.5em',
+                  color: '#888',
+                  cursor: 'pointer',
+                  marginLeft: 12,
+                  lineHeight: 1
+                }}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+            </div>
+            {getPlansForDay(new Date(selectedDay)).map(plan => (
+              <div key={plan._id} style={{ marginBottom: 16, borderBottom: '1px solid #f0f0f0', paddingBottom: 8, position: 'relative' }}>
+                <div style={{ fontWeight: 600, color: '#333', fontSize: '1.05em' }}>{plan.title}</div>
+                <div style={{ fontSize: '0.95em', color: '#1976d2', fontWeight: 500 }}>Class: {plan.class}</div>
+                <div style={{ fontSize: '0.92em', color: '#888' }}>
+                  Type: {plan.eventType} 
+                </div>
+                <div style={{ fontSize: '0.92em', color: '#888' }}>
+                  Status: {plan.status}
+                </div>
+                {plan.venue && (
+                  <div style={{ fontSize: '0.92em', color: '#888' }}>
+                    Venue: {plan.venue}
+                  </div>
+                )}
+                {plan.description && (
+                  <div style={{ fontSize: '0.92em', color: '#555', marginTop: 2 }}>
+                    {plan.description}
+                  </div>
+                )}
+                <button
+      onClick={() => handleDelete(plan._id)}
+      style={{
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        background: '#e53935',
+        color: '#fff',
+        border: 'none',
+        borderRadius: 4,
+        padding: '2px 10px',
+        cursor: 'pointer',
+        fontSize: '0.95em'
+      }}
+      title="Delete"
+    >
+      Delete
+    </button>
+              </div>
+            ))}
+          </div>
         )}
-      </AnimatePresence>
-    </PlannerContainer>
+      </PlannerContainer>
+    </>
   );
 };
 

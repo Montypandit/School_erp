@@ -31,12 +31,12 @@ import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
 import TeacherDashboard from "./component/teacher/TeacherDashboard";
 import GetAttendence from "./component/teacher/GetAttendence";
-
 import WeeklySchedule from "./admin/WeeklySchedule";
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
 import AllotmentClass from "./component/coordinator/Alottment_class";
 import Allotments from "./component/coordinator/Allotments";
-// import PTMManagement from "./component/coordinator/PTMManagement";
+import PTMManagement from "./component/teacher/PTMMangement";
+import ActivityPlanner from "./coordinator/ActivityPlanner";
 import MonthlyPlanner from "./coordinator/monthlyPlanner";
 
 const App = () => {
@@ -58,7 +58,7 @@ const App = () => {
         <Route path="/coordinator/enquiry/process/:inquiryId" element={<EnquiryStudent/>}/>
         <Route path="/coordinator/enquiry" element={<EnquiryStudent/>}/>
         <Route path="/coordinator/student" element={<Student/>}/>
-        <Route path="/coordinator/planner" element={<MonthlyPlanner/>}/>
+        <Route path="/coordinator/monthly/planner" element={<MonthlyPlanner/>}/>
         <Route path="/admin/attendence" element={<Attendence/>}/>
         <Route path="/admin/employees" element={<EmployeeLogin/>}/>
         <Route path="/admin/allteachers" element={<GetAllTeacher/>}/>
@@ -74,7 +74,7 @@ const App = () => {
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail/>}/>
         <Route path="/students/page" element={<StudentListPage/>}/>
         <Route path="/coordinator/update/student/:admissionId" element={<UpdateStudentInfo/>}/>
-        <Route path="/teacher/attendence" element={<GetAttendence/>}/>
+
           </Routes>
     </Router>
   );

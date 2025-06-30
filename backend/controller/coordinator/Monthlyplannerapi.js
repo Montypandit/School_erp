@@ -5,7 +5,7 @@ const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 
 // Create Monthly Plan
-router.post('/create/monthly-plan', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.post('/create/monthly/planner', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const newPlan = new MonthlyPlanner(req.body);
     const savedPlan = await newPlan.save();
@@ -27,7 +27,7 @@ router.put('/update/monthly-plan/by/:id', authMiddleware, authorizeRoles('admin'
 });
 
 // Get All Monthly Plans
-router.get('/get/all/monthly-plans', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.get('/get/all/monthly/planners', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const plans = await MonthlyPlanner.find().sort({ startDate: 1 });
     res.status(200).json({ message: 'Monthly plans fetched', data: plans });
@@ -47,4 +47,13 @@ router.get('/get/monthly-plan/by/:id', authMiddleware, authorizeRoles('admin', '
   }
 });
 
+router.delete('/delete/monthly/plan/by/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try {
+    const deletedPlan = await MonthlyPlanner.findByIdAndDelete(req.params.id);
+    if (!deletedPlan) return res.status(404).json({ message: 'Monthly plan not found' });
+    res.status(200).json({ message: 'Monthly plan deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to delete monthly plan', error: err.message });
+  }
+});
 module.exports = router;
