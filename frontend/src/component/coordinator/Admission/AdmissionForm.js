@@ -83,10 +83,21 @@ export default function AdmissionForm() {
           class: data.currentClass || "",
           dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : "",
           fatherName: data.fatherName || "",
+          fatherQualification: data.fatherQualification || "",
+          fatherOccupation: data.fatherOccupation || "",
           fatherMobile: data.fatherPhoneNo || "",
-          email: data.fatherEmail || "",
+          fatherEmail: data.fatherEmail || "",
+          motherName: data.motherName || "",
+          motherQualification: data.motherQualification || "",
+          motherOccupation: data.motherOccupation || "",
+          motherMobile: data.motherPhoneNo || "",
+          motherEmail: data.motherEmail || "",
+          email: data.fatherEmail || "", // or data.motherEmail if you prefer
           residentialAddress: data.residentialAddress || "",
-          emergencyContactPhoneNo: data.fatherPhoneNo || "", // Using emergencyContactPhoneNo as per formData
+          emergencyContactPhoneNo: data.fatherPhoneNo || "",
+          haveYouVisitedOurWebsite: data.haveYouVisitedOurWebsite || false,
+          howDoYouKnowAboutSUNVILLEKIDZ: data.howDoYouKnowAboutSUNVILLEKIDZ || "",
+          references: data.references || "",
         }));
       } catch (error) {
         console.error("Error fetching inquiry data:", error);
@@ -119,6 +130,8 @@ export default function AdmissionForm() {
       setFormData((prev) => ({ ...prev, [name]: value }))
     }
   }
+
+
 
   const handleImageChange = async (photoType, file) => {
     if (file && file.type.startsWith("image/")) {
@@ -193,15 +206,10 @@ export default function AdmissionForm() {
     if (!formData.fatherName.trim()) newErrors.fatherName = "Father name is required"
     if (!formData.motherName.trim()) newErrors.motherName = "Mother name is required"
     if (!formData.fatherMobile.trim()) newErrors.fatherMobile = "Father mobile is required"
-    if (!formData.motherMobile.trim()) newErrors.motherMobile = "Mother mobile is required"
     if (!formData.email.trim()) newErrors.email = "Email is required"
     if (!formData.residentialAddress.trim()) newErrors.residentialAddress = "Address is required"
     if (!formData.emergencyContactPhoneNo.trim()) newErrors.emergencyContactPhoneNo = "Contact mobile is required"
 
-    // Photo validation
-    if (!photos.child.file) newErrors.childPhoto = "Child photo is required"
-    if (!photos.father.file) newErrors.fatherPhoto = "Father photo is required"
-    if (!photos.mother.file) newErrors.motherPhoto = "Mother photo is required"
 
     // Email validation
     if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
@@ -270,7 +278,9 @@ export default function AdmissionForm() {
       // Reset form after successful submission
       setTimeout(() => {
         setSubmitStatus("idle")
-      }, 8000)
+      }, 5000)
+
+      navigate(`/coordinator/admission/fees/${submissionData.admissionId}`)
     } catch (error) {
       console.error("Submission error:", error)
       setSubmitStatus("error")

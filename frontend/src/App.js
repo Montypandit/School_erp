@@ -99,6 +99,7 @@ const App = () => {
         <Route path="/coordinator/activity/planner" element={<ActivityPlanner/>}/>
         <Route path="/coordinator/allotment" element={<Allotments/>}/>
         <Route path="/students/page" element={<StudentListPage/>}/>
+        <Route path="/coordinator/admission/fees/:admissionId" element={<AdmissionFees/>}/>
 
         {/* ==================== Teacher Module ==================== */}
         <Route path="/teacher/login" element={<TeacherLogin/>}/>
