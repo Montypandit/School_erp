@@ -7,6 +7,7 @@ import {
   Calendar,
   FileText,
   BarChart3,
+  BookOpen,
 } from "lucide-react";
 import TeacherNavbar from "./TeacherNavbar"; // ✅ Make sure path is correct
 
@@ -147,6 +148,7 @@ const TeacherHome = () => {
             <ActionButton href="/teacher/attendence" icon={<Calendar />} label="Attendance" />
             <ActionButton href="/teacher/result" icon={<BarChart3 />} label="Results" />
             <ActionButton href="/teacher/report" icon={<FileText />} label="Reports" />
+            <ActionButton href="/teacher/homework" icon={<BookOpen />} label="Homework" />
           </div>
         </div>
 
