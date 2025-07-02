@@ -51,6 +51,7 @@ import TeacherDashboard from "./component/teacher/TeacherDashboard";
 import GetAttendence from "./component/teacher/GetAttendence";
 import TeacherSchedulePage from "./teacher/TeachingSchedule";
 import PTMManagement from "./component/teacher/PTMMangement";
+import AddResult from "./component/teacher/AddResult";
 
 // Principal Components
 import PrincipalLogin from './principal/PrincipalLogin';
@@ -106,6 +107,7 @@ const App = () => {
         <Route path="/teacher/schedule" element={<ScheduleForm/>}/>
         <Route path="/teaching/schedule" element={<TeacherSchedulePage/>}/>
         <Route path="/teacher/ptm" element={<PTMManagement/>}/>
+        <Route path="/teacher/results" element={<AddResult/>}/>
 
         {/* ==================== Principal Module ==================== */}
         <Route path ="/principal/login" element={<PrincipalLogin/>}/>
