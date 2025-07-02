@@ -69,4 +69,24 @@ router.put('/update/attendance/:attendanceId', authMiddleware, authorizeRoles('t
   }
 });
 
+// GET attendance by date for teachers
+router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles('teacher'), async (req, res) => {
+  try {
+    const { date } = req.params;
+
+    if (!date) return res.status(400).json({ message: 'Date is required' });
+
+    const records = await Attendance.find({ date }).sort({ createdAt: -1 });
+
+    if (records.length === 0) {
+      return res.status(404).json({ message: 'No attendance records found for this date' });
+    }
+
+    res.status(200).json({ data: records });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 module.exports = router;

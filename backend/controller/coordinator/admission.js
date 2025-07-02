@@ -73,6 +73,50 @@ router.get('/get/attendance', authMiddleware, authorizeRoles('admin', 'coordinat
     res.status(500).json({ message: "Failed to fetch attendance", error: error.message });
   }
 });
+// ======================= GET ALL ATTENDANCE RECORDS FOR A SPECIFIC DATE =======================
+router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles('teacher'), async (req, res) => {
+  try {
+    const { date } = req.params;
+
+    if (!date) return res.status(400).json({ message: 'Date is required' });
+
+    const formattedDate = new Date(date).toISOString().split('T')[0];
+
+    const records = await Attendance.find({ date: formattedDate }).sort({ createdAt: -1 });
+
+    if (records.length === 0) {
+      return res.status(404).json({ message: 'No attendance records found for this date' });
+    }
+
+    // Map and prepare frontend-compatible data
+    const mapped = records.map(record => {
+      const total = record.students.length;
+      const present = record.students.filter(s => s.status === 'present').length;
+      const absent = total - present;
+      const absentList = record.students
+        .filter(s => s.status === 'absent')
+        .map(s => s.name || s.studentName || s.admissionId); // Adjust field as per schema
+
+      const attendancePercentage = total === 0 ? 0 : Math.round((present / total) * 100);
+
+      return {
+        class: record.class,
+        section: record.section,
+        totalStudents: total,
+        presentStudents: present,
+        absentStudents: absent,
+        absentList,
+        attendancePercentage,
+      };
+    });
+
+    res.status(200).json({ data: mapped });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 // ✅ GET all attendance records for a specific date (e.g., today)
 router.get('/get/all-attendance', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {

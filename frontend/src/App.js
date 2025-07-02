@@ -46,6 +46,7 @@ import GetAttendence from "./component/teacher/GetAttendence";
 import Results from "./component/teacher/AddResult";
 import TeacherSchedulePage from "./teacher/TeachingSchedule";
 import PTMManagement from "./component/teacher/PTMMangement";
+import Report from "./component/teacher/Reports";
 
 // Principal Components
 //import PrincipalLogin from './principal/PrincipalLogin';
@@ -79,6 +80,7 @@ const App = () => {
         <Route path="/teacher/results" element={<Results/>}/>
         <Route path="/teacher/schedule" element={<TeacherSchedulePage/>}/>
         <Route path="/teacher/ptm" element={<PTMManagement/>}/>
+        <Route path="/teacher/report" element={<Report/>}/>
 
         
         <Route path="/teacher/schedule" element={<ScheduleForm/>}/>
