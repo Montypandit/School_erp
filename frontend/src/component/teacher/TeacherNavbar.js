@@ -57,6 +57,12 @@ const TeacherNavbar = () => {
                 Results
               </Link>
               <Link
+                to="/teacher/ptm"
+                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+              >
+                PTM
+              </Link>
+              <Link
                 to="/teacher/reports"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
@@ -82,7 +88,7 @@ const TeacherNavbar = () => {
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="flex items-center  mb-4 gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+              className="flex items-center  gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
             >
               <svg
                 className="w-4 h-4"

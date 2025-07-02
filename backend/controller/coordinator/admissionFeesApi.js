@@ -7,13 +7,6 @@ const authorizeRoles = require('../../middleware/authorizeRules');
 
 const router = express.Router();
 
-// Function to generate unique receipt ID
-const generateReceiptId = (type = 'ADMFEE') => {
-  const timestamp = Date.now().toString().slice(-6);
-  const random = Math.floor(Math.random() * 3000).toString().padStart(4, '0');
-  return `${type}${timestamp}${random}`;
-};
-
 // POST API to create admission fees
 router.post('/create/admission/fee', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
@@ -25,10 +18,8 @@ router.post('/create/admission/fee', authMiddleware, authorizeRoles('admin', 'co
       return res.status(400).json({ message: 'Fees already generated for this admission ID' });
     }
 
-    const receiptId = generateReceiptId();
     const newFees = new AdmissionFees({
       ...feesData,
-      receiptId
     });
 
     await newFees.save();

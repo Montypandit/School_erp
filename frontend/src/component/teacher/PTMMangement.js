@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, User, Phone, MessageSquare, CheckCircle, XCircle, Plus, Search, Filter } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import TeacherNavbar from './TeacherNavbar'
 
 const PTMManagement = () => {
   const [students, setStudents] = useState([]);
@@ -10,45 +13,6 @@ const PTMManagement = () => {
   const [filterClass, setFilterClass] = useState('');
   const [activeTab, setActiveTab] = useState('students');
 
-  // Sample student data
-  const sampleStudents = [
-    {
-      admissionId: 'ADM001',
-      name: 'Rahul Sharma',
-      class: '10-A',
-      rollNo: '15',
-      parentName: 'Rajesh Sharma',
-      parentPhone: '+91-9876543210',
-      email: 'rajesh.sharma@email.com'
-    },
-    {
-      admissionId: 'ADM002',
-      name: 'Priya Singh',
-      class: '10-A',
-      rollNo: '22',
-      parentName: 'Suresh Singh',
-      parentPhone: '+91-9876543211',
-      email: 'suresh.singh@email.com'
-    },
-    {
-      admissionId: 'ADM003',
-      name: 'Amit Kumar',
-      class: '9-B',
-      rollNo: '08',
-      parentName: 'Vikash Kumar',
-      parentPhone: '+91-9876543212',
-      email: 'vikash.kumar@email.com'
-    },
-    {
-      admissionId: 'ADM004',
-      name: 'Anita Gupta',
-      class: '10-B',
-      rollNo: '11',
-      parentName: 'Ramesh Gupta',
-      parentPhone: '+91-9876543213',
-      email: 'ramesh.gupta@email.com'
-    }
-  ];
 
   const [scheduleForm, setScheduleForm] = useState({
     title: '',
@@ -58,13 +22,69 @@ const PTMManagement = () => {
     venue: '',
     remarks: ''
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setStudents(sampleStudents);
-    // Load existing PTM meetings from localStorage (simulating database)
-    const savedMeetings = JSON.parse(localStorage.getItem('ptmMeetings') || '[]');
-    setPtmMeetings(savedMeetings);
-  }, []);
+    const fetchPTMMeetings = async () => {
+      try {
+        const token = sessionStorage.getItem('teacherToken');
+        if (!token) {
+          toast.info('Please login to continue');
+          navigate('/');
+          return;
+        }
+
+        const res = await fetch('http://localhost:5000/api/ptm/get/all/ptm/schedules', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch PTM meetings');
+        }
+        const data = await res.json();
+        setPtmMeetings(data.data);
+      } catch (error) {
+        toast.error('Failed to fetch PTM meetings. Please try again later');
+        console.error(error);
+      }
+    };
+
+    const fetchStudents = async () => {
+      try {
+        const token = sessionStorage.getItem('teacherToken');
+        if (!token) {
+          toast.info('Please login to continue');
+          navigate('/');
+          return;
+        }
+
+        const res = await fetch('http://localhost:5000/api/final/admission/get/all/admissions', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application.json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch students');
+        }
+        const data = await res.json();
+        setStudents(data.data);
+      } catch (error) {
+        console.error('Error fechintg data', error);
+        toast.error('Failed to fetch students. Please try again later');
+      }
+    }
+
+
+    fetchStudents();
+    fetchPTMMeetings();
+  }, [navigate]);
 
   const handleSchedulePTM = (student) => {
     setSelectedStudent(student);
@@ -79,37 +99,62 @@ const PTMManagement = () => {
     setShowScheduleModal(true);
   };
 
-  const handleFormSubmit = () => {
+  const handleFormSubmit = async () => {
     // Basic validation
     if (!scheduleForm.title || !scheduleForm.description || !scheduleForm.scheduleDate || !scheduleForm.scheduleTime) {
-      alert('Please fill in all required fields');
+      toast.info('Please fill in all required fields');
       return;
     }
-    
+
     const newMeeting = {
       meetingId: `PTM${Date.now()}`,
       admissionId: selectedStudent.admissionId,
       studentName: selectedStudent.name,
-      parentName: selectedStudent.parentName,
-      parentPhone: selectedStudent.parentPhone,
+      parentName: selectedStudent.fatherName,
+      parentPhone: selectedStudent.fatherMobile,
       ...scheduleForm,
       attendBy: 'Teacher',
       attendiesPhoneNo: selectedStudent.parentPhone,
       attendiesFeedback: '',
       meetingStatus: 'Scheduled',
-      createdAt: new Date().toISOString()
     };
+
+    try {
+      const token = sessionStorage.getItem('teacherToken');
+      if (!token) {
+        toast.info('Please login to continue');
+        navigate('/');
+        return;
+      }
+      const res = await fetch('http://localhost:5000/api/ptm/create/ptm/schedule', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newMeeting)
+      });
+
+      if (!res.ok) {
+        toast.error('Failed to schedule PTM meeting. Please try again later');
+        throw new Error('Filed to schedule PTM Meeting');
+      }
+
+      const data = await res.json();
+      toast.success(data.message);
+    } catch (error) {
+      console.error('Error scheduling PTM', error);
+    }
 
     const updatedMeetings = [...ptmMeetings, newMeeting];
     setPtmMeetings(updatedMeetings);
-    localStorage.setItem('ptmMeetings', JSON.stringify(updatedMeetings));
 
     // Simulate WhatsApp message sending
     sendWhatsAppMessage(selectedStudent, scheduleForm);
-    
+
     setShowScheduleModal(false);
     setSelectedStudent(null);
-    alert('PTM scheduled successfully! WhatsApp message sent to parent.');
+    toast.success('PTM scheduled successfully! WhatsApp message sent to parent.');
   };
 
   const sendWhatsAppMessage = (student, meeting) => {
@@ -118,10 +163,10 @@ Dear ${student.parentName},
 
 A Parent-Teacher Meeting has been scheduled for your child ${student.name}.
 
-📅 Date: ${new Date(meeting.scheduleDate).toLocaleDateString()}
-🕐 Time: ${meeting.scheduleTime}
-📍 Venue: ${meeting.venue}
-📝 Purpose: ${meeting.description}
+Date: ${new Date(meeting.scheduleDate).toLocaleDateString()}
+Time: ${meeting.scheduleTime}
+Venue: ${meeting.venue}
+Purpose: ${meeting.description}
 
 Please confirm your attendance by replying to this message.
 
@@ -129,30 +174,59 @@ Thank you,
 School Administration
     `.trim();
 
-    const whatsappUrl = `https://wa.me/${student.parentPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    let cleanNumber = student.fatherMobile.replace(/[^0-9]/g, '');
+    if (cleanNumber.length === 10) {
+      cleanNumber = '91' + cleanNumber;
+    }
+    const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+
     window.open(whatsappUrl, '_blank');
   };
 
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         student.admissionId.toLowerCase().includes(searchTerm.toLowerCase());
+      student.admissionId.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesClass = !filterClass || student.class === filterClass;
     return matchesSearch && matchesClass;
   });
 
   const uniqueClasses = [...new Set(students.map(s => s.class))];
 
-  const updateMeetingStatus = (meetingId, newStatus, feedback = '') => {
-    const updatedMeetings = ptmMeetings.map(meeting => 
-      meeting.meetingId === meetingId 
-        ? { ...meeting, meetingStatus: newStatus, attendiesFeedback: feedback }
-        : meeting
-    );
-    setPtmMeetings(updatedMeetings);
-    localStorage.setItem('ptmMeetings', JSON.stringify(updatedMeetings));
+  const updateMeetingStatus = async (meetingId, newStatus) => {
+    try{
+      const token = sessionStorage.getItem('teacherToken');
+      if(!token){
+        toast.info('Please login to continue');
+        navigate('/');
+        return;
+      };
+
+      const res =await fetch(`http://localhost:5000/api/ptm/update/${meetingId}`,{
+        method:'PUT',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body:JSON.stringify({
+          meetingStatus:newStatus
+        })
+      });
+
+      if(!res.ok){
+        throw new Error('Failed to update PTM meeting status');
+      }
+
+      const data = res.json();
+      toast.success('Successfully updated PTM meeting status');
+    } catch(error){
+      console.error('Error updating PTM meeting status',error);
+      toast.error('Failed to update PTM meeting status. Please try again later');
+    }
   };
 
   return (
+    <div>
+    <TeacherNavbar/>
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -167,22 +241,20 @@ School Administration
             <nav className="flex space-x-8 px-6">
               <button
                 onClick={() => setActiveTab('students')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'students'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'students'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
               >
                 <User className="inline-block w-4 h-4 mr-2" />
                 Students
               </button>
               <button
                 onClick={() => setActiveTab('meetings')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === 'meetings'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                }`}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'meetings'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
               >
                 <Calendar className="inline-block w-4 h-4 mr-2" />
                 Scheduled Meetings
@@ -252,10 +324,10 @@ School Administration
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{student.parentName}</div>
+                          <div className="text-sm font-medium text-gray-900">{student.fatherName}</div>
                           <div className="text-sm text-gray-500 flex items-center">
                             <Phone className="w-3 h-3 mr-1" />
-                            {student.parentPhone}
+                            {student.fatherMobile}
                           </div>
                         </div>
                       </td>
@@ -321,13 +393,12 @@ School Administration
                         <div className="text-sm text-gray-500 mt-1">{meeting.venue}</div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          meeting.meetingStatus === 'Completed' 
-                            ? 'bg-green-100 text-green-800' 
-                            : meeting.meetingStatus === 'Cancelled'
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${meeting.meetingStatus === 'Completed'
+                          ? 'bg-green-100 text-green-800'
+                          : meeting.meetingStatus === 'Cancelled'
                             ? 'bg-red-100 text-red-800'
                             : 'bg-yellow-100 text-yellow-800'
-                        }`}>
+                          }`}>
                           {meeting.meetingStatus === 'Completed' && <CheckCircle className="w-3 h-3 mr-1" />}
                           {meeting.meetingStatus === 'Cancelled' && <XCircle className="w-3 h-3 mr-1" />}
                           {meeting.meetingStatus}
@@ -337,7 +408,7 @@ School Administration
                         {meeting.meetingStatus === 'Scheduled' && (
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => updateMeetingStatus(meeting.meetingId, 'Completed', 'Meeting completed successfully')}
+                              onClick={() => updateMeetingStatus(meeting.meetingId, 'Completed')}
                               className="text-green-600 hover:text-green-900 text-sm"
                             >
                               Complete
@@ -381,7 +452,7 @@ School Administration
                   <input
                     type="text"
                     value={scheduleForm.title}
-                    onChange={(e) => setScheduleForm({...scheduleForm, title: e.target.value})}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, title: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
@@ -391,7 +462,7 @@ School Administration
                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                   <textarea
                     value={scheduleForm.description}
-                    onChange={(e) => setScheduleForm({...scheduleForm, description: e.target.value})}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, description: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     rows="3"
                     required
@@ -404,7 +475,7 @@ School Administration
                     <input
                       type="date"
                       value={scheduleForm.scheduleDate}
-                      onChange={(e) => setScheduleForm({...scheduleForm, scheduleDate: e.target.value})}
+                      onChange={(e) => setScheduleForm({ ...scheduleForm, scheduleDate: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
@@ -415,7 +486,7 @@ School Administration
                     <input
                       type="time"
                       value={scheduleForm.scheduleTime}
-                      onChange={(e) => setScheduleForm({...scheduleForm, scheduleTime: e.target.value})}
+                      onChange={(e) => setScheduleForm({ ...scheduleForm, scheduleTime: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
                     />
@@ -427,7 +498,7 @@ School Administration
                   <input
                     type="text"
                     value={scheduleForm.venue}
-                    onChange={(e) => setScheduleForm({...scheduleForm, venue: e.target.value})}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, venue: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
@@ -436,7 +507,7 @@ School Administration
                   <label className="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
                   <textarea
                     value={scheduleForm.remarks}
-                    onChange={(e) => setScheduleForm({...scheduleForm, remarks: e.target.value})}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, remarks: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     rows="2"
                   />
@@ -459,11 +530,12 @@ School Administration
                     Schedule & Send WhatsApp
                   </button>
                 </div>
-                </div>
+              </div>
             </div>
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 };

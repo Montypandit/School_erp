@@ -15,7 +15,7 @@ const inquiryFormSchema =new mongoose.Schema({
     motherQualification:{type:String},
     motherOccupation:{type:String},
     motherName:{type:String, required:true},
-    residentalAddress:{type:String},
+    residentialAddress:{type:String},
     haveYouVisitedOurWebsite:{type:Boolean},
     howDoYouKnowAboutSUNVILLEKIDZ:{type:String},
     references:{type:String}

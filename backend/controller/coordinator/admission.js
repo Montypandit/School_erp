@@ -131,7 +131,7 @@ router.put('/update/admission/:admissionId', authMiddleware, authorizeRoles('adm
 });
 
 // ======================= GET ALL ADMISSIONS =======================
-router.get('/get/all/admissions', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.get('/get/all/admissions', authMiddleware, authorizeRoles('admin', 'coordinator','teacher'), async (req, res) => {
   try {
     const admissions = await Admission.find().sort({ createdAt: -1 });
     res.status(200).json({ message: 'Admissions fetched successfully', data: admissions });

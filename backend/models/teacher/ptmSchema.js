@@ -11,9 +11,7 @@ const ptmSchema = new mongoose.Schema({
     remarks:{type:String},
     attendBy:{type:String, required:true},
     attendiesPhoneNo:{type:String},
-    attendiesFeedback:{type:String, required:true},
     meetingStatus:{type:String, required:true},
-
 
 },{timestamps:true} );
 
