@@ -142,7 +142,7 @@ router.get('/get/all/admissions', authMiddleware, authorizeRoles('admin', 'coord
 });
 
 // ======================= GET STUDENT BY ADMISSION ID =======================
-router.get('/get/student/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.get('/get/student/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator','teacher'), async (req, res) => {
   try {
     const student = await Admission.findOne({ admissionId: req.params.admissionId });
     if (!student) return res.status(404).json({ message: 'Student not found' });

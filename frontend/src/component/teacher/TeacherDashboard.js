@@ -146,7 +146,7 @@ const TeacherHome = () => {
           <h2 className="text-xl font-semibold text-gray-700 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <ActionButton href="/teacher/attendence" icon={<Calendar />} label="Attendance" />
-            <ActionButton href="/teacher/result" icon={<BarChart3 />} label="Results" />
+            <ActionButton href="/teacher/results" icon={<BarChart3 />} label="Results" />
             <ActionButton href="/teacher/report" icon={<FileText />} label="Reports" />
             <ActionButton href="/teacher/homework" icon={<BookOpen />} label="Homework" />
           </div>
