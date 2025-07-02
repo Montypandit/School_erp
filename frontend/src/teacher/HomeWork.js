@@ -1,57 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Container, 
-  Paper, 
-  Typography, 
-  TextField, 
-  Button, 
-  MenuItem, 
-  Select, 
-  FormControl, 
-  InputLabel, 
-  Grid,
-  Box,
-  Snackbar,
-  Alert,
-  Divider,
-  Card,
-  CardContent,
-  CardHeader,
-  Avatar,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Chip,
-  useTheme,
-  alpha,
-  IconButton,
-  Tooltip
-} from '@mui/material';
-import {
-  Assignment as AssignmentIcon,
-  Class as ClassIcon,
-  Category as CategoryIcon,
-  Event as EventIcon,
-  Person as PersonIcon,
-  CheckCircleOutline as CheckCircleOutlineIcon,
-  ErrorOutline as ErrorOutlineIcon,
-  InfoOutlined as InfoOutlinedIcon
-} from '@mui/icons-material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { format } from 'date-fns';
-import axios from 'axios';
-
-// Mock data - replace with API calls in production
-const CLASSES = ['Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
-const SECTIONS = ['A', 'B', 'C', 'D'];
-const SUBJECTS = [
-  'Mathematics', 'Science', 'English', 'Hindi', 'Social Studies',
-  'Computer Science', 'Physics', 'Chemistry', 'Biology', 'History',
-  'Geography', 'Economics', 'Business Studies', 'Accountancy'
-];
+import { toast } from 'react-toastify';
+import { BookOpen, Calendar, Clock, CheckCircle, AlertCircle, Info } from 'lucide-react';
+import TeacherNavbar from '../component/teacher/TeacherNavbar';
 
 const HomeWork = () => {
   const [formData, setFormData] = useState({
@@ -59,492 +9,452 @@ const HomeWork = () => {
     section: '',
     subject: '',
     homeworkDetails: '',
-    dueDate: null
+    dueDate: ''
   });
-  const [filter, setFilter] = useState({
-    className: '',
-    section: ''
-  });
-  const [students, setStudents] = useState([]);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  
+  const [teacherSchedules, setTeacherSchedules] = useState([]);
+  const [availableClasses, setAvailableClasses] = useState([]);
+  const [availableSections, setAvailableSections] = useState([]);
+  const [availableSubjects, setAvailableSubjects] = useState([]);
+  const [teacherId, setTeacherId] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Log session storage for debugging
+  useEffect(() => {
+    console.log('Session Storage Contents:');
+    for (let i = 0; i < sessionStorage.length; i++) {
+      const key = sessionStorage.key(i);
+      console.log(`${key}: ${sessionStorage.getItem(key)}`);
+    }
+  }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  // Fetch teacher's data and schedules on component mount
+  useEffect(() => {
+    const fetchTeacherData = async () => {
+      const token = sessionStorage.getItem('teacherToken');
+      if (!token) {
+        toast.error('Please login to continue');
+        window.location.href = '/teacher/login';
+        return;
+      }
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    const newFilter = {
-      ...filter,
-      [name]: value
+      try {
+        // First get teacher's info
+        const teacherRes = await fetch(
+          `http://localhost:5000/api/employees/get/employee/email/${sessionStorage.getItem('teacherEmail')}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+
+        if (!teacherRes.ok) {
+          throw new Error('Failed to fetch teacher information');
+        }
+
+        const teacherData = await teacherRes.json();
+        setTeacherId(teacherData.empId);
+
+        // Then get teacher's schedule
+        const scheduleRes = await fetch(
+          `http://localhost:5000/api/teaching/schedule/get/teaching/schedule/${teacherData.empId}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          }
+        );
+
+        if (!scheduleRes.ok) {
+          throw new Error('Failed to fetch teaching schedule');
+        }
+
+        const scheduleData = await scheduleRes.json();
+        setTeacherSchedules(scheduleData);
+        
+        // Extract unique classes that the teacher is assigned to
+        const classes = [...new Set(
+          scheduleData
+            .filter(schedule => schedule.empId === teacherData.empId) // Only include classes assigned to this teacher
+            .map(item => item.className)
+        )];
+        
+        if (classes.length === 0) {
+          toast.warning('You are not assigned to any classes. Please contact the administrator.');
+        }
+        
+        setAvailableClasses(classes);
+        
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        toast.error('Failed to load teaching schedule');
+      } finally {
+        setIsLoading(false);
+      }
     };
-    setFilter(newFilter);
-    
-    // Reset section if class changes
-    if (name === 'className' && value !== filter.className) {
+
+    fetchTeacherData();
+  }, []);
+
+  // Update sections when class is selected
+  useEffect(() => {
+    if (formData.className) {
+      const sections = [
+        ...new Set(
+          teacherSchedules
+            .filter(schedule => 
+              schedule.className === formData.className && 
+              schedule.empId === teacherId
+            )
+            .map(schedule => schedule.section)
+        )
+      ];
+      setAvailableSections(sections);
+      
+      // Reset section and subject when class changes
       setFormData(prev => ({
         ...prev,
-        section: ''
+        section: '',
+        subject: ''
+      }));
+      setAvailableSubjects([]);
+    }
+  }, [formData.className, teacherSchedules, teacherId]);
+
+  // Update subjects when section is selected
+  useEffect(() => {
+    if (formData.className && formData.section) {
+      const subjects = [
+        ...new Set(
+          teacherSchedules
+            .filter(
+              schedule => 
+                schedule.className === formData.className && 
+                schedule.section === formData.section &&
+                schedule.empId === teacherId
+            )
+            .map(schedule => schedule.subject)
+        )
+      ];
+      setAvailableSubjects(subjects);
+      
+      // Reset subject when section changes
+      setFormData(prev => ({
+        ...prev,
+        subject: ''
       }));
     }
-  };
+  }, [formData.section, formData.className, teacherSchedules, teacherId]);
 
-  const handleDateChange = (date) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      dueDate: date
+      [name]: value
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!formData.className || !formData.section || !formData.subject || !formData.homeworkDetails || !formData.dueDate) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    
+    // Validate due date is in the future
+    const selectedDate = new Date(formData.dueDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < today) {
+      toast.error('Due date must be in the future');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
     try {
-      // In a real app, you would make an API call here
-      // await axios.post('/api/homework', formData);
+      const token = sessionStorage.getItem('teacherToken');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // First try to get teacher's admission ID from session storage
+      let teacherAdmissionId = sessionStorage.getItem('teacherAdmissionId');
       
-      setSnackbarMessage('Homework assigned successfully!');
-      setSnackbarSeverity('success');
-      setOpenSnackbar(true);
+      // If not found in session storage, try to fetch teacher's profile
+      if (!teacherAdmissionId) {
+        try {
+          const profileResponse = await fetch(`http://localhost:5000/api/employees/get/employee/email/${sessionStorage.getItem('teacherEmail')}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!profileResponse.ok) {
+            throw new Error('Failed to fetch teacher profile');
+          }
+          
+          const teacherProfile = await profileResponse.json();
+          console.log('Teacher Profile:', teacherProfile);
+          
+          // Try to find a suitable identifier in the profile
+          teacherAdmissionId = teacherProfile.admissionId || 
+                             teacherProfile.employeeId ||
+                             teacherProfile._id; // Try MongoDB _id as fallback
+          
+          if (!teacherAdmissionId) {
+            console.error('Available profile fields:', Object.keys(teacherProfile));
+            throw new Error(`Admission ID not found in teacher profile. Available fields: ${Object.keys(teacherProfile).join(', ')}`);
+          }
+          
+          // Store for future use
+          sessionStorage.setItem('teacherAdmissionId', teacherAdmissionId);
+        } catch (error) {
+          console.error('Error fetching teacher profile:', error);
+          throw new Error('Could not retrieve teacher information. Please try again or contact support.');
+        }
+      }
+
+      // Prepare the homework data according to the backend schema
+      const homeworkData = {
+        admissionId: teacherAdmissionId, // Required by the backend schema
+        className: formData.className,
+        section: formData.section,
+        subject: formData.subject,
+        homeworkDetails: formData.homeworkDetails,
+        dueDate: formData.dueDate,
+        assignedBy: teacherId,
+        // Remove fields not in the schema to avoid validation errors
+        // assignedDate is automatically added by the timestamps option
+      };
       
-      // Reset form
+      console.log('Sending homework data:', JSON.stringify(homeworkData, null, 2));
+
+      console.log('Submitting homework:', homeworkData);
+      
+      const response = await fetch('http://localhost:5000/api/homework/for/students/create/homework', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(homeworkData)
+      });
+
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (jsonError) {
+        console.error('Failed to parse JSON response:', jsonError);
+        const textResponse = await response.text();
+        console.error('Raw response text:', textResponse);
+        throw new Error('Invalid response from server');
+      }
+      
+      if (!response.ok) {
+        console.error('Server responded with error status:', response.status);
+        console.error('Error response data:', responseData);
+        throw new Error(responseData.message || `Server error: ${response.status}`);
+      }
+      
+      // Reset form on success
       setFormData({
-        className: filter.className,
-        section: filter.section,
+        className: formData.className, // Keep class selected
+        section: formData.section,     // Keep section selected
         subject: '',
         homeworkDetails: '',
-        dueDate: null
+        dueDate: ''
       });
-    } catch (error) {
-      console.error('Error assigning homework:', error);
-      setSnackbarMessage('Failed to assign homework. Please try again.');
-      setSnackbarSeverity('error');
-      setOpenSnackbar(true);
-    }
-  };
-
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
-
-  // In a real app, you would fetch students based on the selected class and section
-  useEffect(() => {
-    if (filter.className && filter.section) {
-      // Simulate API call to fetch students
-      // const fetchStudents = async () => {
-      //   const response = await axios.get(`/api/students?class=${filter.className}&section=${filter.section}`);
-      //   setStudents(response.data);
-      // };
-      // fetchStudents();
       
-      // Mock data for demonstration
-      setStudents(Array(5).fill().map((_, i) => ({
-        admissionId: `ADM${Math.floor(1000 + Math.random() * 9000)}`,
-        name: `Student ${i + 1}`
-      })));
+      toast.success('Homework assigned successfully!');
+    } catch (err) {
+      console.error('Error assigning homework:', err);
+      toast.error(`Failed to assign homework: ${err.message || 'Please try again'}`);
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [filter.className, filter.section]);
+  };
 
-  const theme = useTheme();
-  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading your teaching assignments...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Box sx={{ 
-          mb: 4,
-          textAlign: 'center',
-          background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-          color: 'white',
-          p: 3,
-          borderRadius: 2,
-          boxShadow: theme.shadows[4]
-        }}>
-          <Typography variant="h3" component="h1" sx={{ 
-            fontWeight: 700,
-            letterSpacing: '0.5px',
-            mb: 1
-          }}>
-            Homework Assignment
-          </Typography>
-          <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
-            Create and manage homework assignments for your students
-          </Typography>
-        </Box>
-        
-        <Grid container spacing={3} alignItems="stretch">
-          {/* Filter Section */}
-          <Grid item xs={12} md={4}>
-            <Paper 
-              elevation={3} 
-              sx={{ 
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                borderRadius: 2,
-                overflow: 'hidden',
-                border: `1px solid ${theme.palette.divider}`,
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: theme.shadows[8]
-                }
-              }}
-            >
-              <Box sx={{ 
-                bgcolor: 'primary.main', 
-                color: 'white', 
-                p: 2,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1
-              }}>
-                <ClassIcon />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Filter Students</Typography>
-              </Box>
-              <Box sx={{ p: 3, flexGrow: 1 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel id="class-label">Class</InputLabel>
-                    <Select
-                      labelId="class-label"
-                      id="className"
-                      name="className"
-                      value={filter.className}
-                      onChange={handleFilterChange}
-                      label="Class"
-                      fullWidth
-                    >
-                      {CLASSES.map((cls) => (
-                        <MenuItem key={cls} value={cls}>
-                          {cls}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                  <FormControl fullWidth margin="normal">
-                    <InputLabel id="section-label">Section</InputLabel>
-                    <Select
-                      labelId="section-label"
-                      id="section"
-                      name="section"
-                      value={filter.section}
-                      onChange={handleFilterChange}
-                      label="Section"
-                      disabled={!filter.className}
-                      fullWidth
-                    >
-                      {SECTIONS.map((sec) => (
-                        <MenuItem key={sec} value={sec}>
-                          {sec}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-              
-              {students.length > 0 && (
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="subtitle2" color="text.secondary" sx={{ 
-                    mb: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5
-                  }}>
-                    <PersonIcon fontSize="small" />
-                    Students in {filter.className}-{filter.section}:
-                  </Typography>
-                  <List dense sx={{ 
-                    maxHeight: 200, 
-                    overflow: 'auto', 
-                    bgcolor: alpha(theme.palette.primary.light, 0.05),
-                    borderRadius: 1,
-                    p: 1
-                  }}>
-                    {students.map((student) => (
-                      <ListItem 
-                        key={student.admissionId} 
-                        sx={{
-                          p: 0.5,
-                          mb: 0.5,
-                          borderRadius: 1,
-                          '&:hover': {
-                            bgcolor: alpha(theme.palette.primary.main, 0.05)
-                          }
-                        }}
-                      >
-                        <ListItemAvatar sx={{ minWidth: 32 }}>
-                          <Avatar 
-                            sx={{ 
-                              width: 24, 
-                              height: 24, 
-                              bgcolor: theme.palette.primary.main,
-                              fontSize: '0.75rem'
-                            }}
-                          >
-                            {student.name.charAt(0)}
-                          </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText 
-                          primary={
-                            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                              {student.name}
-                            </Typography>
-                          } 
-                          secondary={
-                            <Chip 
-                              label={student.admissionId} 
-                              size="small" 
-                              variant="outlined"
-                              sx={{ 
-                                height: 18,
-                                fontSize: '0.65rem',
-                                mt: 0.5
-                              }}
-                            />
-                          }
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                </Box>
-              )}
-              </Box>
-            </Paper>
-          </Grid>
+    <div className="min-h-screen bg-gray-50">
+      <TeacherNavbar />
+      
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="flex items-center mb-6">
+            <BookOpen className="h-8 w-8 text-green-600 mr-3" />
+            <h1 className="text-2xl font-bold text-gray-800">Assign Homework</h1>
+          </div>
           
-          {/* Homework Form */}
-          <Grid item xs={12} md={8}>
-            <Paper 
-              elevation={3} 
-              sx={{ 
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                borderRadius: 2,
-                overflow: 'hidden',
-                border: `1px solid ${theme.palette.divider}`,
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: theme.shadows[8]
-                }
-              }}
-            >
-              <Box sx={{ 
-                bgcolor: 'primary.main', 
-                color: 'white', 
-                p: 2,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1
-              }}>
-                <AssignmentIcon />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Assign Homework</Typography>
-              </Box>
-              <Box sx={{ p: 3 }}>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              {/* Class Selection */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Class <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="className"
+                  value={formData.className}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                  required
+                >
+                  <option value="">Select Class</option>
+                  {availableClasses.map((cls, index) => (
+                    <option key={index} value={cls}>
+                      {cls}
+                    </option>
+                  ))}
+                </select>
+              </div>
               
-              <form onSubmit={handleSubmit}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <FormControl fullWidth margin="normal">
-                      <InputLabel id="subject-label" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <CategoryIcon fontSize="small" />
-                        Subject
-                      </InputLabel>
-                      <Select
-                        labelId="subject-label"
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleInputChange}
-                        label={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <CategoryIcon fontSize="small" />
-                            Subject
-                          </Box>
-                        }
-                        required
-                        disabled={!filter.className || !filter.section}
-                        sx={{
-                          '& .MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'divider',
-                          },
-                          '&:hover .MuiOutlinedInput-notchedOutline': {
-                            borderColor: 'primary.main',
-                          },
-                        }}
-                      >
-                        {SUBJECTS.map((subj) => (
-                          <MenuItem key={subj} value={subj}>
-                            {subj}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  
-                  <Grid item xs={12} md={6}>
-                    <FormControl fullWidth margin="normal">
-                      <DatePicker
-                        label={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <EventIcon fontSize="small" />
-                            Due Date
-                          </Box>
-                        }
-                        value={formData.dueDate}
-                        onChange={handleDateChange}
-                        renderInput={(params) => (
-                          <TextField 
-                            {...params} 
-                            fullWidth 
-                            required 
-                            sx={{
-                              '& .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'divider',
-                              },
-                              '&:hover .MuiOutlinedInput-notchedOutline': {
-                                borderColor: 'primary.main',
-                              },
-                            }}
-                          />
-                        )}
-                        minDate={new Date()}
-                        disabled={!filter.className || !filter.section}
-                        inputFormat="dd/MM/yyyy"
-                      />
-                    </FormControl>
-                  </Grid>
-                  
-                  <Grid item xs={12}>
-                    <TextField
-                      margin="normal"
-                      fullWidth
-                      multiline
-                      rows={6}
-                      name="homeworkDetails"
-                      label={
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <AssignmentIcon fontSize="small" />
-                          Homework Details
-                        </Box>
-                      }
-                      placeholder="Enter homework details here..."
-                      value={formData.homeworkDetails}
-                      onChange={handleInputChange}
-                      required
-                      disabled={!filter.className || !filter.section}
-                      sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '&:hover fieldset': {
-                            borderColor: 'primary.main',
-                          },
-                        },
-                        '& .MuiInputLabel-root': {
-                          display: 'flex',
-                          alignItems: 'center',
-                        }
-                      }}
-                    />
-                  </Grid>
-                  
-                  <Grid item xs={12}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      color="primary"
-                      size="large"
-                      fullWidth
-                      disabled={!filter.className || !filter.section || !formData.subject || !formData.homeworkDetails || !formData.dueDate}
-                      startIcon={<AssignmentIcon />}
-                      sx={{
-                        mt: 2,
-                        py: 1.5,
-                        fontWeight: 600,
-                        letterSpacing: '0.5px',
-                        textTransform: 'none',
-                        borderRadius: 2,
-                        background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-                        '&:hover': {
-                          transform: 'translateY(-2px)',
-                          boxShadow: theme.shadows[4],
-                        },
-                        '&:active': {
-                          transform: 'translateY(0)',
-                        },
-                        '&.Mui-disabled': {
-                          background: theme.palette.grey[300],
-                          color: theme.palette.grey[500],
-                        }
-                      }}
-                    >
-                      Assign Homework
-                    </Button>
-                  </Grid>
-                </Grid>
-              </form>
-              </Box>
-              <Box sx={{ 
-                p: 2, 
-                bgcolor: alpha(theme.palette.primary.light, 0.1),
-                borderTop: `1px solid ${theme.palette.divider}`,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1
-              }}>
-                <InfoOutlinedIcon color="primary" fontSize="small" />
-                <Typography variant="caption" color="text.secondary">
-                  Homework will be assigned to all students in {filter.className || 'selected class'} - {filter.section || 'section'}
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
+              {/* Section Selection */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Section <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="section"
+                  value={formData.section}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                  disabled={!formData.className}
+                  required
+                >
+                  <option value="">Select Section</option>
+                  {availableSections.map((section, index) => (
+                    <option key={index} value={section}>
+                      {section}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Subject Selection */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Subject <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                  disabled={!formData.section}
+                  required
+                >
+                  <option value="">Select Subject</option>
+                  {availableSubjects.map((subject, index) => (
+                    <option key={index} value={subject}>
+                      {subject}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Due Date */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Due Date <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Calendar className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="date"
+                    name="dueDate"
+                    value={formData.dueDate}
+                    onChange={handleChange}
+                    min={new Date().toISOString().split('T')[0]}
+                    className="pl-10 w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Homework Details */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Homework Details <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                name="homeworkDetails"
+                value={formData.homeworkDetails}
+                onChange={handleChange}
+                rows={5}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                placeholder="Enter homework details here..."
+                required
+              />
+            </div>
+            
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${isSubmitting ? 'bg-green-400' : 'bg-green-600 hover:bg-green-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Assigning...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="-ml-1 mr-2 h-5 w-5" />
+                    Assign Homework
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
         
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-          sx={{
-            '& .MuiPaper-root': {
-              borderRadius: 2,
-              boxShadow: theme.shadows[6],
-              minWidth: 300,
-            }
-          }}
-        >
-          <Alert 
-            onClose={handleCloseSnackbar} 
-            severity={snackbarSeverity} 
-            sx={{ 
-              width: '100%',
-              alignItems: 'center',
-              '& .MuiAlert-message': {
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1
-              }
-            }}
-            iconMapping={{
-              success: <CheckCircleOutlineIcon fontSize="inherit" />,
-              error: <ErrorOutlineIcon fontSize="inherit" />
-            }}
-          >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
-      </Container>
-    </LocalizationProvider>
+        {/* Additional Information */}
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-center mb-4">
+            <Info className="h-5 w-5 text-blue-500 mr-2" />
+            <h2 className="text-lg font-medium text-gray-900">Assignment Guidelines</h2>
+          </div>
+          <ul className="list-disc pl-5 space-y-2 text-sm text-gray-600">
+            <li>Select the appropriate class, section, and subject from the dropdown menus above.</li>
+            <li>Enter detailed homework instructions in the provided text area.</li>
+            <li>Set a due date for the homework assignment.</li>
+            <li>You can only assign homework to classes and subjects you are assigned to teach.</li>
+            <li>Students will be notified of new homework assignments automatically.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
   );
 };
 
