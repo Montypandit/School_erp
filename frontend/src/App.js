@@ -10,7 +10,7 @@ import CoordinatorHome from './coordinator/CoordinatorHome';
 import CoordinatorLogin from "./component/coordinator/CoordinatorLogin";
 import EmployeeForm from "./admin/EmployeeForm";
 import FeesGeneration from "./coordinator/feesGeneration";
-import TeacherLogin from "./teacher/TeacherLogin";
+//import TeacherLogin from "./teacher/TeacherLogin";
 import TeacherHome from "./teacher/TeacherHome";
 import FeePaid from './coordinator/FeePaid'
 import EnquiryStudent from "./coordinator/enquiryStudent";
@@ -36,24 +36,25 @@ import Allotments from "./component/coordinator/Allotments";
 import ActivityPlanner from "./coordinator/ActivityPlanner";
 import MonthlyPlanner from "./coordinator/monthlyPlanner";
 import Teacher from './component/coordinator/Teacher';
-import AdmissionForm from "./component/coordinator/Admission/AdmissionForm";
-import AdmissionFees from './component/coordinator/Admission/AdmissionFees';
+//import AdmissionForm from "./component/coordinator/Admission/AdmissionForm";
+//import AdmissionFees from './component/coordinator/Admission/AdmissionFees';
 
 // Teacher Components
 import TeacherLogin from "./teacher/TeacherLogin";
 import TeacherDashboard from "./component/teacher/TeacherDashboard";
 import GetAttendence from "./component/teacher/GetAttendence";
+import Results from "./component/teacher/AddResult";
 import TeacherSchedulePage from "./teacher/TeachingSchedule";
 import PTMManagement from "./component/teacher/PTMMangement";
 
 // Principal Components
-import PrincipalLogin from './principal/PrincipalLogin';
-import PrincipalHome from "./component/principal/PrincipalHome";
-import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
+//import PrincipalLogin from './principal/PrincipalLogin';
+//import PrincipalHome from "./component/principal/PrincipalHome";
+//import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
 
 // Common Components
-import Home from './Home';
-import ScheduleForm from "./component/admin/ScheduleForm";
+//import Home from './Home';
+//import ScheduleForm from "./component/admin/ScheduleForm";
 
 const App = () => {
   return (
@@ -72,10 +73,19 @@ const App = () => {
         <Route path="/admin/teacher/:empId" element={<GetTeacher/>}/>
         <Route path="/admin/examschedule" element={<ExamSchedule/>}/>
         <Route path="/admin/leaveapproval" element={<LeaveApproval/>}/>
+        <Route path="/teacher/login" element={<TeacherLogin/>}/>
+        <Route path="/teacher/home" element={<TeacherDashboard/>}/>
+        <Route path="/teacher/attendence" element={<GetAttendence/>}/>
+        <Route path="/teacher/results" element={<Results/>}/>
+        <Route path="/teacher/schedule" element={<TeacherSchedulePage/>}/>
+        <Route path="/teacher/ptm" element={<PTMManagement/>}/>
+
+        
         <Route path="/teacher/schedule" element={<ScheduleForm/>}/>
         <Route path="/admin/weeklyschedule" element={<WeeklySchedule/>}/>
         <Route path="/final/admission/form/:inquiryId/:admissionId" element={<AdmissionForm/>}/>
         <Route path ="/principal/login" element={<PrincipalLogin/>}/>
+
         <Route path="/principal/home" element={<PrincipalHome/>}/>
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail/>}/>
       </Routes>
