@@ -1,9 +1,11 @@
 
-import { Users, Calendar, Download, Search, Eye, BarChart3 } from 'lucide-react';
+import { Users, Calendar, Download, Search, Eye, BarChart3, X, UserCheck, UserX } from 'lucide-react';
+
 import React, { useState, useEffect } from 'react';
 import TeacherNavbar from './TeacherNavbar'; // Ensure this path is correct
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import "jspdf-autotable"; // 🔥 this must be here and NOT commented or missing
+
 import { toast } from 'react-toastify';
 const AttendanceReportPage = () => {
   const [selectedDate, setSelectedDate] = useState('2025-07-02');
@@ -12,6 +14,8 @@ const AttendanceReportPage = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   //  attendance data come from backend
+  const [showModal, setShowModal] = useState(false);
+  const [selectedClassDetails, setSelectedClassDetails] = useState(null);
 
   
 // Ensure this is imported
@@ -108,13 +112,20 @@ const handleDownloadReport = () => {
 };
 
   const handleViewDetails = (className) => {
-    toast.success(`Opening detailed attendance view for ${className}`);
+    const selectedClassData = attendanceData.find(item => item.class === className);
+    
+    if (!selectedClassData) {
+      toast.error("Class data not found!");
+      return;
+    }
+
+    setSelectedClassDetails(selectedClassData);
+    setShowModal(true);
   };
 
-  const getAttendanceColor = (percentage) => {
-    if (percentage >= 95) return 'text-green-600 bg-green-100';
-    if (percentage >= 90) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedClassDetails(null);
   };
 
   const getProgressBarColor = (percentage) => {
@@ -122,7 +133,178 @@ const handleDownloadReport = () => {
     if (percentage >= 90) return 'bg-yellow-500';
     return 'bg-red-500';
   };
+const getAttendanceColor = (percentage) => {
+  if (percentage >= 95) return 'text-green-600 bg-green-100';
+  if (percentage >= 90) return 'text-yellow-600 bg-yellow-100';
+  return 'text-red-600 bg-red-100';
+};
 
+   const ViewDetailsModal = () => {
+    if (!showModal || !selectedClassDetails) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          {/* Modal Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {selectedClassDetails.class} - Attendance Details
+              </h2>
+              <p className="text-gray-600 mt-1">
+                Date: {new Date(selectedDate).toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </p>
+            </div>
+            <button
+              onClick={closeModal}
+              className="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Modal Content */}
+          <div className="p-6">
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-blue-600 text-sm font-medium">Total Students</p>
+                    <p className="text-2xl font-bold text-blue-800">{selectedClassDetails.totalStudents}</p>
+                  </div>
+                  <Users className="w-8 h-8 text-blue-600" />
+                </div>
+              </div>
+              
+              <div className="bg-green-50 p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-green-600 text-sm font-medium">Present</p>
+                    <p className="text-2xl font-bold text-green-800">{selectedClassDetails.presentStudents}</p>
+                  </div>
+                  <UserCheck className="w-8 h-8 text-green-600" />
+                </div>
+              </div>
+              
+              <div className="bg-red-50 p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-red-600 text-sm font-medium">Absent</p>
+                    <p className="text-2xl font-bold text-red-800">{selectedClassDetails.absentStudents}</p>
+                  </div>
+                  <UserX className="w-8 h-8 text-red-600" />
+                </div>
+              </div>
+            </div>
+
+            {/* Attendance Percentage */}
+            <div className="bg-gray-50 p-4 rounded-lg mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-semibold text-gray-900">Attendance Percentage</h3>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getAttendanceColor(selectedClassDetails.attendancePercentage)}`}>
+                  {selectedClassDetails.attendancePercentage}%
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-4">
+                <div 
+                  className={`h-4 rounded-full ${getProgressBarColor(selectedClassDetails.attendancePercentage)} transition-all duration-300`}
+                  style={{width: `${selectedClassDetails.attendancePercentage}%`}}
+                ></div>
+              </div>
+            </div>
+
+            {/* Absent Students List */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <UserX className="w-5 h-5" />
+                Absent Students
+              </h3>
+              
+              {selectedClassDetails.absentList.length > 0 ? (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {selectedClassDetails.absentList.map((student, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-white p-3 rounded-lg border border-red-100">
+                        <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                          <UserX className="w-4 h-4 text-red-600" />
+                        </div>
+                        <span className="text-gray-800 font-medium">{student}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                  <UserCheck className="w-12 h-12 text-green-600 mx-auto mb-3" />
+                  <h4 className="text-lg font-semibold text-green-800 mb-2">Perfect Attendance!</h4>
+                  <p className="text-green-600">All students are present in this class today.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Additional Information */}
+            <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+              <h4 className="font-semibold text-gray-900 mb-2">Summary</h4>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-600">Attendance Rate:</span>
+                  <span className="ml-2 font-medium">{selectedClassDetails.attendancePercentage}%</span>
+                </div>
+                <div>
+                  <span className="text-gray-600">Students Present:</span>
+                  <span className="ml-2 font-medium">{selectedClassDetails.presentStudents}/{selectedClassDetails.totalStudents}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Modal Footer */}
+          <div className="flex justify-end gap-3 p-6 border-t border-gray-200">
+            <button
+              onClick={closeModal}
+              className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              Close
+            </button>
+            <button
+              onClick={() => {
+                // Download individual class report
+                const doc = new jsPDF();
+                doc.setFontSize(18);
+                doc.text(`${selectedClassDetails.class} - Attendance Report`, 14, 22);
+                doc.setFontSize(12);
+                doc.text(`Date: ${selectedDate}`, 14, 30);
+                doc.text(`Total Students: ${selectedClassDetails.totalStudents}`, 14, 40);
+                doc.text(`Present: ${selectedClassDetails.presentStudents}`, 14, 50);
+                doc.text(`Absent: ${selectedClassDetails.absentStudents}`, 14, 60);
+                doc.text(`Attendance %: ${selectedClassDetails.attendancePercentage}%`, 14, 70);
+                
+                if (selectedClassDetails.absentList.length > 0) {
+                  doc.text(`Absent Students:`, 14, 85);
+                  selectedClassDetails.absentList.forEach((student, index) => {
+                    doc.text(`${index + 1}. ${student}`, 20, 95 + (index * 10));
+                  });
+                }
+                
+                doc.save(`${selectedClassDetails.class}_Attendance_${selectedDate}.pdf`);
+                toast.success("Class report downloaded successfully!");
+              }}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Download Class Report
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
   return (
     <>
     <TeacherNavbar/>
@@ -327,6 +509,7 @@ const handleDownloadReport = () => {
         </div>
       </div>
     </div>
+    <ViewDetailsModal />
     </>
   );
 };
