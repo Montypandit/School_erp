@@ -35,6 +35,7 @@ const teachingSchedule = require('./controller/coordinator/teachingScheduleApi')
 const homeworkRoutes = require('./controller/teacher/homeworkapi');
 const ptmApi = require('./controller/teacher/ptmApi');
 const examResult = require('./controller/teacher/examResult'); // ✅ Exam Result API
+const monthlyFeePaidApi = require('./controller/coordinator/monthlyFeePaidApi');
 
 // Use APIs (with consistent route prefix)
 server.use('/api/auth', userLoginApi);
@@ -57,8 +58,7 @@ server.use('/api/coordinator/students/allocate', studentAllocationApi);
 server.use('/api/teaching/schedule',teachingSchedule);
 server.use('/api/homework/for/students', homeworkRoutes);
 server.use('/api/ptm',ptmApi);
-
-
+server.use('/api/monthy/fees',monthlyFeePaidApi);
 server.use('/api/teacher/results', examResult);
 // Start server
 server.listen(port, () => {

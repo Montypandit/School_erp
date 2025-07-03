@@ -38,13 +38,13 @@ import EnquiryStudent from "./coordinator/enquiryStudent";
 import Student from './component/coordinator/Student';
 import StudentListPage from "./component/coordinator/StudentListPage";
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
-import AllotmentClass from "./component/coordinator/Alottment_class";
 import Allotments from "./component/coordinator/Allotments";
 import ActivityPlanner from "./coordinator/ActivityPlanner";
 import MonthlyPlanner from "./coordinator/monthlyPlanner";
 import Teacher from './component/coordinator/Teacher';
 import AdmissionForm from "./component/coordinator/Admission/AdmissionForm";
 import AdmissionFees from './component/coordinator/Admission/AdmissionFees';
+import MonthlyFeePaid from './coordinator/MonthlyFeePaid';
 
 // Teacher Components
 import TeacherLogin from "./teacher/TeacherLogin";
@@ -96,6 +96,7 @@ const App = () => {
         <Route path="/coordinator/monthly/planner" element={<MonthlyPlanner/>}/>
         <Route path="/coordinator/teacher/page" element={<Teacher/>}/>
         <Route path="/coordinator/admission/fees/:admissionId" element={<AdmissionFees/>}/>
+        <Route path="/coordinator/admission-fees/:admissionId" element={<MonthlyFeePaid/>}/>
 
         {/* Teacher Module */}
         <Route path="/teacher/login" element={<TeacherLogin/>}/>
