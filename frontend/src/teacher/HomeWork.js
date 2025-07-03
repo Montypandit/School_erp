@@ -20,14 +20,6 @@ const HomeWork = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Log session storage for debugging
-  useEffect(() => {
-    console.log('Session Storage Contents:');
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      console.log(`${key}: ${sessionStorage.getItem(key)}`);
-    }
-  }, []);
 
   // Fetch teacher's data and schedules on component mount
   useEffect(() => {
