@@ -56,6 +56,7 @@ import Report from "./component/teacher/Reports";
 // Common Components
 //import Home from './Home';
 //import ScheduleForm from "./component/admin/ScheduleForm";
+import EmployeeProfile from "./component/employee/EmployeeProfile";
 
 const App = () => {
   return (
@@ -90,10 +91,10 @@ const App = () => {
 
         <Route path="/principal/home" element={<PrincipalHome/>}/>
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail/>}/>
+        <Route path="/employee/profile/:email" element={<EmployeeProfile />} />
       </Routes>
     </Router>
   );
 };
 
 export default App;
-
