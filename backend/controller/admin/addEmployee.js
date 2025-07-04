@@ -16,7 +16,7 @@ router.post('/create/employee', authMiddleware, authorizeRoles('admin'), async (
         const empId = generateRandomEmpId();
         const {
           firstName, lastName, email, phone, gender, dob, doj, qualification,
-          residentalAddress, permanentAddress, role, aadharNo, panNo,
+          residentialAddress, permanentAddress, role, aadharNo, panNo,
           passportNo, salary, imageUrl
         } = req.body;
     
@@ -30,7 +30,7 @@ router.post('/create/employee', authMiddleware, authorizeRoles('admin'), async (
           dob,
           doj,
           qualification,
-          residentalAddress,
+          residentialAddress,
           permanentAddress,
           role,
           aadharNo,
@@ -72,7 +72,7 @@ router.get('/get/employee/:empId', authMiddleware, authorizeRoles('admin'), asyn
 });
 
 // get employee by email
-router.get('/get/employee/email/:email', authMiddleware, authorizeRoles('admin','teacher'), async (req, res) => {
+router.get('/get/employee/email/:email', authMiddleware, authorizeRoles('admin','teacher','coordinator','principal'), async (req, res) => {
   try {
     const employee = await Employee.findOne({ email: req.params.email });
     if (!employee) return res.status(404).json({ message: 'Employee not found' });

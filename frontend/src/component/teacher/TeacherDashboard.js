@@ -10,6 +10,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import TeacherNavbar from "./TeacherNavbar"; // ✅ Make sure path is correct
+import { toast } from "react-toastify";
 
 // ✅ Stat card component
 const StatCard = ({ title, value, icon, color }) => (
@@ -93,6 +94,11 @@ const TeacherHome = () => {
     const fetchStats = async () => {
       try {
         const token = sessionStorage.getItem("teacherToken");
+        if(!token){
+          toast.info('Please login to continue');
+          window.location.href = '/'
+          return;
+        }
         const response = await fetch(
           "http://localhost:5000/api/final/admission/get/all/admissions",
           {

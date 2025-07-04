@@ -14,6 +14,7 @@ import './App.css';
 // Common Components
 import Home from './Home';
 import ScheduleForm from "./component/admin/ScheduleForm";
+import EmployeeProfile from "./component/employee/EmployeeProfile";
 
 // Admin Components
 import AdminLogin from './admin/AdminLogin';
@@ -60,7 +61,6 @@ import Report from "./component/teacher/Reports";
 import PrincipalLogin from './principal/PrincipalLogin';
 import PrincipalHome from "./component/principal/PrincipalHome";
 import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
-import EmployeeProfile from "./component/employee/EmployeeProfile";
 
 const App = () => {
   return (
@@ -69,6 +69,7 @@ const App = () => {
         {/* Common Routes */}
         <Route path='/' element={<Home />} />
         <Route path="/final/admission/form/:inquiryId/:admissionId" element={<AdmissionForm />} />
+        <Route path="/employee/profile" element={<EmployeeProfile />} />
 
         {/* Admin Module */}
         <Route path='/admin/login' element={<AdminLogin />} />
@@ -116,7 +117,6 @@ const App = () => {
         <Route path="/principal/login" element={<PrincipalLogin />} />
         <Route path="/principal/home" element={<PrincipalHome />} />
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail />} />
-        <Route path="/employee/profile/:email" element={<EmployeeProfile />} />
       </Routes>
     </Router>
   );

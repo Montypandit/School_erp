@@ -10,7 +10,7 @@ const employee =new mongoose.Schema({
     dob:{type:Date},
     doj:{type:Date},
     qualification:{type:String},
-    residentalAddress:{type:String},
+    residentialAddress:{type:String},
     permanentAddress:{type:String},
     role:{type:String, required:true},
     aadharNo:{type:String},

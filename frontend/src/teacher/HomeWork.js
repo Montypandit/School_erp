@@ -34,7 +34,7 @@ const HomeWork = () => {
       try {
         // First get teacher's info
         const teacherRes = await fetch(
-          `http://localhost:5000/api/employees/get/employee/email/${sessionStorage.getItem('teacherEmail')}`,
+          `http://localhost:5000/api/employees/get/employee/email/${sessionStorage.getItem('email')}`,
           {
             method: 'GET',
             headers: {
@@ -185,7 +185,7 @@ const HomeWork = () => {
       // If not found in session storage, try to fetch teacher's profile
       if (!teacherAdmissionId) {
         try {
-          const profileResponse = await fetch(`http://localhost:5000/api/employees/get/employee/email/${sessionStorage.getItem('teacherEmail')}`, {
+          const profileResponse = await fetch(`http://localhost:5000/api/employees/get/employee/email/${sessionStorage.getItem('email')}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -198,7 +198,6 @@ const HomeWork = () => {
           }
           
           const teacherProfile = await profileResponse.json();
-          console.log('Teacher Profile:', teacherProfile);
           
           // Try to find a suitable identifier in the profile
           teacherAdmissionId = teacherProfile.admissionId || 
@@ -231,9 +230,6 @@ const HomeWork = () => {
         // assignedDate is automatically added by the timestamps option
       };
       
-      console.log('Sending homework data:', JSON.stringify(homeworkData, null, 2));
-
-      console.log('Submitting homework:', homeworkData);
       
       const response = await fetch('http://localhost:5000/api/homework/for/students/create/homework', {
         method: 'POST',
