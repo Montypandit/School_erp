@@ -13,7 +13,6 @@ const AttendanceReportPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [attendanceData, setAttendanceData] = useState([]);
   const [loading, setLoading] = useState(false);
-  //  attendance data come from backend
   const [showModal, setShowModal] = useState(false);
   const [selectedClassDetails, setSelectedClassDetails] = useState(null);
 
