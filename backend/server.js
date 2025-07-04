@@ -60,7 +60,9 @@ server.use('/api/homework/for/students', homeworkRoutes);
 server.use('/api/ptm',ptmApi);
 server.use('/api/monthy/fees',monthlyFeePaidApi);
 server.use('/api/teacher/results', examResult);
-// Start server
+
+
+
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

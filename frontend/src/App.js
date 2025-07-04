@@ -1,67 +1,54 @@
-/**
- * App.js
- * -------------
- * Main entry point for the React application.
- * Sets up routing for all modules: Admin, Coordinator, Teacher, Principal, and Common routes.
- * Uses React Router for navigation.
- * Each route points to a specific component representing a page or feature.
- */
-
 import React from "react";
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
-
-// Common Components
 import Home from './Home';
-import ScheduleForm from "./component/admin/ScheduleForm";
-
-// Admin Components
 import AdminLogin from './admin/AdminLogin';
 import AdminHome from './admin/AdminHome';
-import EmployeeForm from "./admin/EmployeeForm";
-import EmployeeLogin from "./admin/EmployeeLogin";
-import GetAllTeacher from "./teacher/GetAllTeacher";
-import GetAllStudent from "./component/Student/GetAllStudent";
-import GetTeacher from "./teacher/GetTeacher";
-import ExamSchedule from "./admin/ExamSchedule";
-import LeaveApproval from "./admin/LeaveApproval";
-import WeeklySchedule from "./admin/WeeklySchedule";
-import Attendence from "./admin/Attendence";
-
-// Coordinator Components
 import InquiryForm from "./component/coordinator/InquiryForm";
 import CoordinatorHome from './coordinator/CoordinatorHome';
 import CoordinatorLogin from "./component/coordinator/CoordinatorLogin";
+import EmployeeForm from "./admin/EmployeeForm";
 import FeesGeneration from "./coordinator/feesGeneration";
-import FeePaid from './coordinator/FeePaid';
+import TeacherLogin from "./teacher/TeacherLogin";
+import TeacherHome from "./teacher/TeacherHome";
+import FeePaid from './coordinator/FeePaid'
 import EnquiryStudent from "./coordinator/enquiryStudent";
-import Student from './component/coordinator/Student';
+import EmployeeLogin from "./admin/EmployeeLogin";
+import PrincipalLogin from './principal/PrincipalLogin'
+import PrincipalHome from "./component/principal/PrincipalHome";
+import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
+import GetAllTeacher from "./teacher/GetAllTeacher";
+import GetAllStudent from "./component/Student/GetAllStudent";
+import GetTeacher from "./teacher/GetTeacher";
+import AdmissionForm from "./component/coordinator/Admission/AdmissionForm"
+import AdmissionFees from './component/coordinator/Admission/AdmissionFees'
+import Student from './component/coordinator/Student'
+import ScheduleForm from "./component/admin/ScheduleForm";
+import Attendence from "./admin/Attendence";
 import StudentListPage from "./component/coordinator/StudentListPage";
+import ExamSchedule from "./admin/ExamSchedule";
+import LeaveApproval from "./admin/LeaveApproval";
+import WeeklySchedule from "./admin/WeeklySchedule";
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
+import AllotmentClass from "./component/coordinator/Alottment_class";
 import Allotments from "./component/coordinator/Allotments";
 import ActivityPlanner from "./coordinator/ActivityPlanner";
 import MonthlyPlanner from "./coordinator/monthlyPlanner";
-import Teacher from './component/coordinator/Teacher';
-import AdmissionForm from "./component/coordinator/Admission/AdmissionForm";
-import AdmissionFees from './component/coordinator/Admission/AdmissionFees';
-import MonthlyFeePaid from './coordinator/MonthlyFeePaid';
-
-// Teacher Components
-import TeacherLogin from "./teacher/TeacherLogin";
 import TeacherDashboard from "./component/teacher/TeacherDashboard";
+import TeacherSchedulePage from "./component/teacher/TeacherSchedulePage";
 import GetAttendence from "./component/teacher/GetAttendence";
 import Results from "./component/teacher/AddResult";
-import TeacherSchedulePage from "./teacher/TeachingSchedule";
-import PTMManagement from "./component/teacher/PTMMangement";
-import Homework from "./teacher/HomeWork"
-import Report from "./component/teacher/Reports";
+import PTMManagement from "./component/teacher/PTMManagement";
+import Homework from "./component/teacher/Homework";
+import Report from "./teacher/Report";
+import EmployeeProfile from "./component/EmployeeProfile";
+import ViewStudentReport from "./component/principal/viewReport";
+import MonthlyFeePaid from "./component/coordinator/MonthlyFeePaid";
+import Teacher from "./component/coordinator/Teacher";  
 
-// Principal Components
-import PrincipalLogin from './principal/PrincipalLogin';
-import PrincipalHome from "./component/principal/PrincipalHome";
-import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
-import PrincipalReport from "./component/principal/viewReport";
-import EmployeeProfile from "./component/employee/EmployeeProfile";
+
+
 
 const App = () => {
   return (
@@ -117,7 +104,7 @@ const App = () => {
         <Route path="/principal/login" element={<PrincipalLogin />} />
         <Route path="/principal/home" element={<PrincipalHome />} />
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail />} />
-        <Route path="/principal/report" element={<PrincipalReport />} />
+        <Route path="/principal/report" element={<ViewStudentReport />} />
         <Route path="/employee/profile/:email" element={<EmployeeProfile />} />
       </Routes>
     </Router>
@@ -125,3 +112,4 @@ const App = () => {
 };
 
 export default App;
+

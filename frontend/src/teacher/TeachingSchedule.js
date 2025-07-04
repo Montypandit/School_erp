@@ -45,12 +45,12 @@ const TeacherSchedulePage = () => {
             const token = sessionStorage.getItem('teacherToken');
             if (!token) {
                 toast.error('Authentication token not found. Please log in.');
-                window.location.href = '/teacher/login';
+                window.location.href = '/';
                 return;
             }
 
             try {
-                const res = await fetch(`http://localhost:5000/api/employees/get/employee/email/${sessionStorage.getItem('teacherEmail')}`, {
+                const res = await fetch(`http://localhost:5000/api/employees/get/employee/email/${sessionStorage.getItem('email')}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

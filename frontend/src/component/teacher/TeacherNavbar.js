@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
  
 const TeacherNavbar = () => {
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [adminInfo, setAdminInfo] = useState({ name: '', email: '' });
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem('adminInfo');
-    if (stored) {
-      setAdminInfo(JSON.parse(stored));
-    }
-  }, []);
 
   const handleLogout = () => {
     sessionStorage.removeItem('teacherToken');
-    navigate('/teacher/login');
+    sessionStorage.removeItem('email');
+    navigate('/');
   };
 
   return (
@@ -75,7 +67,10 @@ const TeacherNavbar = () => {
           {/* Right Section - User Icon and Logout */}
           <div className="flex items-center justify-end gap-4">
             {/* User Icon */}
-            <div className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full flex items-center justify-center font-semibold shadow-md">
+            <Link
+              to="/employee/profile"
+              className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full flex items-center justify-center font-semibold shadow-md"
+            >
               <svg
                 className="w-5 h-5"
                 fill="currentColor"
@@ -83,7 +78,7 @@ const TeacherNavbar = () => {
               >
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
               </svg>
-            </div>
+            </Link>
 
             {/* Logout Button */}
             <button

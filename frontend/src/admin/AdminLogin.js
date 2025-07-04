@@ -113,7 +113,7 @@ const AdminLogin = () => {
 
       const token = await response.text();
       sessionStorage.setItem('adminToken', token);
-      sessionStorage.setItem('adminEmail', formData.email);
+      sessionStorage.setItem('email', formData.email);
       toast.success('Login successful! Redirecting...');
       navigate('/admin/home');
 
