@@ -1,146 +1,169 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import PrincipalNavbar from './PrincipalNavbar'; // Assuming you have a PrincipalNavbar
+import React, { useEffect, useState } from "react";
+import {
+  Users,
+  CheckCircle,
+  XCircle,
+  GraduationCap,
+  Calendar,
+  FileText,
+  BarChart3,
+  BookOpen,
+} from "lucide-react";
+ // ✅ Make sure path is correct
+import PrincipalNavbar from "./PrincipalNavbar";
+
+// ✅ Stat card component
+const StatCard = ({ title, value, icon, color }) => (
+  <div className="bg-white p-4 rounded shadow flex-1 min-w-[200px]">
+    <div className="text-2xl mb-2">{icon}</div>
+    <h3 className="text-gray-700 font-medium">{title}</h3>
+    <p className="text-lg font-bold text-gray-900">{value}</p>
+    {typeof value === "string" && value.includes("/") && (
+      <p className={`text-sm font-medium ${color}`}>
+        {Math.round((+value.split("/")[0] / +value.split("/")[1]) * 100)}%
+      </p>
+    )}
+  </div>
+);
+
+// ✅ Action button
+const ActionButton = ({ href, icon, label }) => (
+  <a
+    href={href}
+    className="bg-white p-4 rounded text-center shadow hover:shadow-md transition transform hover:scale-105 flex flex-col items-center min-h-[100px]"
+  >
+    <div className="text-2xl text-gray-600 mb-2">{icon}</div>
+    <div className="text-gray-700 font-medium">{label}</div>
+  </a>
+);
 
 const PrincipalHome = () => {
-  const [admissions, setAdmissions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [presentCount, setPresentCount] = useState(0);
+  const [absentCount, setAbsentCount] = useState(0);
+  const [lateCount, setLateCount] = useState(0);
 
+  // ✅ Fetch attendance stats
   useEffect(() => {
-    const fetchAdmissionsForApproval = async () => {
+    const fetchAttendanceStats = async () => {
       try {
-        setLoading(true);
-        const token = sessionStorage.getItem('principalToken'); // Assuming principal token
-        if (!token) {
-          toast.info('Please login to continue');
-          navigate('/principal/login'); // Redirect to principal login
-          return;
-        }
+        const token = sessionStorage.getItem("principalToken");
+        const today = new Date().toISOString().split("T")[0];
 
-        // Fetch all admission approval statuses
-        const response = await fetch('http://localhost:5000/api/admissions/get/all/admission/approval/status', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+        const res = await fetch(
+          `http://localhost:5000/api/final/admission/get/all-attendance?date=${today}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
           }
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: 'Failed to parse error' }));
-          throw new Error(errorData.message || 'Failed to fetch admissions for approval');
-        }
-
-        const data = await response.json();
-        // Filter for admissions that are 'Pending' or 'Forwarded' for principal review
-        const pendingAdmissions = data.data.filter(
-          (adm) => adm.admissionApproved === 'Pending' || adm.admissionApproved === 'Forwarded'
         );
-        setAdmissions(pendingAdmissions);
+
+        const data = await res.json();
+
+        if (res.ok) {
+          let present = 0;
+          let absent = 0;
+          let late = 0;
+
+          data.data.forEach((record) => {
+            record.students.forEach((s) => {
+              if (s.status === "present") present++;
+              else if (s.status === "absent") absent++;
+              else if (s.status === "late") late++;
+            });
+          });
+
+          setPresentCount(present);
+          setAbsentCount(absent);
+          setLateCount(late);
+        } else {
+          console.error("Attendance fetch failed:", data.message);
+        }
       } catch (err) {
-        console.error('Error fetching admissions:', err);
-        setError(err.message || 'Failed to load admissions.');
-        toast.error(err.message || 'Failed to load admissions.');
-      } finally {
-        setLoading(false);
+        console.error("Error fetching attendance:", err);
       }
     };
 
-    fetchAdmissionsForApproval();
-  }, [navigate]);
+    fetchAttendanceStats();
+  }, []);
 
-  const handleViewDetails = (inquiryId) => {
-    navigate(`/principal/admission/detail/${inquiryId}`);
+  // ✅ Fetch total students
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = sessionStorage.getItem("principalToken");
+        const response = await fetch(
+          "http://localhost:5000/api/final/admission/get/all/admissions",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const result = await response.json();
+        if (response.ok) {
+          setTotalStudents(result.data.length);
+        }
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const stats = {
+    totalStudents,
+    totalTeachers: 20,
+    presentStudents: presentCount,
+    absentStudents: absentCount,
+    lateStudents: lateCount,
+    presentTeachers: 18, // Optional
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <p className="text-gray-600">Loading admissions...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-100 p-8">
-        <p className="text-red-600 text-center">{error}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-100">
-      <PrincipalNavbar />
-      <div className="container mx-auto p-6 mt-16"> {/* Added mt-16 for navbar spacing */}
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Admission Approvals</h1>
+    <>
+      <PrincipalNavbar /> {/* ✅ Navbar at top */}
 
-        {admissions.length === 0 ? (
-          <div className="bg-white p-6 rounded-lg shadow-md text-center text-gray-600">
-            No pending admissions for approval.
+      <div className="min-h-screen bg-gray-50 p-4 space-y-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Teacher Dashboard</h1>
+          <p className="text-gray-600">Welcome back! Here's what's happening today.</p>
+        </div>
+
+        {/* Stats Section */}
+        <div className="flex flex-wrap gap-4">
+          <StatCard title="Total Students" value={stats.totalStudents} icon={<Users />} color="text-blue-600" />
+          <StatCard title="Present" value={`${stats.presentStudents}/${stats.totalStudents}`} icon={<CheckCircle />} color="text-green-600" />
+          <StatCard title="Absent" value={`${stats.absentStudents}/${stats.totalStudents}`} icon={<XCircle />} color="text-red-600" />
+          <StatCard title="Late Students" value={`${stats.lateStudents}/${stats.totalStudents}`} icon={<GraduationCap />} color="text-yellow-600" />
+        </div>
+
+        {/* Quick Actions */}
+        <div>
+          <h2 className="text-xl font-semibold text-gray-700 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <ActionButton href="/teacher/attendence" icon={<Calendar />} label="Attendance" />
+            <ActionButton href="/teacher/results" icon={<BarChart3 />} label="Results" />
+            <ActionButton href="/principal/report" icon={<FileText />} label="Reports" />
+            <ActionButton href="/teacher/homework" icon={<BookOpen />} label="Homework" />
           </div>
-        ) : (
-          <div className="overflow-x-auto bg-white rounded-lg shadow-md">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Admission ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Inquiry ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {admissions.map((admission) => (
-                  <tr key={admission._id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {admission.admissionId}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {admission.inquiryId}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        admission.admissionApproved === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
-                        admission.admissionApproved === 'Forwarded' ? 'bg-blue-100 text-blue-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {admission.admissionApproved}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(admission.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button
-                        onClick={() => handleViewDetails(admission.inquiryId)}
-                        className="text-indigo-600 hover:text-indigo-900 hover:underline"
-                      >
-                        View Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        </div>
+
+        {/* Recent Activity */}
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-xl font-semibold text-gray-700 mb-3">Recent Activity</h2>
+          <ul className="space-y-2 text-gray-600 text-sm">
+            <li>✔️ New student enrolled</li>
+            <li>🕘 Attendance submitted</li>
+            <li>📢 Assignment reminder sent</li>
+          </ul>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

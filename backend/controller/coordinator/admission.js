@@ -46,7 +46,7 @@ router.post('/save/attendence', authMiddleware, authorizeRoles('admin', 'coordin
 });
 
 // ======================= GET ATTENDANCE =======================
-router.get('/get/attendance', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
+router.get('/get/attendance', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher','principal'), async (req, res) => {
   try {
     const { class: className, date } = req.query;
 
@@ -74,7 +74,7 @@ router.get('/get/attendance', authMiddleware, authorizeRoles('admin', 'coordinat
   }
 });
 // ======================= GET ALL ATTENDANCE RECORDS FOR A SPECIFIC DATE =======================
-router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles('teacher'), async (req, res) => {
+router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles('admin','teacher','principal'), async (req, res) => {
   try {
     const { date } = req.params;
 
@@ -119,7 +119,7 @@ router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles('teacher'
 
 
 // ✅ GET all attendance records for a specific date (e.g., today)
-router.get('/get/all-attendance', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
+router.get('/get/all-attendance', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher','principal'), async (req, res) => {
   try {
     const { date } = req.query;
     if (!date) return res.status(400).json({ message: "Date is required" });
@@ -175,7 +175,7 @@ router.put('/update/admission/:admissionId', authMiddleware, authorizeRoles('adm
 });
 
 // ======================= GET ALL ADMISSIONS =======================
-router.get('/get/all/admissions', authMiddleware, authorizeRoles('admin', 'coordinator','teacher'), async (req, res) => {
+router.get('/get/all/admissions', authMiddleware, authorizeRoles('admin', 'coordinator','teacher','principal'), async (req, res) => {
   try {
     const admissions = await Admission.find().sort({ createdAt: -1 });
     res.status(200).json({ message: 'Admissions fetched successfully', data: admissions });
@@ -186,7 +186,7 @@ router.get('/get/all/admissions', authMiddleware, authorizeRoles('admin', 'coord
 });
 
 // ======================= GET STUDENT BY ADMISSION ID =======================
-router.get('/get/student/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator','teacher'), async (req, res) => {
+router.get('/get/student/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator','teacher','principal'), async (req, res) => {
   try {
     const student = await Admission.findOne({ admissionId: req.params.admissionId });
     if (!student) return res.status(404).json({ message: 'Student not found' });
@@ -197,7 +197,7 @@ router.get('/get/student/:admissionId', authMiddleware, authorizeRoles('admin', 
 });
 
 // ======================= GET STUDENTS BY CLASS =======================
-router.get('/get/students/byClass/:classId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.get('/get/students/byClass/:classId', authMiddleware, authorizeRoles('admin', 'coordinator','principal'), async (req, res) => {
   try {
     const { classId } = req.params;
     const students = await Admission.find({ class: classId }).sort({ createdAt: -1 });

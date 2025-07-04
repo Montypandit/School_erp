@@ -60,6 +60,7 @@ import Report from "./component/teacher/Reports";
 import PrincipalLogin from './principal/PrincipalLogin';
 import PrincipalHome from "./component/principal/PrincipalHome";
 import PrincipalAdmissionDetail from "./component/principal/PrincipalAdmissionDetail";
+import PrincipalReport from "./component/principal/viewReport";
 import EmployeeProfile from "./component/employee/EmployeeProfile";
 
 const App = () => {
@@ -116,6 +117,7 @@ const App = () => {
         <Route path="/principal/login" element={<PrincipalLogin />} />
         <Route path="/principal/home" element={<PrincipalHome />} />
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail />} />
+        <Route path="/principal/report" element={<PrincipalReport />} />
         <Route path="/employee/profile/:email" element={<EmployeeProfile />} />
       </Routes>
     </Router>
