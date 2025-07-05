@@ -114,4 +114,26 @@ router.delete('/delete/employee/:empId', authMiddleware, authorizeRoles('admin')
   }
 });
 
+
+router.get('/get/employee/count',authMiddleware, authorizeRoles('admin'), async(req,res)=>{
+  try{
+    const totalEmployees = await Employee.countDocuments();
+    res.status(200).json({totalEmployees});
+  }catch(err){
+    console.log(err);
+    res.status(500).json({error:err.message});
+  }
+});
+
+router.get('/get/employee/count/role/:role',authMiddleware, authorizeRoles('admin'), async (req,res) =>{
+  try{
+    const {role} = req.params;
+    const employees = await Employee.countDocuments({role:role});
+    res.status(200).json({employeeCount:employees, totalEmployees: await Employee.countDocuments()});
+  }catch(err){
+    console.log(err)
+    res.status(500).json({error:err.message});
+  }
+});
+
 module.exports = router;

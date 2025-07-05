@@ -46,7 +46,7 @@ const AdminNavbar = () => {
                 Dashboard
               </Link>
               <Link
-                to="/admin/employees"
+                to="/admin/employee/page"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Employees
@@ -75,7 +75,7 @@ const AdminNavbar = () => {
           {/* Right Section - User Icon and Logout */}
           <div className="flex items-center justify-end gap-4">
             {/* User Icon */}
-            <Link
+            {/* <Link
               to="/employee/profile"
               className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full flex items-center justify-center font-semibold shadow-md"
             >
@@ -86,7 +86,7 @@ const AdminNavbar = () => {
               >
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
               </svg>
-            </Link>
+            </Link> */}
 
             {/* Logout Button */}
             <button
