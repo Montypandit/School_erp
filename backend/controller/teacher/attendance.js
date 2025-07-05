@@ -1,5 +1,5 @@
 const express = require('express');
-const Attendance = require('../../models/teacher/attendanceSchema'); // assume model is already created
+const Attendance = require('../../models/teacher/attendanceSchema');
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 const router = express.Router();
@@ -43,7 +43,7 @@ router.get('/get/all/attendance', authMiddleware, authorizeRoles('admin'), async
 });
 
 // GET attendance by teacher - Teacher only
-router.get('/get/my/attendance', authMiddleware, authorizeRoles('teacher'), async (req, res) => {
+router.get('/get/my/attendance', authMiddleware, authorizeRoles('admin','teacher'), async (req, res) => {
   try {
     const teacherId = req.user._id;
     const records = await Attendance.find({ takenBy: teacherId }).sort({ createdAt: -1 });
@@ -70,7 +70,7 @@ router.put('/update/attendance/:attendanceId', authMiddleware, authorizeRoles('t
 });
 
 // GET attendance by date for teachers
-router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles('teacher'), async (req, res) => {
+router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles( 'admin','teacher'), async (req, res) => {
   try {
     const { date } = req.params;
 
@@ -87,6 +87,7 @@ router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles('teacher'
     res.status(500).json({ error: error.message });
   }
 });
+
 
 
 module.exports = router;

@@ -36,6 +36,7 @@ const homeworkRoutes = require('./controller/teacher/homeworkapi');
 const ptmApi = require('./controller/teacher/ptmApi');
 const examResult = require('./controller/teacher/examResult'); // ✅ Exam Result API
 const monthlyFeePaidApi = require('./controller/coordinator/monthlyFeePaidApi');
+const attendanceApi = require('./controller/teacher/attendance');
 
 // Use APIs (with consistent route prefix)
 server.use('/api/auth', userLoginApi);
