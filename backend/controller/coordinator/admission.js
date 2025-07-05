@@ -213,4 +213,20 @@ router.get('/get/students/byClass/:classId', authMiddleware, authorizeRoles('adm
   }
 });
 
+
+router.get('/get/admission/count',authMiddleware, authorizeRoles('admin','coordinator'), async(req,res)=>{
+  try{
+    // count admissions which are created in current year
+    const totalAdmissionCount = await Admission.countDocuments({createdAt:{$gte: new Date(new Date().getFullYear(),0,1)}});
+    const totalAdmissionAllTime = await Admission.countDocuments();
+
+    if(!totalAdmissionCount && !totalAdmissionAllTime){
+      return status(404).json({message:"No admission found"});
+    }
+    res.status(200).json({totalAdmissionCount,totalAdmissionAllTime});
+  } catch(err){
+    console.log(err);
+    res.status(500).json({message:'Error fetching admission count', error:err.message});
+  }
+});
 module.exports = router;

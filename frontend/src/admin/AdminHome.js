@@ -1,6 +1,7 @@
 import AdminNavbar from './AdminNavbar';
-import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import {toast} from 'react-toastify'
 
 // ✅ Define StatCard
 const StatCard = ({ title, value, percentage, icon, color }) => {
@@ -56,6 +57,59 @@ const AdminHome = () => {
     presentTeachers: 72,
   });
 
+  const [allTimeTotalstudents, setAllTimeTotalStudents] = useState('');
+  const [totalStudents, setTotalStudetnts] = useState(0);
+  const [totalTeachers, setTotalTeachers] = useState(0);
+  const [presentStudents, setPresentStudents] = useState('');
+  const [absentStudents, setAbsentStudents] = useState('');
+  const [presentTeachers, setPresentTeachers] = useState('');
+
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    const token = sessionStorage.getItem('adminToken');
+    if(!token){
+      toast.info('Please login to continue');
+      navigate('/');
+      return;
+    }
+    // fetching students data
+    const fetchTotalStudents = async ()=>{
+      try{
+        const res = await fetch('http://localhost:5000/api/final/admission/get/admission/count',{
+          method:'GET',
+          headers:{
+            'Content-Type':'application/json',
+            'Authorization':`Bearer ${token}`
+          },
+
+        });
+
+        if(!res.ok){
+          throw new Error('Failed to fetch total students data');
+        }
+
+        const data = await res.json();
+        setTotalStudetnts(data.totalAdmissionCount);
+        setAllTimeTotalStudents(data.totalAdmissionAllTime)
+        
+      } catch(err){
+        toast.err('Oops! Something went wrong. Please try again later');
+        console.error(err);
+      }
+    }
+
+    const fetchTotalPresntStudents = async ()=>{
+      try{
+        const res = await fetch('http://localhost:5000/')
+      } catch(err){
+        console.log('Error fetching data');
+      }
+    }
+
+    fetchTotalStudents();
+  },[])
+
   // Calculate percentages, ensuring no division by zero
   const presentStudentPercentage = stats.totalStudents > 0 ? Math.round((stats.presentStudents / stats.totalStudents) * 100) : 0;
   const absentStudentPercentage = stats.totalStudents > 0 ? Math.round((stats.absentStudents / stats.totalStudents) * 100) : 0;
@@ -63,7 +117,6 @@ const AdminHome = () => {
 
   // ✅ Dummy stats for testing
   const dummyStats = {
-    totalStudents: 10,
     totalTeachers: 20,
     presentStudents: 2,
     absentStudents: 2,
@@ -89,7 +142,7 @@ const AdminHome = () => {
       }}>
         <StatCard 
           title="Total Students"
-          value={dummyStats.totalStudents} 
+          value={totalStudents} 
           percentage={100}
           icon="👥"
           color="#4CAF50"
