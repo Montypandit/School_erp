@@ -1,15 +1,8 @@
 const express = require('express');
 const router = express.Router();
-//const WeeklySchedule = require('../../models/schedule/scheduleModel'); // your provided schema
-// const authMiddleware = require('../../middleware/authMiddleware');
-// const authorizeRoles = require('../../middleware/authorizeRoles');
-const scheduleModel = require('../models/schedule/scheduleModel');
-const authMiddleware = require('../middleware/authMiddleware');
-const authorizeRoles = require('../middleware/authorizeRules');
-
-// const authMiddleware = require('../middleware/authMiddleware');
-// const authorizeRoles = require('../middleware/authorizeRoles');
-
+const scheduleModel = require('../../models/schedule/scheduleModel');
+const authMiddleware = require('../../middleware/authMiddleware');
+const authorizeRoles = require('../../middleware/authorizeRules');
 
 /**
  * CREATE Weekly Schedule (Admin, Coordinator)

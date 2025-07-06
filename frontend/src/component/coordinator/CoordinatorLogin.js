@@ -121,6 +121,7 @@ const CoordinatorLogin = () => {
       // If response is OK, the body is the token itself (plain text)
       const token = await response.text();
       sessionStorage.setItem('coordinatorToken', token);
+      sessionStorage.setItem('email',formData.email)
       toast.success('Login successful! Redirecting...');
       navigate('/coordinator/home');
 

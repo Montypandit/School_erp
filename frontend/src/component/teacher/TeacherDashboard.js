@@ -10,6 +10,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import TeacherNavbar from "./TeacherNavbar"; // ✅ Make sure path is correct
+import { toast } from "react-toastify";
 
 // ✅ Stat card component
 const StatCard = ({ title, value, icon, color }) => (
@@ -93,6 +94,11 @@ const TeacherHome = () => {
     const fetchStats = async () => {
       try {
         const token = sessionStorage.getItem("teacherToken");
+        if(!token){
+          toast.info('Please login to continue');
+          window.location.href = '/'
+          return;
+        }
         const response = await fetch(
           "http://localhost:5000/api/final/admission/get/all/admissions",
           {
@@ -146,7 +152,7 @@ const TeacherHome = () => {
           <h2 className="text-xl font-semibold text-gray-700 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             <ActionButton href="/teacher/attendence" icon={<Calendar />} label="Attendance" />
-            <ActionButton href="/teacher/result" icon={<BarChart3 />} label="Results" />
+            <ActionButton href="/teacher/results" icon={<BarChart3 />} label="Results" />
             <ActionButton href="/teacher/report" icon={<FileText />} label="Reports" />
             <ActionButton href="/teacher/homework" icon={<BookOpen />} label="Homework" />
           </div>

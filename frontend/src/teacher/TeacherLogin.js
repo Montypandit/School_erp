@@ -123,7 +123,7 @@ const TeacherLogin = () => {
       // If response is OK, the body is the token itself (plain text)
       const token = await response.text();
       sessionStorage.setItem('teacherToken', token);
-      sessionStorage.setItem('teacherEmail', formData.email);
+      sessionStorage.setItem('email', formData.email);
       toast.success('Login successful! Redirecting...');
       navigate('/teacher/home');
 

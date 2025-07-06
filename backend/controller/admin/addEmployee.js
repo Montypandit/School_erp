@@ -16,7 +16,7 @@ router.post('/create/employee', authMiddleware, authorizeRoles('admin'), async (
         const empId = generateRandomEmpId();
         const {
           firstName, lastName, email, phone, gender, dob, doj, qualification,
-          residentalAddress, permanentAddress, role, aadharNo, panNo,
+          residentialAddress, permanentAddress, role, aadharNo, panNo,
           passportNo, salary, imageUrl
         } = req.body;
     
@@ -30,7 +30,7 @@ router.post('/create/employee', authMiddleware, authorizeRoles('admin'), async (
           dob,
           doj,
           qualification,
-          residentalAddress,
+          residentialAddress,
           permanentAddress,
           role,
           aadharNo,
@@ -72,7 +72,7 @@ router.get('/get/employee/:empId', authMiddleware, authorizeRoles('admin'), asyn
 });
 
 // get employee by email
-router.get('/get/employee/email/:email', authMiddleware, authorizeRoles('admin','teacher'), async (req, res) => {
+router.get('/get/employee/email/:email', authMiddleware, authorizeRoles('admin','teacher','coordinator','principal'), async (req, res) => {
   try {
     const employee = await Employee.findOne({ email: req.params.email });
     if (!employee) return res.status(404).json({ message: 'Employee not found' });
@@ -111,6 +111,28 @@ router.delete('/delete/employee/:empId', authMiddleware, authorizeRoles('admin')
     res.status(200).json({ message: 'Employee deleted successfully', data: deleted });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+
+router.get('/get/employee/count',authMiddleware, authorizeRoles('admin'), async(req,res)=>{
+  try{
+    const totalEmployees = await Employee.countDocuments();
+    res.status(200).json({totalEmployees});
+  }catch(err){
+    console.log(err);
+    res.status(500).json({error:err.message});
+  }
+});
+
+router.get('/get/employee/count/role/:role',authMiddleware, authorizeRoles('admin'), async (req,res) =>{
+  try{
+    const {role} = req.params;
+    const employees = await Employee.countDocuments({role:role});
+    res.status(200).json({employeeCount:employees, totalEmployees: await Employee.countDocuments()});
+  }catch(err){
+    console.log(err)
+    res.status(500).json({error:err.message});
   }
 });
 

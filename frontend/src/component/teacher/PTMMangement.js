@@ -1,536 +1,541 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Clock, MapPin, User, Phone, MessageSquare, FileText, Plus, Edit, Trash2, Search, Filter, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Calendar, Clock, User, Phone, MessageSquare, CheckCircle, XCircle, Plus, Search, Filter } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import TeacherNavbar from './TeacherNavbar'
 
 const PTMManagement = () => {
+  const [students, setStudents] = useState([]);
   const [ptmMeetings, setPtmMeetings] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingMeeting, setEditingMeeting] = useState(null);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [formData, setFormData] = useState({
-    admissionId: '',
-    meetingId: '',
+  const [filterClass, setFilterClass] = useState('');
+  const [activeTab, setActiveTab] = useState('students');
+
+
+  const [scheduleForm, setScheduleForm] = useState({
     title: '',
     description: '',
     scheduleDate: '',
     scheduleTime: '',
     venue: '',
-    remarks: '',
-    attendBy: '',
-    attendiesPhoneNo: '',
-    attendiesFeedback: '',
-    meetingStatus: 'Scheduled'
+    remarks: ''
   });
+  const navigate = useNavigate();
 
-  // Sample data for demonstration
   useEffect(() => {
-    const sampleData = [
-      {
-        _id: '1',
-        admissionId: 'ADM001',
-        meetingId: 'PTM001',
-        title: 'Academic Progress Discussion',
-        description: 'Discuss student academic performance and behavioral assessment',
-        scheduleDate: new Date('2025-07-05'),
-        scheduleTime: '10:00 AM',
-        venue: 'Room 201',
-        remarks: 'Parent requested discussion about mathematics performance',
-        attendBy: 'John Smith (Father)',
-        attendiesPhoneNo: '+91-9876543210',
-        attendiesFeedback: 'Very informative session',
-        meetingStatus: 'Completed',
-        createdAt: new Date('2025-06-20')
-      },
-      {
-        _id: '2',
-        admissionId: 'ADM002',
-        meetingId: 'PTM002',
-        title: 'Behavioral Counseling',
-        description: 'Address behavioral concerns and create improvement plan',
-        scheduleDate: new Date('2025-07-10'),
-        scheduleTime: '2:30 PM',
-        venue: 'Counselor Office',
-        remarks: 'Teacher recommended counseling session',
-        attendBy: 'Mary Johnson (Mother)',
-        attendiesPhoneNo: '+91-9876543211',
-        attendiesFeedback: '',
-        meetingStatus: 'Scheduled',
-        createdAt: new Date('2025-06-25')
+    const fetchPTMMeetings = async () => {
+      try {
+        const token = sessionStorage.getItem('teacherToken');
+        if (!token) {
+          toast.info('Please login to continue');
+          navigate('/');
+          return;
+        }
+
+        const res = await fetch('http://localhost:5000/api/ptm/get/all/ptm/schedules', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch PTM meetings');
+        }
+        const data = await res.json();
+        setPtmMeetings(data.data);
+      } catch (error) {
+        toast.error('Failed to fetch PTM meetings. Please try again later');
+        console.error(error);
       }
-    ];
-    setPtmMeetings(sampleData);
-  }, []);
+    };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+    const fetchStudents = async () => {
+      try {
+        const token = sessionStorage.getItem('teacherToken');
+        if (!token) {
+          toast.info('Please login to continue');
+          navigate('/');
+          return;
+        }
 
-  const handleSubmit = () => {
-    // Basic validation
-    if (!formData.admissionId || !formData.meetingId || !formData.title || !formData.description || 
-        !formData.scheduleDate || !formData.scheduleTime || !formData.attendBy || !formData.attendiesFeedback) {
-      alert('Please fill in all required fields');
-      return;
-    }
-    
-    if (editingMeeting) {
-      // Update existing meeting
-      setPtmMeetings(prev => 
-        prev.map(meeting => 
-          meeting._id === editingMeeting._id 
-            ? { ...meeting, ...formData, scheduleDate: new Date(formData.scheduleDate) }
-            : meeting
-        )
-      );
-    } else {
-      // Add new meeting
-      const newMeeting = {
-        ...formData,
-        _id: Date.now().toString(),
-        scheduleDate: new Date(formData.scheduleDate),
-        createdAt: new Date()
-      };
-      setPtmMeetings(prev => [...prev, newMeeting]);
+        const res = await fetch('http://localhost:5000/api/final/admission/get/all/admissions', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application.json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch students');
+        }
+        const data = await res.json();
+        setStudents(data.data);
+      } catch (error) {
+        console.error('Error fechintg data', error);
+        toast.error('Failed to fetch students. Please try again later');
+      }
     }
 
-    resetForm();
-  };
 
-  const resetForm = () => {
-    setFormData({
-      admissionId: '',
-      meetingId: '',
-      title: '',
-      description: '',
+    fetchStudents();
+    fetchPTMMeetings();
+  }, [navigate]);
+
+  const handleSchedulePTM = (student) => {
+    setSelectedStudent(student);
+    setScheduleForm({
+      title: `PTM - ${student.name}`,
+      description: `Parent-Teacher Meeting for ${student.name} (${student.class})`,
       scheduleDate: '',
       scheduleTime: '',
-      venue: '',
-      remarks: '',
-      attendBy: '',
-      attendiesPhoneNo: '',
+      venue: 'School Conference Room',
+      remarks: ''
+    });
+    setShowScheduleModal(true);
+  };
+
+  const handleFormSubmit = async () => {
+    // Basic validation
+    if (!scheduleForm.title || !scheduleForm.description || !scheduleForm.scheduleDate || !scheduleForm.scheduleTime) {
+      toast.info('Please fill in all required fields');
+      return;
+    }
+
+    const newMeeting = {
+      meetingId: `PTM${Date.now()}`,
+      admissionId: selectedStudent.admissionId,
+      studentName: selectedStudent.name,
+      parentName: selectedStudent.fatherName,
+      parentPhone: selectedStudent.fatherMobile,
+      ...scheduleForm,
+      attendBy: 'Teacher',
+      attendiesPhoneNo: selectedStudent.parentPhone,
       attendiesFeedback: '',
-      meetingStatus: 'Scheduled'
-    });
-    setShowForm(false);
-    setEditingMeeting(null);
-  };
+      meetingStatus: 'Scheduled',
+    };
 
-  const handleEdit = (meeting) => {
-    setEditingMeeting(meeting);
-    setFormData({
-      ...meeting,
-      scheduleDate: meeting.scheduleDate.toISOString().split('T')[0]
-    });
-    setShowForm(true);
-  };
+    try {
+      const token = sessionStorage.getItem('teacherToken');
+      if (!token) {
+        toast.info('Please login to continue');
+        navigate('/');
+        return;
+      }
+      const res = await fetch('http://localhost:5000/api/ptm/create/ptm/schedule', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(newMeeting)
+      });
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this PTM meeting?')) {
-      setPtmMeetings(prev => prev.filter(meeting => meeting._id !== id));
+      if (!res.ok) {
+        toast.error('Failed to schedule PTM meeting. Please try again later');
+        throw new Error('Filed to schedule PTM Meeting');
+      }
+
+      const data = await res.json();
+      toast.success(data.message);
+    } catch (error) {
+      console.error('Error scheduling PTM', error);
     }
+
+    const updatedMeetings = [...ptmMeetings, newMeeting];
+    setPtmMeetings(updatedMeetings);
+
+    // Simulate WhatsApp message sending
+    sendWhatsAppMessage(selectedStudent, scheduleForm);
+
+    setShowScheduleModal(false);
+    setSelectedStudent(null);
+    toast.success('PTM scheduled successfully! WhatsApp message sent to parent.');
   };
 
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'Completed':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'Cancelled':
-        return <XCircle className="w-5 h-5 text-red-500" />;
-      case 'Scheduled':
-        return <AlertCircle className="w-5 h-5 text-blue-500" />;
-      default:
-        return <AlertCircle className="w-5 h-5 text-gray-500" />;
+  const sendWhatsAppMessage = (student, meeting) => {
+    const message = `
+Dear ${student.parentName},
+
+A Parent-Teacher Meeting has been scheduled for your child ${student.name}.
+
+Date: ${new Date(meeting.scheduleDate).toLocaleDateString()}
+Time: ${meeting.scheduleTime}
+Venue: ${meeting.venue}
+Purpose: ${meeting.description}
+
+Please confirm your attendance by replying to this message.
+
+Thank you,
+School Administration
+    `.trim();
+
+    let cleanNumber = student.fatherMobile.replace(/[^0-9]/g, '');
+    if (cleanNumber.length === 10) {
+      cleanNumber = '91' + cleanNumber;
     }
+    const whatsappUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(message)}`;
+
+    window.open(whatsappUrl, '_blank');
   };
 
-  const filteredMeetings = ptmMeetings.filter(meeting => {
-    const matchesSearch = meeting.admissionId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         meeting.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         meeting.attendBy.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || meeting.meetingStatus === statusFilter;
-    return matchesSearch && matchesStatus;
+  const filteredStudents = students.filter(student => {
+    const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.admissionId.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesClass = !filterClass || student.class === filterClass;
+    return matchesSearch && matchesClass;
   });
 
+  const uniqueClasses = [...new Set(students.map(s => s.class))];
+
+  const updateMeetingStatus = async (meetingId, newStatus) => {
+    try{
+      const token = sessionStorage.getItem('teacherToken');
+      if(!token){
+        toast.info('Please login to continue');
+        navigate('/');
+        return;
+      };
+
+      const res =await fetch(`http://localhost:5000/api/ptm/update/${meetingId}`,{
+        method:'PUT',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body:JSON.stringify({
+          meetingStatus:newStatus
+        })
+      });
+
+      if(!res.ok){
+        throw new Error('Failed to update PTM meeting status');
+      }
+
+      const data = res.json();
+      toast.success('Successfully updated PTM meeting status');
+    } catch(error){
+      console.error('Error updating PTM meeting status',error);
+      toast.error('Failed to update PTM meeting status. Please try again later');
+    }
+  };
+
   return (
+    <div>
+    <TeacherNavbar/>
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">PTM Management</h1>
-              <p className="text-gray-600 mt-1">Manage Parent-Teacher Meetings</p>
-            </div>
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              Schedule PTM
-            </button>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">PTM Management System</h1>
+          <p className="text-gray-600">Schedule and manage Parent-Teacher Meetings</p>
         </div>
 
-        {/* Search and Filter */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="w-5 h-5 absolute left-3 top-3 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by admission ID, title, or attendee..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-gray-400" />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        {/* Navigation Tabs */}
+        <div className="bg-white rounded-lg shadow-sm mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8 px-6">
+              <button
+                onClick={() => setActiveTab('students')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'students'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
               >
-                <option value="all">All Status</option>
-                <option value="Scheduled">Scheduled</option>
-                <option value="Completed">Completed</option>
-                <option value="Cancelled">Cancelled</option>
-                <option value="Rescheduled">Rescheduled</option>
-              </select>
-            </div>
+                <User className="inline-block w-4 h-4 mr-2" />
+                Students
+              </button>
+              <button
+                onClick={() => setActiveTab('meetings')}
+                className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'meetings'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+              >
+                <Calendar className="inline-block w-4 h-4 mr-2" />
+                Scheduled Meetings
+              </button>
+            </nav>
           </div>
         </div>
 
-        {/* PTM Form Modal */}
-        {showForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  {editingMeeting ? 'Edit PTM Meeting' : 'Schedule New PTM Meeting'}
-                </h2>
-                
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Admission ID *
-                      </label>
-                      <input
-                        type="text"
-                        name="admissionId"
-                        value={formData.admissionId}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Meeting ID *
-                      </label>
-                      <input
-                        type="text"
-                        name="meetingId"
-                        value={formData.meetingId}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Title *
-                    </label>
+        {/* Students Tab */}
+        {activeTab === 'students' && (
+          <div className="bg-white rounded-lg shadow-sm">
+            {/* Search and Filter */}
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <input
                       type="text"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleInputChange}
-                      required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Search students..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
+                </div>
+                <div className="sm:w-48">
+                  <select
+                    value={filterClass}
+                    onChange={(e) => setFilterClass(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">All Classes</option>
+                    {uniqueClasses.map(cls => (
+                      <option key={cls} value={cls}>{cls}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
 
+            {/* Students List */}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Class</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parent Details</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredStudents.map((student) => (
+                    <tr key={student.admissionId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{student.name}</div>
+                          <div className="text-sm text-gray-500">ID: {student.admissionId}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {student.class}
+                        </span>
+                        <div className="text-sm text-gray-500 mt-1">Roll: {student.rollNo}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{student.fatherName}</div>
+                          <div className="text-sm text-gray-500 flex items-center">
+                            <Phone className="w-3 h-3 mr-1" />
+                            {student.fatherMobile}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => handleSchedulePTM(student)}
+                          className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Schedule PTM
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Meetings Tab */}
+        {activeTab === 'meetings' && (
+          <div className="bg-white rounded-lg shadow-sm">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-lg font-medium text-gray-900">Scheduled PTM Meetings</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meeting Details</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schedule</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {ptmMeetings.map((meeting) => (
+                    <tr key={meeting.meetingId} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{meeting.title}</div>
+                          <div className="text-sm text-gray-500">{meeting.description}</div>
+                          <div className="text-xs text-gray-400 mt-1">ID: {meeting.meetingId}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{meeting.studentName}</div>
+                          <div className="text-sm text-gray-500">{meeting.parentName}</div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center text-sm text-gray-900">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {new Date(meeting.scheduleDate).toLocaleDateString()}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-500 mt-1">
+                          <Clock className="w-4 h-4 mr-1" />
+                          {meeting.scheduleTime}
+                        </div>
+                        <div className="text-sm text-gray-500 mt-1">{meeting.venue}</div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${meeting.meetingStatus === 'Completed'
+                          ? 'bg-green-100 text-green-800'
+                          : meeting.meetingStatus === 'Cancelled'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {meeting.meetingStatus === 'Completed' && <CheckCircle className="w-3 h-3 mr-1" />}
+                          {meeting.meetingStatus === 'Cancelled' && <XCircle className="w-3 h-3 mr-1" />}
+                          {meeting.meetingStatus}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {meeting.meetingStatus === 'Scheduled' && (
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => updateMeetingStatus(meeting.meetingId, 'Completed')}
+                              className="text-green-600 hover:text-green-900 text-sm"
+                            >
+                              Complete
+                            </button>
+                            <button
+                              onClick={() => updateMeetingStatus(meeting.meetingId, 'Cancelled')}
+                              className="text-red-600 hover:text-red-900 text-sm"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {ptmMeetings.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  No PTM meetings scheduled yet.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Schedule PTM Modal */}
+        {showScheduleModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+              <div className="mb-4">
+                <h3 className="text-lg font-bold text-gray-900">Schedule PTM</h3>
+                <p className="text-sm text-gray-600">
+                  For {selectedStudent?.name} ({selectedStudent?.class})
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <input
+                    type="text"
+                    value={scheduleForm.title}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, title: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <textarea
+                    value={scheduleForm.description}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, description: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows="3"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Description *
-                    </label>
-                    <textarea
-                      name="description"
-                      value={formData.description}
-                      onChange={handleInputChange}
-                      required
-                      rows="3"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Schedule Date *
-                      </label>
-                      <input
-                        type="date"
-                        name="scheduleDate"
-                        value={formData.scheduleDate}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Schedule Time *
-                      </label>
-                      <input
-                        type="text"
-                        name="scheduleTime"
-                        value={formData.scheduleTime}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="e.g., 10:00 AM"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Venue
-                      </label>
-                      <input
-                        type="text"
-                        name="venue"
-                        value={formData.venue}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Meeting Status *
-                      </label>
-                      <select
-                        name="meetingStatus"
-                        value={formData.meetingStatus}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      >
-                        <option value="Scheduled">Scheduled</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
-                        <option value="Rescheduled">Rescheduled</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Attend By *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
                     <input
-                      type="text"
-                      name="attendBy"
-                      value={formData.attendBy}
-                      onChange={handleInputChange}
+                      type="date"
+                      value={scheduleForm.scheduleDate}
+                      onChange={(e) => setScheduleForm({ ...scheduleForm, scheduleDate: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
-                      placeholder="e.g., John Smith (Father)"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Attendee Phone Number
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
                     <input
-                      type="text"
-                      name="attendiesPhoneNo"
-                      value={formData.attendiesPhoneNo}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Remarks
-                    </label>
-                    <textarea
-                      name="remarks"
-                      value={formData.remarks}
-                      onChange={handleInputChange}
-                      rows="2"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Attendee Feedback *
-                    </label>
-                    <textarea
-                      name="attendiesFeedback"
-                      value={formData.attendiesFeedback}
-                      onChange={handleInputChange}
+                      type="time"
+                      value={scheduleForm.scheduleTime}
+                      onChange={(e) => setScheduleForm({ ...scheduleForm, scheduleTime: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       required
-                      rows="3"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
+                </div>
 
-                  <div className="flex justify-end gap-4 pt-4">
-                    <button
-                      type="button"
-                      onClick={resetForm}
-                      className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSubmit}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                    >
-                      {editingMeeting ? 'Update Meeting' : 'Schedule Meeting'}
-                    </button>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
+                  <input
+                    type="text"
+                    value={scheduleForm.venue}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, venue: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Remarks</label>
+                  <textarea
+                    value={scheduleForm.remarks}
+                    onChange={(e) => setScheduleForm({ ...scheduleForm, remarks: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    rows="2"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowScheduleModal(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleFormSubmit}
+                    className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-1 inline-block" />
+                    Schedule & Send WhatsApp
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         )}
-
-        {/* PTM List */}
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">PTM Meetings</h2>
-            
-            {filteredMeetings.length === 0 ? (
-              <div className="text-center py-8">
-                <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-500">No PTM meetings found</p>
-              </div>
-            ) : (
-              <div className="grid gap-4">
-                {filteredMeetings.map((meeting) => (
-                  <div key={meeting._id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          {getStatusIcon(meeting.meetingStatus)}
-                          <h3 className="text-lg font-semibold text-gray-900">{meeting.title}</h3>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            meeting.meetingStatus === 'Completed' ? 'bg-green-100 text-green-800' :
-                            meeting.meetingStatus === 'Cancelled' ? 'bg-red-100 text-red-800' :
-                            'bg-blue-100 text-blue-800'
-                          }`}>
-                            {meeting.meetingStatus}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-2">{meeting.description}</p>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEdit(meeting)}
-                          className="text-blue-600 hover:text-blue-800 p-1"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(meeting._id)}
-                          className="text-red-600 hover:text-red-800 p-1"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">ID:</span>
-                        <span className="font-medium">{meeting.admissionId}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">Date:</span>
-                        <span className="font-medium">{meeting.scheduleDate.toLocaleDateString()}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">Time:</span>
-                        <span className="font-medium">{meeting.scheduleTime}</span>
-                      </div>
-                      
-                      {meeting.venue && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-600">Venue:</span>
-                          <span className="font-medium">{meeting.venue}</span>
-                        </div>
-                      )}
-                      
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-gray-400" />
-                        <span className="text-gray-600">Attendee:</span>
-                        <span className="font-medium">{meeting.attendBy}</span>
-                      </div>
-                      
-                      {meeting.attendiesPhoneNo && (
-                        <div className="flex items-center gap-2">
-                          <Phone className="w-4 h-4 text-gray-400" />
-                          <span className="text-gray-600">Phone:</span>
-                          <span className="font-medium">{meeting.attendiesPhoneNo}</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {meeting.remarks && (
-                      <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                        <div className="flex items-start gap-2">
-                          <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5" />
-                          <div>
-                            <span className="text-sm font-medium text-gray-700">Remarks:</span>
-                            <p className="text-sm text-gray-600 mt-1">{meeting.remarks}</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {meeting.attendiesFeedback && (
-                      <div className="mt-3 p-3 bg-blue-50 rounded-lg">
-                        <div className="flex items-start gap-2">
-                          <MessageSquare className="w-4 h-4 text-blue-400 mt-0.5" />
-                          <div>
-                            <span className="text-sm font-medium text-blue-700">Feedback:</span>
-                            <p className="text-sm text-blue-600 mt-1">{meeting.attendiesFeedback}</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
       </div>
+    </div>
     </div>
   );
 };

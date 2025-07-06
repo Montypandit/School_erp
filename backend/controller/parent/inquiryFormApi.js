@@ -27,7 +27,7 @@ router.post('/create/inquiry', async (req, res) => {
       motherOccupation,
       motherPhoneNo,
       motherEmail,
-      residentalAddress,
+      residentialAddress,
       haveYouVisitedOurWebsite,
       howDoYouKnowAboutSUNVILLEKIDZ,
       references
@@ -51,7 +51,7 @@ router.post('/create/inquiry', async (req, res) => {
       motherOccupation:motherOccupation,
       motherPhoneNo:motherPhoneNo,
       motherEmail:motherEmail,
-      residentalAddress:residentalAddress,
+      residentialAddress:residentialAddress,
       haveYouVisitedOurWebsite:haveYouVisitedOurWebsite,
       howDoYouKnowAboutSUNVILLEKIDZ:howDoYouKnowAboutSUNVILLEKIDZ,
       references:references

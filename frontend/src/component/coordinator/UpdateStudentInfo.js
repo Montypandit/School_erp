@@ -2,10 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import CoordinatorNavbar from './CoordinatorNavbar';
+import AdminNavbar from '../../admin/AdminNavbar';
+
+
+const getToken = () => {
+  return (
+    sessionStorage.getItem('adminToken') ||
+    sessionStorage.getItem('coordinatorToken')
+  );
+};
+
 
 const UpdateStudentInfo = () => {
   const { admissionId } = useParams();
   const navigate = useNavigate();
+
+  const [userRole, setUserRole] = useState('');
 
   const [formData, setFormData] = useState({
     applicationId: '',
@@ -55,11 +67,29 @@ const UpdateStudentInfo = () => {
     const fetchStudentData = async () => {
       setLoading(true);
       try {
-        const token = sessionStorage.getItem('coordinatorToken');
+        const token = getToken();
         if (!token) {
           toast.info('Please login to continue');
-          navigate('/coordinator/login');
+          navigate('/');
           return;
+        }
+
+        const roleResponse = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${encodeURIComponent(sessionStorage.getItem('email'))}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!roleResponse.ok) {
+          throw new Error('Failed to fetch user role');
+        }
+
+        const roleData = await roleResponse.json();
+        setUserRole(roleData.role);
+
+        if (!roleResponse.ok) {
+          throw new Error('Failed to fetch employee data');
         }
 
         const res = await fetch(`http://localhost:5000/api/final/admission/get/student/${admissionId}`, {
@@ -128,9 +158,9 @@ const UpdateStudentInfo = () => {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: type === 'checkbox' ? checked : value 
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -187,7 +217,9 @@ const UpdateStudentInfo = () => {
     setSubmitting(true);
 
     try {
-      const token = sessionStorage.getItem('coordinatorToken');
+      const coordinatorToken = sessionStorage.getItem('coordinatorToken');
+      const adminToken = sessionStorage.getItem('adminToken');
+      const token = coordinatorToken || adminToken;
       let updatedFormData = { ...formData };
 
       if (photos.child.file) {
@@ -215,7 +247,12 @@ const UpdateStudentInfo = () => {
       }
 
       toast.success('Student information updated successfully!');
-      navigate('/students/page');
+      // Conditionally navigate based on which token is available
+      if (adminToken) {
+        navigate('/admin/allstudents');
+      } else {
+        navigate('/students/page');
+      }
 
     } catch (error) {
       console.error('Error updating student:', error);
@@ -389,7 +426,7 @@ const UpdateStudentInfo = () => {
 
   return (
     <>
-      <CoordinatorNavbar />
+        { userRole === 'coordinator' ? <CoordinatorNavbar /> : userRole === 'admin' ? <AdminNavbar/> : 'User Role Not found'}
       <div style={formStyles.container}>
         <div style={formStyles.paper}>
           <form onSubmit={handleSubmit}>
@@ -810,14 +847,20 @@ const UpdateStudentInfo = () => {
             <div style={formStyles.buttonGroup}>
               <button
                 type="button"
-                style={{...formStyles.button, ...formStyles.secondaryButton}}
-                onClick={() => navigate('/coordinator/students')}
+                style={{ ...formStyles.button, ...formStyles.secondaryButton }}
+                onClick={() => {
+                  if (sessionStorage.getItem('adminToken')) {
+                    navigate('/admin/allstudents');
+                  } else {
+                    navigate('/students/page');
+                  }
+                }}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                style={{...formStyles.button, ...formStyles.primaryButton}}
+                style={{ ...formStyles.button, ...formStyles.primaryButton }}
                 disabled={submitting}
               >
                 {submitting ? 'Updating...' : 'Update Student'}
