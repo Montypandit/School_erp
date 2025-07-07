@@ -28,15 +28,16 @@ const studentRoutes = require('./controller/student/studentapi');
 const admissionFees = require('./controller/coordinator/admissionFeesApi')
 const examScheduleApi = require('./controller/admin/examScheduleapi');
 const leaveApi = require('./controller/admin/leaveApi');
-const scheduleApi = require('./controller/admin/ScheduleApi');
 const activityPlannerRoutes = require('./controller/coordinator/Activityplannerapi');
 const monthlyPlannerRoutes = require('./controller/coordinator/Monthlyplannerapi');
 const teachingSchedule = require('./controller/coordinator/teachingScheduleApi');
 const homeworkRoutes = require('./controller/teacher/homeworkapi');
 const teacherAttendanceRoutes = require('./controller/coordinator/teacherAttendanceApi');
-
-
-
+const scheduleApi = require('./controller/admin/ScheduleApi')
+const monthlyFeePaidApi = require('./controller/coordinator/monthlyFeePaidApi')
+const ptmApi = require('./controller/teacher/ptmApi');
+const examResult = require('./controller/teacher/examResult');
+const attendanceApi = require('./controller/teacher/attendance');
 
 // Use APIs (with consistent route prefix)
 server.use('/api/auth', userLoginApi);
@@ -59,7 +60,9 @@ server.use('/api/coordinator/students/allocate', studentAllocationApi);
 server.use('/api/teaching/schedule',teachingSchedule);
 server.use('/api/homework/for/students', homeworkRoutes);
 server.use('/api/teacher/attendance', teacherAttendanceRoutes);
-
+server.use('/api/monthly/fees',monthlyFeePaidApi)
+server.use('/api/ptm',ptmApi);
+server.use('/api/teacher/results', examResult);
 
 
 
@@ -71,18 +74,12 @@ server.listen(port, () => {
 });
 
 
-mongoose.connect(mongoKey, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('✅ MongoDB connected'))
-.catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // MongoDB connection
-// mongoose.connect(mongoKey);
-// mongoose.connection.on('connected', () => {
-//   console.log('MongoDB connection successful');
-// });
-// mongoose.connection.on('error', () => {
-//   console.log('MongoDB connection failed');
-// });
+mongoose.connect(mongoKey);
+mongoose.connection.on('connected', () => {
+  console.log('MongoDB connection successful');
+});
+mongoose.connection.on('error', () => {
+  console.log('MongoDB connection failed');
+});

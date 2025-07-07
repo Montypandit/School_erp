@@ -4,7 +4,7 @@ import { Users, Calendar, Download, Search, Eye, BarChart3, X, UserCheck, UserX 
 import React, { useState, useEffect } from 'react';
 import TeacherNavbar from './TeacherNavbar'; // Ensure this path is correct
 import jsPDF from "jspdf";
-import "jspdf-autotable"; // 🔥 this must be here and NOT commented or missing
+import autoTable from "jspdf-autotable";
 
 import { toast } from 'react-toastify';
 const AttendanceReportPage = () => {
@@ -99,7 +99,7 @@ const handleDownloadReport = () => {
     item.absentList.join(", "),
   ]);
 
-  doc.autoTable({
+  autoTable(doc, {
     startY: 40,
     head: [tableColumn],
     body: tableRows,

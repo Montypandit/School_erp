@@ -107,7 +107,7 @@ const FeeManagementPage = () => {
                 navigate('/');
                 return;
             }
-            const res = await fetch(`http://localhost:5000/api/monthy/fees/get/fees/${admissionId}`, {
+            const res = await fetch(`http://localhost:5000/api/monthly/fees/get/fees/${admissionId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -194,7 +194,7 @@ const FeeManagementPage = () => {
                 navigate('/');
                 return;
             }
-            const res = await fetch(`http://localhost:5000/api/monthy/fees/paid/fees/${admissionId}`, {
+            const res = await fetch(`http://localhost:5000/api/monthly/fees/paid/fees/${admissionId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
