@@ -33,8 +33,9 @@ router.post('/create/inquiry-process', authMiddleware, authorizeRoles('admin', '
   }
 });
 
+
 // Get All Inquiries (admin/coordinator)
-router.get('/get/all/inquiry-process', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.get('/get/all/inquiry-process', authMiddleware, authorizeRoles('admin', 'coordinator','principal'), async (req, res) => {
   try {
     const all = await InquiryFormProcess.find().sort({ createdAt: -1 });
     res.status(200).json({data:all});

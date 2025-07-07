@@ -18,6 +18,7 @@ router.put('/update/admission/status',authMiddleware,authorizeRoles('admin','pri
      if (!updatedData) {
       return res.status(404).json({ message: 'Admission record not found' });
     }
+
     
         res.status(200).json({message:'Admission Status updated successfully', data:updatedData});
     }catch(error){

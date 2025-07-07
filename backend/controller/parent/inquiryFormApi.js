@@ -66,7 +66,7 @@ router.post('/create/inquiry', async (req, res) => {
 });
 
 // Get All Inquiries
-router.get('/all/inquiries',authMiddleware,authorizeRoles('coordinator','admin'), async (req, res) => {
+router.get('/all/inquiries',authMiddleware,authorizeRoles('coordinator','admin','principal'), async (req, res) => {
   try {
     const all = await InquiryForm.find();
     res.status(200).json({data:all});

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -80,7 +81,7 @@ export default function ScheduleForm() {
 
     const result = await response.json();
     if (response.ok) {
-      alert("Schedule submitted successfully!");
+      toast.success("Schedule submitted successfully!");
       setClassName("");
       setSections([
         {

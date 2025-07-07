@@ -44,7 +44,7 @@ const PrincipalNavbar = () => {
                 Reports
               </Link>
               <Link
-                to="/principal/admission-approval"
+                to="/principal/admission/approvals"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Admission Approval
@@ -138,7 +138,7 @@ const PrincipalNavbar = () => {
               Reports
             </Link>
             <Link
-              to="/principal/admission-approval"
+              to="/principal/admission/approvals"
               className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
               onClick={() => setIsMobileMenuOpen(false)}
             >

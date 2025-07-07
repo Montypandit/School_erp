@@ -16,17 +16,19 @@ const AdmissionApproval = () => {
         const token = sessionStorage.getItem('principalToken');
         if (!token) {
           toast.info('Please login to continue');
-          navigate('/principal/login');
+          navigate('/');
           return;
         }
 
         // Fetch all admission approval statuses
         const admissionRes = await fetch('http://localhost:5000/api/admissions/get/all/admission/approval/status', {
+          method:'GET',
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
         // Fetch all inquiries to get student details
         const inquiryRes = await fetch('http://localhost:5000/api/inquiry/all/inquiries', {
+          method:'GET',
           headers: { 'Authorization': `Bearer ${token}` }
         });
 
@@ -104,9 +106,12 @@ const AdmissionApproval = () => {
         },
         body: JSON.stringify({
           inquiryId,
-          status: status,
+          admissionApproved: status,
         }),
       });
+
+      console.log(inquiryId);
+      console.log(status);
 
       if (!res.ok) {
         const result = await res.json();

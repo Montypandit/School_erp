@@ -31,6 +31,7 @@ import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
 import WeeklySchedule from "./admin/WeeklySchedule";
 import Employee from "./component/admin/Employee"
+import AdmissionApproval from "./component/principal/AdmissionApproval"
 
 
 // Coordinator Components
@@ -76,11 +77,11 @@ const App = () => {
         <Route path="/admin/weeklyschedule" element={<WeeklySchedule />} />
         <Route path="/admin/attendence" element={<Attendence />} />
         <Route path="/admin/employee/page" element={<Employee/>}/>
+        <Route path="/parent/inquiry/form" element={<InquiryForm />} />
 
         {/* Coordinator Module */}
         <Route path="/coordinator/home" element={<CoordinatorHome />} />
         <Route path="/coordinator/login" element={<CoordinatorLogin />} />
-        <Route path="/parent/inquiry/form" element={<InquiryForm />} />
         <Route path="/coordinator/fees/generate/:admissionId" element={<FeesGeneration />} />
         <Route path="/coordinator/all/fee/details" element={<FeePaid />} />
         <Route path="/coordinator/enquiry/process/:inquiryId" element={<EnquiryStudent />} />
@@ -113,6 +114,7 @@ const App = () => {
         <Route path="/principal/admission/detail/:inquiryId" element={<PrincipalAdmissionDetail />} />
         <Route path="/principal/report" element={<ViewStudentReport />} />
         <Route path="/employee/profile/:email" element={<EmployeeProfile />} />
+        <Route path="/principal/admission/approvals" element={<AdmissionApproval />} />
       </Routes>
     </Router>
   );
