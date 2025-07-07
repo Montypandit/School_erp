@@ -36,16 +36,17 @@ import Allotments from "./component/coordinator/Allotments";
 import ActivityPlanner from "./coordinator/ActivityPlanner";
 import MonthlyPlanner from "./coordinator/monthlyPlanner";
 import TeacherDashboard from "./component/teacher/TeacherDashboard";
-import TeacherSchedulePage from "./component/teacher/TeacherSchedulePage";
+import TeacherSchedulePage from "./teacher/TeachingSchedule";
 import GetAttendence from "./component/teacher/GetAttendence";
 import Results from "./component/teacher/AddResult";
-import PTMManagement from "./component/teacher/PTMManagement";
-import Homework from "./component/teacher/Homework";
-import Report from "./teacher/Report";
-import EmployeeProfile from "./component/EmployeeProfile";
+import PTMManagement from "./component/teacher/PTMMangement";
+import Homework from "./teacher/HomeWork";
+import Report from "./component/teacher/Reports";
+import EmployeeProfile from "./component/employee/EmployeeProfile";
 import ViewStudentReport from "./component/principal/viewReport";
-import MonthlyFeePaid from "./component/coordinator/MonthlyFeePaid";
+import MonthlyFeePaid from "./coordinator/MonthlyFeePaid";
 import Teacher from "./component/coordinator/Teacher";  
+import Profile from "./component/teacher/ProfilePage";
 
 
 
@@ -99,6 +100,7 @@ const App = () => {
         <Route path="/teacher/schedule/form" element={<ScheduleForm />} />
         <Route path="/teacher/homework" element={<Homework />} />
         <Route path="/teacher/report" element={<Report />} />
+        <Route path="/teacher/profile" element={<Profile />} />
 
         {/* Principal Module */}
         <Route path="/principal/login" element={<PrincipalLogin />} />

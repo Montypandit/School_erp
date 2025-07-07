@@ -68,7 +68,7 @@ const TeacherNavbar = () => {
           <div className="flex items-center justify-end gap-4">
             {/* User Icon */}
             <Link
-              to="/employee/profile"
+              to="/teacher/profile"
               className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full flex items-center justify-center font-semibold shadow-md"
             >
               <svg

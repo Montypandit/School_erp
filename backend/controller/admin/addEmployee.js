@@ -71,6 +71,22 @@ router.get('/get/employee/:empId', authMiddleware, authorizeRoles('admin'), asyn
   }
 });
 
+router.get('/get/teacher/profile', authMiddleware, authorizeRoles('teacher'), async (req, res) => {
+  try {
+    const teacher = await Teacher.findOne({ empId: req.user.empId });
+
+    if (!teacher) {
+      return res.status(404).json({ message: 'Teacher not found' });
+    }
+
+    res.status(200).json(teacher);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
 // get employee by email
 router.get('/get/employee/email/:email', authMiddleware, authorizeRoles('admin','teacher','coordinator','principal'), async (req, res) => {
   try {

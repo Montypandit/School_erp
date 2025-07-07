@@ -155,6 +155,8 @@ const TeacherHome = () => {
             <ActionButton href="/teacher/results" icon={<BarChart3 />} label="Results" />
             <ActionButton href="/teacher/report" icon={<FileText />} label="Reports" />
             <ActionButton href="/teacher/homework" icon={<BookOpen />} label="Homework" />
+            {/* <ActionButton href="/teacher/schedule" icon={<Calendar />} label="Schedule" /> */}
+            <ActionButton href="/teacher/ptm" icon={<FileText />} label="PTM Management" /> 
           </div>
         </div>
 
