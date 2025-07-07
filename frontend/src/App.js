@@ -30,7 +30,7 @@ import StudentListPage from "./component/coordinator/StudentListPage";
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
 import WeeklySchedule from "./admin/WeeklySchedule";
-import Attendence from "./admin/Attendence";
+//import Attendence from "./admin/Attendence";
 import Employee from "./component/admin/Employee"
 
 
