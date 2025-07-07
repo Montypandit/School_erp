@@ -1,7 +1,7 @@
 import AdminNavbar from './AdminNavbar';
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
-import {toast} from 'react-toastify'
+import { toast } from 'react-toastify'
 
 // ✅ Define StatCard
 const StatCard = ({ title, value, percentage, icon, color }) => {
@@ -57,69 +57,106 @@ const AdminHome = () => {
     presentTeachers: 72,
   });
 
-  const [allTimeTotalstudents, setAllTimeTotalStudents] = useState('');
+  const [allTimeTotalstudents, setAllTimeTotalStudents] = useState(0);
   const [totalStudents, setTotalStudetnts] = useState(0);
   const [totalTeachers, setTotalTeachers] = useState(0);
-  const [presentStudents, setPresentStudents] = useState('');
-  const [absentStudents, setAbsentStudents] = useState('');
-  const [presentTeachers, setPresentTeachers] = useState('');
+  const [presentStudents, setPresentStudents] = useState(0);
+  const [absentStudents, setAbsentStudents] = useState(0);
+  const [presentTeachers, setPresentTeachers] = useState(0);
+  const [totalEmployees, setTotalEmployees] = useState(0);
 
   const navigate = useNavigate();
 
-  useEffect(()=>{
+  useEffect(() => {
     const token = sessionStorage.getItem('adminToken');
-    if(!token){
+    if (!token) {
       toast.info('Please login to continue');
       navigate('/');
       return;
     }
     // fetching students data
-    const fetchTotalStudents = async ()=>{
-      try{
-        const res = await fetch('http://localhost:5000/api/final/admission/get/admission/count',{
-          method:'GET',
-          headers:{
-            'Content-Type':'application/json',
-            'Authorization':`Bearer ${token}`
+    const fetchTotalStudents = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/final/admission/get/admission/count', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
 
         });
 
-        if(!res.ok){
+        if (!res.ok) {
           throw new Error('Failed to fetch total students data');
         }
 
         const data = await res.json();
         setTotalStudetnts(data.totalAdmissionCount);
         setAllTimeTotalStudents(data.totalAdmissionAllTime)
-        
-      } catch(err){
+
+      } catch (err) {
         toast.err('Oops! Something went wrong. Please try again later');
         console.error(err);
       }
     }
 
-    const fetchTotalPresntStudents = async ()=>{
-      try{
-        const res = await fetch('http://localhost:5000/')
-      } catch(err){
-        console.log('Error fetching data');
+    const fetchTotalPresntAbsentStudents = async () => {
+      try {
+        const res = await fetch(`http://localhost:5000/api/final/admission/get/all-attendance/${new Date().toISOString().split('T')[0]}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorizartion': `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to fetch present stdents data');
+        }
+        const data = await res.json();
+        setPresentStudents(data.presentStudents);
+        setAbsentStudents(data.absentStudents);
+      } catch (err) {
+        console.error(err);
       }
     }
 
+    const fetchTotalTeachers = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/employees/get/employee/count/role/teacher',{
+          method:'GET',
+          headers:{
+            'Content-Type':'application/json',
+            'Authorization':`Bearer ${token}`
+          }
+        });
+
+        if(!res.ok){
+          throw new Error('Failed to fetch total teachers data');
+        }
+
+        const data = await res.json();
+        setTotalTeachers(data.employeeCount)
+        setTotalEmployees(data.totalEmployees);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    fetchTotalTeachers();
+    fetchTotalPresntAbsentStudents();
     fetchTotalStudents();
-  },[])
+  }, [])
 
   // Calculate percentages, ensuring no division by zero
-  const presentStudentPercentage = stats.totalStudents > 0 ? Math.round((stats.presentStudents / stats.totalStudents) * 100) : 0;
-  const absentStudentPercentage = stats.totalStudents > 0 ? Math.round((stats.absentStudents / stats.totalStudents) * 100) : 0;
-  const presentTeacherPercentage = stats.totalTeachers > 0 ? Math.round((stats.presentTeachers / stats.totalTeachers) * 100) : 0;
+  const presentStudentPercentage = stats.totalStudents > 0 ? Math.round((presentStudents / totalStudents) * 100) : 0;
+  const absentStudentPercentage = stats.totalStudents > 0 ? Math.round((absentStudents / totalStudents) * 100) : 0;
+  const presentTeacherPercentage = stats.totalTeachers > 0 ? Math.round((stats.presentTeachers / totalTeachers) * 100) : 0;
 
   // ✅ Dummy stats for testing
   const dummyStats = {
     totalTeachers: 20,
-    presentStudents: 2,
-    absentStudents: 2,
+
     presentTeachers: 4,
   };
 
@@ -131,50 +168,73 @@ const AdminHome = () => {
     }}>
       <AdminNavbar />
 
-      <h1 style={{ color: '#333', marginBottom: '25px' }}>Admin Dashboard</h1>
+      <h1 style={{textAlign:'left', color: '#333', margin: '15px' , fontSize:'30px', fontWeight:700 }}>Dashboard</h1>
 
       {/* Stats Overview */}
       <div style={{
         display: 'flex',
         flexWrap: 'wrap',
-        gap: '20px',
+        gap: '40px',
         marginBottom: '30px'
       }}>
-        <StatCard 
+
+        <StatCard
           title="Total Students"
-          value={totalStudents} 
-          percentage={100}
+          value={allTimeTotalstudents}
           icon="👥"
           color="#4CAF50"
         />
-        <StatCard 
-          title="Present Today"
-          value={`${dummyStats.presentStudents}/${dummyStats.totalStudents}`}
+        <StatCard
+          title="Current Year Students"
+          value={totalStudents}
+          icon="👥"
+          color="#4CAF50"
+        />
+         <StatCard 
+          title="Total Employees" 
+          value={totalEmployees} 
+          percentage={100}
+          icon="👨‍🏫"
+          color="#4CAF50"
+        />
+         <StatCard
+          title="Total Teachers"
+          value={totalTeachers}
+          percentage={100}
+          icon="👨‍🏫"
+          color="#4CAF50"
+        />
+        <StatCard
+          title="Present Students"
+          value={`${presentStudents}/${totalStudents}`}
           percentage={presentStudentPercentage}
           icon="✅"
           color="#2196F3"
         />
-        <StatCard 
-          title="Absent Today"
-          value={`${dummyStats.absentStudents}/${dummyStats.totalStudents}`}
+        <StatCard
+          title="Absent Students"
+          value={ absentStudents === 0 ? `${totalStudents}/${totalStudents}`:  `${absentStudents}/${totalStudents}`}
           percentage={absentStudentPercentage}
           icon="❌"
           color="#F44336"
         />
-        <StatCard 
+       
+        <StatCard
           title="Teachers Present"
           value={`${dummyStats.presentTeachers}/${dummyStats.totalTeachers}`}
           percentage={presentTeacherPercentage}
           icon="👨‍🏫"
           color="#9C27B0"
         />
-        <StatCard 
-          title="Total Teachers" 
-          value={dummyStats.totalTeachers} 
+        <StatCard
+          title="Absent Teachers"
+          value={dummyStats.totalTeachers}
           percentage={100}
           icon="👨‍🏫"
           color="#4CAF50"
         />
+
+       
       </div>
 
       {/* Quick Actions */}

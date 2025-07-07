@@ -33,10 +33,10 @@ const activityPlannerRoutes = require('./controller/coordinator/Activityplannera
 const monthlyPlannerRoutes = require('./controller/coordinator/Monthlyplannerapi');
 const teachingSchedule = require('./controller/coordinator/teachingScheduleApi');
 const homeworkRoutes = require('./controller/teacher/homeworkapi');
-const ptmApi = require('./controller/teacher/ptmApi');
-const examResult = require('./controller/teacher/examResult'); // ✅ Exam Result API
-const monthlyFeePaidApi = require('./controller/coordinator/monthlyFeePaidApi');
-const attendanceApi = require('./controller/teacher/attendance');
+const teacherAttendanceRoutes = require('./controller/coordinator/teacherAttendanceApi');
+
+
+
 
 // Use APIs (with consistent route prefix)
 server.use('/api/auth', userLoginApi);
@@ -58,23 +58,31 @@ server.use('/api/monthly/planner', monthlyPlannerRoutes);
 server.use('/api/coordinator/students/allocate', studentAllocationApi);
 server.use('/api/teaching/schedule',teachingSchedule);
 server.use('/api/homework/for/students', homeworkRoutes);
-server.use('/api/ptm',ptmApi);
-server.use('/api/monthy/fees',monthlyFeePaidApi);
-server.use('/api/teacher/results', examResult);
+server.use('/api/teacher/attendance', teacherAttendanceRoutes);
 
 
 
+
+
+
+// Start server
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
 
 
+mongoose.connect(mongoKey, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('✅ MongoDB connected'))
+.catch((err) => console.error('❌ MongoDB connection error:', err));
 
 // MongoDB connection
-mongoose.connect(mongoKey);
-mongoose.connection.on('connected', () => {
-  console.log('MongoDB connection successful');
-});
-mongoose.connection.on('error', () => {
-  console.log('MongoDB connection failed');
-});
+// mongoose.connect(mongoKey);
+// mongoose.connection.on('connected', () => {
+//   console.log('MongoDB connection successful');
+// });
+// mongoose.connection.on('error', () => {
+//   console.log('MongoDB connection failed');
+// });

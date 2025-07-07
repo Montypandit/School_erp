@@ -73,8 +73,14 @@ router.get('/get/attendance', authMiddleware, authorizeRoles('admin', 'coordinat
     res.status(500).json({ message: "Failed to fetch attendance", error: error.message });
   }
 });
+
+
 // ======================= GET ALL ATTENDANCE RECORDS FOR A SPECIFIC DATE =======================
+<<<<<<< HEAD
 router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles('admin','teacher','principal'), async (req, res) => {
+=======
+router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles('admin', 'teacher'), async (req, res) => {
+>>>>>>> a549822d04aafdaac2c4dde077b562a8d2ec1744
   try {
     const { date } = req.params;
 
@@ -227,6 +233,21 @@ router.get('/get/admission/count',authMiddleware, authorizeRoles('admin','coordi
   } catch(err){
     console.log(err);
     res.status(500).json({message:'Error fetching admission count', error:err.message});
+  }
+});
+
+// Delete a student
+router.delete('/delete/student/:admissionId',authMiddleware, authorizeRoles('admin'), async (req,res)=>{
+  try{
+    const {admissionId} = req.params;
+    const deleteStudent = await Admission.findByIdAndDelete(admissionId);
+    if(!deleteStudent){
+      return res.status(404).json({message:'Student not found'});
+    }
+    res.status(200).json({data:deleteStudent})
+  }catch(err){
+    console.log(err);
+    res.status(500).json({message:'Error deleting student', error:err.message});
   }
 });
 module.exports = router;

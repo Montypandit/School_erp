@@ -30,6 +30,19 @@ import StudentListPage from "./component/coordinator/StudentListPage";
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
 import WeeklySchedule from "./admin/WeeklySchedule";
+import Attendence from "./admin/Attendence";
+import Employee from "./component/admin/Employee"
+
+
+// Coordinator Components
+import InquiryForm from "./component/coordinator/InquiryForm";
+import CoordinatorHome from './coordinator/CoordinatorHome';
+import CoordinatorLogin from "./component/coordinator/CoordinatorLogin";
+import FeesGeneration from "./coordinator/feesGeneration";
+import FeePaid from './coordinator/FeePaid';
+import EnquiryStudent from "./coordinator/enquiryStudent";
+import Student from './component/coordinator/Student';
+import StudentListPage from "./component/coordinator/StudentListPage";
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
 import AllotmentClass from "./component/coordinator/Alottment_class";
 import Allotments from "./component/coordinator/Allotments";
@@ -71,6 +84,7 @@ const App = () => {
         <Route path="/admin/leaveapproval" element={<LeaveApproval />} />
         <Route path="/admin/weeklyschedule" element={<WeeklySchedule />} />
         <Route path="/admin/attendence" element={<Attendence />} />
+        <Route path="/admin/employee/page" element={<Employee/>}/>
 
         {/* Coordinator Module */}
         <Route path="/coordinator/home" element={<CoordinatorHome />} />
