@@ -1,5 +1,3 @@
-import React from "react";
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import Home from './Home';
@@ -30,14 +28,12 @@ import StudentListPage from "./component/coordinator/StudentListPage";
 import ExamSchedule from "./admin/ExamSchedule";
 import LeaveApproval from "./admin/LeaveApproval";
 import WeeklySchedule from "./admin/WeeklySchedule";
-import Attendence from "./admin/Attendence";
 import Employee from "./component/admin/Employee"
 import AdmissionApproval from "./component/principal/AdmissionApproval"
 
 
 // Coordinator Components
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
-import AllotmentClass from "./component/coordinator/Alottment_class";
 import Allotments from "./component/coordinator/Allotments";
 import ActivityPlanner from "./coordinator/ActivityPlanner";
 import MonthlyPlanner from "./coordinator/monthlyPlanner";
