@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect } from "react";
 import {
   ArrowLeft,
@@ -19,6 +17,7 @@ import TeacherNavBar from "./TeacherNavbar"; // Ensure this path is correct
 
 const AttendancePage = () => {
   const [selectedClass, setSelectedClass] = useState("");
+  const [selectedSection,setSelectedSection] = useState("");
   const [selectedDate, setSelectedDate] = useState(() => {
   const today = new Date();
   return today.toISOString().split("T")[0]; 
@@ -72,9 +71,13 @@ const AttendancePage = () => {
             // No saved attendance, set default to "present"
             const defaultAttendance = {};
             data.data.forEach((student) => {
-              if (student.class === selectedClass) {
-                defaultAttendance[student._id] = "present";
-              }
+              if (
+  student.class === selectedClass &&
+  (selectedSection ? student.section === selectedSection : true)
+) {
+  defaultAttendance[student._id] = "present";
+}
+
             });
             setAttendance(defaultAttendance);
           }
@@ -149,14 +152,18 @@ const handleSaveAttendance = async () => {
 };
 
 
-  const filteredStudents = students
-    .filter((student) =>
-      selectedClass ? student.class === selectedClass : true
-    )
-    .filter((student) =>
-      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.admissionId.includes(searchTerm)
-    );
+ 
+   const filteredStudents = students
+  .filter((student) =>
+    (selectedClass ? student.class === selectedClass : true) &&
+    (selectedSection ? student.section === selectedSection : true)
+  )
+  .filter((student) =>
+    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    student.admissionId.includes(searchTerm)
+  );
+
+    
 
   const stats = {
     total: Object.keys(students).length,
@@ -197,6 +204,24 @@ const handleSaveAttendance = async () => {
             <option value="5">Class 5</option>
           </select>
         </div>
+
+        <div>
+
+          <label className="block mb-1 font-medium">Select Section</label>
+          <select
+            value={selectedSection}
+            onChange={(e) => setSelectedSection(e.target.value)}
+            className="w-full p-2 border rounded"
+          >
+            <option value="">All Sections</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            
+          </select>
+          </div>
+
         <div>
           <label className="block mb-1 font-medium">Select Date</label>
           <input
@@ -247,6 +272,7 @@ const handleSaveAttendance = async () => {
               <th className="text-left p-3">Admission ID</th>
               <th className="text-left p-3">Father's Name</th>
               <th className="text-left p-3">Class</th>
+              <th className="text-left p-3">Section</th>
               <th className="text-left p-3">Attendance</th>
             </tr>
           </thead>
@@ -257,6 +283,7 @@ const handleSaveAttendance = async () => {
                 <td className="p-3">{student.admissionId}</td>
                 <td className="p-3">{student.fatherName}</td>
                 <td className="p-3">{student.class}</td>
+                <td className="p-3">{student.section}</td>
                 <td className="p-3 space-x-2">
                   {["present", "late", "absent"].map((status) => (
                     <button
