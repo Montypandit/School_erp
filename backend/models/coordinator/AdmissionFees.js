@@ -9,13 +9,18 @@ const admissionFeesSchema = new mongoose.Schema({
     activityFees: { type: Number, default: 0 },
     maintenanceFees: { type: Number, default: 0 },
     tutionFees: { type: Number, default: 0 },
-    totalAdmissionFees:{type:Number, default:0},
-    uniform:{type:Number, default:0},
-    transport:{type:Number, default:0},
-    books:{type:Number, default:0},
-    totalPaidAmount:{type:Number, default:0},
-    belt:{type:Number, default:0}
-    
+    uniform: { type: Number, default: 0 },
+    transport: { type: Number, default: 0 },
+    books: { type: Number, default: 0 },
+    totalPaidAmount: { type: Number, default: 0 },
+    belt: { type: Number, default: 0 },
+    others: [
+        {
+            name: { type: String },
+            amount: { type: Number }
+        }
+    ]
+
 }, { timestamps: true });
 
 const AdmissionFees = mongoose.model('AdmissionFees', admissionFeesSchema);

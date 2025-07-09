@@ -10,7 +10,6 @@ export default function AdmissionForm() {
   const [formData, setFormData] = useState({
     name: "",
     gender: "",
-    rollNo: "",
     class: "",
     dob: "",
     childImageUrl: "",
@@ -39,6 +38,8 @@ export default function AdmissionForm() {
     photosOfStudent: false,
     date: "",
   })
+
+
 
   const { inquiryId, admissionId } = useParams(); // Get inquiryId and admissionId from URL
   const navigate = useNavigate();
@@ -76,6 +77,7 @@ export default function AdmissionForm() {
         }
 
         const data = await res.json();
+        console.log(data);
         setFormData(prev => ({
           ...prev,
           name: data.name || "",
@@ -92,7 +94,7 @@ export default function AdmissionForm() {
           motherOccupation: data.motherOccupation || "",
           motherMobile: data.motherPhoneNo || "",
           motherEmail: data.motherEmail || "",
-          email: data.fatherEmail || "", // or data.motherEmail if you prefer
+          email: data.fatherEmail || "",
           residentialAddress: data.residentialAddress || "",
           emergencyContactPhoneNo: data.fatherPhoneNo || "",
           haveYouVisitedOurWebsite: data.haveYouVisitedOurWebsite || false,
@@ -289,15 +291,6 @@ export default function AdmissionForm() {
     }
   }
 
-  const getProgressPercentage = () => {
-    const totalFields = 20 // Approximate number of required fields + pre-filled
-    const filledFields = Object.values(formData).filter((value) =>
-      typeof value === "string" ? value.trim() !== "" : value !== "",
-    ).length
-    const uploadedPhotos = Object.values(photos).filter((photo) => photo.file !== null).length
-
-    return Math.round(((filledFields + uploadedPhotos) / (totalFields + 3)) * 100)
-  }
 
   return (
     <div>
@@ -356,14 +349,6 @@ export default function AdmissionForm() {
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="progress-container">
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${getProgressPercentage()}%` }}></div>
-          </div>
-          <div className="progress-text">{getProgressPercentage()}% Complete</div>
-        </div>
-
         <form onSubmit={handleSubmit} className="admission-form">
           <div className="student-details">
             <div className="name-section">
@@ -388,26 +373,7 @@ export default function AdmissionForm() {
                   Gender : <span className="required">*</span>
                 </label>
                 <div className="gender-options">
-                  <label className={errors.gender ? "error" : ""}>
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="Male"
-                      checked={formData.gender === "Male"}
-                      onChange={handleInputChange}
-                    />
-                    Male
-                  </label>
-                  <label className={errors.gender ? "error" : ""}>
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="Female"
-                      checked={formData.gender === "Female"}
-                      onChange={handleInputChange}
-                    />
-                    Female
-                  </label>
+                  {(formData.gender).toLocaleUpperCase()}
                 </div>
                 {errors.gender && <div className="error-message">{errors.gender}</div>}
               </div>
@@ -415,14 +381,14 @@ export default function AdmissionForm() {
                 <label>
                   Class <span className="required">*</span>
                 </label>
-                <input
-                  type="text"
-                  name="class"
-                  value={formData.class}
-                  onChange={handleInputChange}
-                  className={`class-input ${errors.class ? "error" : ""}`}
-                  placeholder="e.g., Nursery, LKG, UKG"
-                />
+                <select style={{ border: '1px solid black', padding: '2px' }} name="class" onChange={handleInputChange} >
+                  <option value={formData.class}> {formData.class}</option>
+                  <option value="Pre Nursery">Pre Nursery</option>
+                  <option value="Nursery">Nursery</option>
+                  <option value="LKG">LKG</option>
+                  <option value="UKG">UKG</option>
+                </select>
+
                 {errors.class && <div className="error-message">{errors.class}</div>}
               </div>
               <div className="dob-section">
@@ -807,18 +773,9 @@ export default function AdmissionForm() {
               <div className="office-row">
                 <label>Date of Admission :</label>
                 <input type="date" className="office-input" />
-                <label>Roll No. :</label>
-                <input
-                  type="text"
-                  name="rollNo"
-                  value={formData.rollNo}
-                  onChange={handleInputChange}
-                  className="office-input"
-                />
-              </div>
-              <div className="office-row">
                 <label>Date of Joining :</label>
                 <input type="date" className="office-input" />
+
               </div>
             </div>
           </div>
@@ -847,7 +804,19 @@ export default function AdmissionForm() {
                 "Submit Application"
               )}
             </button>
+            {/* Print Button */}
+            {/* <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "10px" }}>
+              <button
+                type="button"
+                className="print-btn"
+                onClick={() => window.print()}
+                style={{ padding: "6px 18px", fontWeight: "bold", background: "#f5f5f5", border: "1px solid #aaa", borderRadius: "4px", cursor: "pointer" }}
+              >
+                🖨️ Print
+              </button>
+            </div> */}
           </div>
+
         </form>
       </div>
     </div>

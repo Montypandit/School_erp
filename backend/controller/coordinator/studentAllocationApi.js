@@ -19,7 +19,7 @@ const getNextRollNo = async (className, section) => {
 };
 
 // ✅ POST: Allocate student with auto rollNo
-router.post('/create/student/allocation/rollNo', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+router.post('/create/student/allocation', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
     const { admissionId, class: className, section, academicYear } = req.body;
 

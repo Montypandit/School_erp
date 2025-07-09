@@ -30,7 +30,7 @@ import LeaveApproval from "./admin/LeaveApproval";
 import WeeklySchedule from "./admin/WeeklySchedule";
 import Employee from "./component/admin/Employee"
 import AdmissionApproval from "./component/principal/AdmissionApproval"
-
+import StudentStatus from "./component/principal/StudentStatus";
 
 // Coordinator Components
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
@@ -112,6 +112,7 @@ const App = () => {
         <Route path="/principal/report" element={<ViewStudentReport />} />
         <Route path="/employee/profile/:email" element={<EmployeeProfile />} />
         <Route path="/principal/admission/approvals" element={<AdmissionApproval />} />
+        <Route path="/student/status/page" element={<StudentStatus/>}/>
       </Routes>
     </Router>
   );

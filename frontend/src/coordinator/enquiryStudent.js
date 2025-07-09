@@ -18,6 +18,13 @@ import {
   FileText,
   BookOpen,
   CheckSquare,
+  Home,
+  Globe,
+  Users,
+  Briefcase,
+  Award,
+  Heart,
+  UserCheck,
 } from "lucide-react"
 import { toast } from "react-toastify"
 import { useNavigate, useParams } from "react-router-dom"
@@ -49,11 +56,11 @@ export default function EnquiryStudent() {
   // Utility function to format date
   const formatDate = (dateString) => {
     const today = new Date();
-  return today.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
+    return today.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 
   // Utility function to validate student data
@@ -116,7 +123,7 @@ export default function EnquiryStudent() {
           toast.error('Failed to fetch inquiry details.');
           throw new Error('Failed to fetch inquiry details');
         }
-        const data =await res.json();
+        const data = await res.json();
 
         setStudent({
           ...data,
@@ -299,7 +306,8 @@ export default function EnquiryStudent() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Student Information */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Basic Student Information */}
             <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border-0 hover:shadow-2xl transition-all duration-300">
               <div className="p-6 pb-4 border-b border-gray-100">
                 <h2 className="flex items-center text-xl font-semibold text-gray-900">
@@ -311,19 +319,48 @@ export default function EnquiryStudent() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-1">
                     <InfoItem icon={<User className="h-4 w-4" />} label="Student Name" value={student.name} />
-                    <InfoItem icon={<User className="h-4 w-4" />} label="Parent/Guardian" value={student.fatherName} />
                     <InfoItem
                       icon={<GraduationCap className="h-4 w-4" />}
                       label="Class Applied"
                       value={student.currentClass}
                     />
-                    <InfoItem icon={<Info className="h-4 w-4" />} label="DOB" value={new Date(student.dob).toLocaleDateString('en-IN', {
+                    <InfoItem icon={<Info className="h-4 w-4" />} label="Date of Birth" value={student.dob ? new Date(student.dob).toLocaleDateString('en-IN', {
                         day: '2-digit',
                         month: '2-digit',
                         year: 'numeric',
-                      })} />
+                      }) : 'Not provided'} />
                   </div>
                   <div className="space-y-1">
+                    <InfoItem icon={<MapPin className="h-4 w-4" />} label="Gender" value={student.gender} />
+                    <InfoItem icon={<Home className="h-4 w-4" />} label="Residential Address" value={student.residentialAddress} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Father's Information */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border-0 hover:shadow-2xl transition-all duration-300">
+              <div className="p-6 pb-4 border-b border-gray-100">
+                <h2 className="flex items-center text-xl font-semibold text-gray-900">
+                  <UserCheck className="h-5 w-5 mr-3 text-blue-600" />
+                  Father's Information
+                </h2>
+              </div>
+              <div className="p-6 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                    <InfoItem icon={<User className="h-4 w-4" />} label="Father's Name" value={student.fatherName} />
+                    <InfoItem icon={<Award className="h-4 w-4" />} label="Qualification" value={student.fatherQualification} />
+                    <InfoItem icon={<Briefcase className="h-4 w-4" />} label="Occupation" value={student.fatherOccupation} />
+                  </div>
+                  <div className="space-y-1">
+                    <InfoItem
+                      icon={<Phone className="h-4 w-4" />}
+                      label="Phone Number"
+                      value={student.fatherPhoneNo}
+                      isLink={true}
+                      linkType="phone"
+                    />
                     <InfoItem
                       icon={<Mail className="h-4 w-4" />}
                       label="Email"
@@ -331,14 +368,94 @@ export default function EnquiryStudent() {
                       isLink={true}
                       linkType="email"
                     />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mother's Information */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border-0 hover:shadow-2xl transition-all duration-300">
+              <div className="p-6 pb-4 border-b border-gray-100">
+                <h2 className="flex items-center text-xl font-semibold text-gray-900">
+                  <Heart className="h-5 w-5 mr-3 text-pink-600" />
+                  Mother's Information
+                </h2>
+              </div>
+              <div className="p-6 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                    <InfoItem icon={<User className="h-4 w-4" />} label="Mother's Name" value={student.motherName} />
+                    <InfoItem icon={<Award className="h-4 w-4" />} label="Qualification" value={student.motherQualification} />
+                    <InfoItem icon={<Briefcase className="h-4 w-4" />} label="Occupation" value={student.motherOccupation} />
+                  </div>
+                  <div className="space-y-1">
                     <InfoItem
                       icon={<Phone className="h-4 w-4" />}
-                      label="Phone"
-                      value={student.fatherPhoneNo}
+                      label="Phone Number"
+                      value={student.motherPhoneNo}
                       isLink={true}
                       linkType="phone"
                     />
-                    <InfoItem icon={<MapPin className="h-4 w-4" />} label="Gender" value={student.gender} />
+                    <InfoItem
+                      icon={<Mail className="h-4 w-4" />}
+                      label="Email"
+                      value={student.motherEmail}
+                      isLink={true}
+                      linkType="email"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Additional Information */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-xl border-0 hover:shadow-2xl transition-all duration-300">
+              <div className="p-6 pb-4 border-b border-gray-100">
+                <h2 className="flex items-center text-xl font-semibold text-gray-900">
+                  <Info className="h-5 w-5 mr-3 text-green-600" />
+                  Additional Information
+                </h2>
+              </div>
+              <div className="p-6 pt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1">
+                    <InfoItem 
+                      icon={<Globe className="h-4 w-4" />} 
+                      label="Visited Our Website" 
+                      value={student.haveYouVisitedOurWebsite ? "Yes" : "No"} 
+                    />
+                    <InfoItem 
+                      icon={<Building className="h-4 w-4" />} 
+                      label="How did you know about SUNVILLEKIDZ" 
+                      value={student.howDoYouKnowAboutSUNVILLEKIDZ} 
+                    />
+                    <InfoItem 
+                      icon={<UserCheck className="h-4 w-4" />} 
+                      label="References" 
+                      value={student.references} 
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <InfoItem 
+                      icon={<Users className="h-4 w-4" />} 
+                      label="Has Siblings" 
+                      value={student.doYouHaveSiblings ? "Yes" : "No"} 
+                    />
+                    {student.doYouHaveSiblings && student.siblings && student.siblings.length > 0 && (
+                      <div className="mt-4">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Siblings:</h4>
+                        <div className="space-y-2">
+                          {student.siblings.map((sibling, index) => (
+                            <div key={index} className="bg-gray-50 p-3 rounded-lg">
+                              <div className="flex justify-between items-center">
+                                <span className="font-medium text-gray-900">{sibling.name || 'Name not provided'}</span>
+                                <span className="text-sm text-gray-600">Age: {sibling.age || 'Not provided'}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -12,49 +12,13 @@ const generateInquiryId = () => {
 // Create Inquiry
 router.post('/create/inquiry', async (req, res) => {
   try {
-    const {
-      name,
-      currentClass,
-      dob,
-      gender,
-      fatherName,
-      fatherQualification,
-      fatherOccupation,
-      fatherPhoneNo,
-      fatherEmail,
-      motherName,
-      motherQualification,
-      motherOccupation,
-      motherPhoneNo,
-      motherEmail,
-      residentialAddress,
-      haveYouVisitedOurWebsite,
-      howDoYouKnowAboutSUNVILLEKIDZ,
-      references
-    } = req.body;
-
     const inquiryId = generateInquiryId();
 
     const newInquiry = new InquiryForm({
-      inquiryId:inquiryId,
-      name:name,
-      currentClass:currentClass,
-      dob:dob,
-      gender:gender,
-      fatherName:fatherName,
-      fatherQualification:fatherQualification,
-      fatherOccupation:fatherOccupation,
-      fatherPhoneNo:fatherPhoneNo,
-      fatherEmail:fatherEmail,
-      motherName:motherName,
-      motherQualification:motherQualification,
-      motherOccupation:motherOccupation,
-      motherPhoneNo:motherPhoneNo,
-      motherEmail:motherEmail,
-      residentialAddress:residentialAddress,
-      haveYouVisitedOurWebsite:haveYouVisitedOurWebsite,
-      howDoYouKnowAboutSUNVILLEKIDZ:howDoYouKnowAboutSUNVILLEKIDZ,
-      references:references
+      // Spread all properties from the request body.
+      // This is more concise and less error-prone if the schema changes.
+      ...req.body,
+      inquiryId: inquiryId,
     });
 
     const saved = await newInquiry.save();

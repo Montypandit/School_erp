@@ -4,8 +4,8 @@ const Admission = require('../../models/coordinator/admissionForm');
 const AdmissionFees = require('../../models/coordinator/AdmissionFees');
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
-
 const router = express.Router();
+
 
 // POST API to create admission fees
 router.post('/create/admission/fee', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
