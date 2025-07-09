@@ -11,8 +11,13 @@ const StudentAllocationSchema = new mongoose.Schema({
     required: true,
     enum: ['A', 'B', 'C', 'D'],
   },
+  class:{type:String, required:true},
+ rollNo: {
+  type: String,
+  required: true
+},
+  academicYear:{type:String, required:true},
   alloted:{type: Boolean, default: false},
-  academicYear:{type:String, required:true}
 }, {timestamps:true});
 
 
