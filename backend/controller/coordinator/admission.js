@@ -31,7 +31,7 @@ router.post('/save/attendence', authMiddleware, authorizeRoles('admin', 'coordin
       filter,
       {
         class: className,
-        section,
+        section : section || 'N/A',
         date: formattedDate,
         students,
       },
