@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './InquiryForm.css';
 import { toast } from 'react-toastify';
 
 const InquiryForm = () => {
@@ -19,6 +18,8 @@ const InquiryForm = () => {
     motherPhoneNo: '',
     motherEmail: '',
     residentialAddress: '',
+    doYouHaveSiblings: false,
+    siblings: [{ name: '', age: '' }],
     haveYouVisitedOurWebsite: false,
     howDoYouKnowAboutSUNVILLEKIDZ: '',
     references: ''
@@ -26,17 +27,26 @@ const InquiryForm = () => {
 
   const [errors, setErrors] = useState({});
 
+  const classOptions = [
+    { value: '', label: 'Select Class' },
+    { value: 'Pre Nursery', label: 'Pre Nursery' },
+    { value: 'Nursery', label: 'Nursery' },
+    { value: 'LKG', label: 'LKG' },
+    { value: 'UKG', label: 'UKG' }
+  ];
+
   const validateForm = () => {
     let valid = true;
     const newErrors = {};
 
-    if (!formData.name) {
+    // Required field validations
+    if (!formData.name.trim()) {
       newErrors.name = 'Student name is required';
       valid = false;
     }
 
     if (!formData.currentClass) {
-      newErrors.class = 'Class is required';
+      newErrors.currentClass = 'Class is required';
       valid = false;
     }
 
@@ -50,37 +60,33 @@ const InquiryForm = () => {
       valid = false;
     }
 
-    if (!formData.fatherName) {
+    if (!formData.fatherName.trim()) {
       newErrors.fatherName = "Father's name is required";
       valid = false;
     }
 
-    if (!formData.fatherPhoneNo) {
-      newErrors.fatherPhoneNo = "Father's phone number is required";
+    if (!formData.fatherPhoneNo.trim()) {
+      newErrors.fatherPhoneNo = "Father's mobile number is required";
+      valid = false;
+    } else if (!/^\d{10}$/.test(formData.fatherPhoneNo)) {
+      newErrors.fatherPhoneNo = "Please enter a valid 10-digit mobile number";
       valid = false;
     }
 
-    if (!formData.fatherEmail) {
-      newErrors.fatherEmail = "Father's email is required";
-      valid = false;
-    }
-
-    if (!formData.motherName) {
+    if (!formData.motherName.trim()) {
       newErrors.motherName = "Mother's name is required";
       valid = false;
     }
 
-    if (!formData.motherPhoneNo) {
-      newErrors.motherPhoneNo = "Mother's phone number is required";
+    if (!formData.motherPhoneNo.trim()) {
+      newErrors.motherPhoneNo = "Mother's mobile number is required";
+      valid = false;
+    } else if (!/^\d{10}$/.test(formData.motherPhoneNo)) {
+      newErrors.motherPhoneNo = "Please enter a valid 10-digit mobile number";
       valid = false;
     }
 
-    if (!formData.motherEmail) {
-      newErrors.motherEmail = "Mother's email is required";
-      valid = false;
-    }
-
-    if (!formData.residentialAddress) {
+    if (!formData.residentialAddress.trim()) {
       newErrors.residentialAddress = 'Residential address is required';
       valid = false;
     }
@@ -90,17 +96,19 @@ const InquiryForm = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value, type, checked } = e.target;
 
     if (type === 'checkbox') {
       setFormData(prev => ({
         ...prev,
-        [name]: e.target.checked
+        [name]: checked
       }));
-    } else if (type === 'number') {
+    } else if (name === 'fatherPhoneNo' || name === 'motherPhoneNo') {
+      // Only allow numbers and limit to 10 digits
+      const numericValue = value.replace(/[^0-9]/g, '').slice(0, 10);
       setFormData(prev => ({
         ...prev,
-        [name]: value.replace(/[^0-9]/g, '')
+        [name]: numericValue
       }));
     } else {
       setFormData(prev => ({
@@ -108,13 +116,39 @@ const InquiryForm = () => {
         [name]: value
       }));
     }
+
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
-  const handleGenderChange = (gender) => {
+  const handleSiblingChange = (index, field, value) => {
+    const updatedSiblings = [...formData.siblings];
+    updatedSiblings[index][field] = value;
     setFormData(prev => ({
       ...prev,
-      gender: gender
+      siblings: updatedSiblings
     }));
+  };
+
+  const addSibling = () => {
+    setFormData(prev => ({
+      ...prev,
+      siblings: [...prev.siblings, { name: '', age: '' }]
+    }));
+  };
+
+  const removeSibling = (index) => {
+    if (formData.siblings.length > 1) {
+      setFormData(prev => ({
+        ...prev,
+        siblings: prev.siblings.filter((_, i) => i !== index)
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -122,21 +156,18 @@ const InquiryForm = () => {
     if (!validateForm()) return;
 
     try {
-
       const res = await fetch('http://localhost:5000/api/inquiry/create/inquiry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
-      })
+      });
 
       if (!res.ok) {
-        console.log('Network response was not ok');
         throw new Error('Network response was not ok');
       }
 
-      // Show success message
       toast.success("Inquiry submitted successfully! Thank you for your interest!");
 
       // Reset form
@@ -156,287 +187,455 @@ const InquiryForm = () => {
         motherPhoneNo: '',
         motherEmail: '',
         residentialAddress: '',
+        doYouHaveSiblings: false,
+        siblings: [{ name: '', age: '' }],
         haveYouVisitedOurWebsite: false,
         howDoYouKnowAboutSUNVILLEKIDZ: '',
         references: ''
       });
-
-      // Clear errors
       setErrors({});
     } catch (error) {
       console.error('Error submitting inquiry:', error);
-      toast.error(error.error);
+      toast.error('Failed to submit inquiry. Please try again.');
     }
   };
 
   return (
-    <div className="inquiry-form-container">
-      <h1 style={{
-        fontSize: '1.5rem',
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        textAlign: 'center',
-        marginBottom: '1.5rem'
-      }}>INQUIRY FORM</h1>
+    <div className="max-w-4xl mx-auto p-6 bg-white">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg mb-8">
+        <h1 className="text-3xl font-bold text-center">Student Inquiry Form</h1>
+        <p className="text-center mt-2 text-blue-100">SUNVILLE KIDZ School</p>
+      </div>
 
-      <form className="inquiry-form" onSubmit={handleSubmit}>
+      <div className="space-y-8">
         {/* Student Information */}
-        <div className="form-section">
-          <h3>Student Information</h3>
-
-          <label htmlFor="name">STUDENT NAME</label>
-          <div className="form-group">
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className={errors.name ? 'error' : ''}
-            />
-            {errors.name && <div className="error-message">{errors.name}</div>}
-          </div>
-
-          <label htmlFor="class">CLASS</label>
-          <div className="form-group">
-            <input
-              type="text"
-              name="currentClass"
-              value={formData.currentClass}
-              onChange={handleChange}
-              className={errors.class ? 'error' : ''}
-            />
-            {errors.class && <div className="error-message">{errors.class}</div>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="dob">DATE OF BIRTH</label>
-            <input
-              type="date"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-              className={errors.dob ? 'error' : ''}
-            />
-            {errors.dob && <div className="error-message">{errors.dob}</div>}
-          </div>
-
-          <div className="form-group gender-group flex gap-4">
-            {/* Male Option */}
-            <div
-              onClick={() => handleGenderChange('male')}
-              className={`gender-option cursor-pointer border px-4 py-2 rounded-md transition-all ${formData.gender === 'male'
-                  ? 'bg-blue-100 text-white border-blue-500'
-                  : 'bg-white text-gray-700 border-gray-300'
-                }`}
-            >
-              <label className="cursor-pointer">MALE</label>
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
+            Student Information
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Student Name *
+              </label>
               <input
-                type="radio"
-                name="gender"
-                value="male"
-                checked={formData.gender === 'male'}
-                onChange={() => { }}
-                className="hidden"
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.name ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Enter student's full name"
               />
+              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
             </div>
 
-            {/* Female Option */}
-            <div
-              onClick={() => handleGenderChange('female')}
-              className={`gender-option cursor-pointer border px-4 py-2 rounded-md transition-all ${formData.gender === 'female'
-                  ? 'bg-pink-100 text-white border-pink-500'
-                  : 'bg-white text-gray-700 border-gray-300'
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Class *
+              </label>
+              <select
+                name="currentClass"
+                value={formData.currentClass}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.currentClass ? 'border-red-500' : 'border-gray-300'
                 }`}
-            >
-              <label className="cursor-pointer">FEMALE</label>
-              <input
-                type="radio"
-                name="gender"
-                value="female"
-                checked={formData.gender === 'female'}
-                onChange={() => { }}
-                className="hidden"
-              />
+              >
+                {classOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {errors.currentClass && <p className="text-red-500 text-sm mt-1">{errors.currentClass}</p>}
             </div>
 
-            {errors.gender && <div className="text-red-500 text-sm mt-2">{errors.gender}</div>}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Date of Birth *
+              </label>
+              <input
+                type="date"
+                name="dob"
+                value={formData.dob}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.dob ? 'border-red-500' : 'border-gray-300'
+                }`}
+              />
+              {errors.dob && <p className="text-red-500 text-sm mt-1">{errors.dob}</p>}
+            </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Gender *
+              </label>
+              <div className="flex gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Male"
+                    checked={formData.gender === 'Male'}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  Male
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Female"
+                    checked={formData.gender === 'Female'}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  Female
+                </label>
+              </div>
+              {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
+            </div>
+          </div>
         </div>
 
         {/* Father's Information */}
-        <div className="form-section">
-          <h3>Father's Information</h3>
-          <div className="form-group">
-            <label htmlFor="fatherName">FATHER'S NAME</label>
-            <input
-              type="text"
-              name="fatherName"
-              value={formData.fatherName}
-              onChange={handleChange}
-              className={errors.fatherName ? 'error' : ''}
-            />
-            {errors.fatherName && <div className="error-message">{errors.fatherName}</div>}
-          </div>
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
+            Father's Information
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Father's Name *
+              </label>
+              <input
+                type="text"
+                name="fatherName"
+                value={formData.fatherName}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.fatherName ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Enter father's full name"
+              />
+              {errors.fatherName && <p className="text-red-500 text-sm mt-1">{errors.fatherName}</p>}
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="fatherQualification">QUALIFICATION</label>
-            <input
-              type="text"
-              name="fatherQualification"
-              value={formData.fatherQualification}
-              onChange={handleChange}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Mobile Number *
+              </label>
+              <input
+                type="tel"
+                name="fatherPhoneNo"
+                value={formData.fatherPhoneNo}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.fatherPhoneNo ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Enter 10-digit mobile number"
+                maxLength="10"
+              />
+              {errors.fatherPhoneNo && <p className="text-red-500 text-sm mt-1">{errors.fatherPhoneNo}</p>}
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="fatherOccupation">OCCUPATION</label>
-            <input
-              type="text"
-              name="fatherOccupation"
-              value={formData.fatherOccupation}
-              onChange={handleChange}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Qualification
+              </label>
+              <input
+                type="text"
+                name="fatherQualification"
+                value={formData.fatherQualification}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter qualification"
+              />
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="fatherPhoneNo">PHONE NUMBER *</label>
-            <input
-              type="number"
-              name="fatherPhoneNo"
-              value={formData.fatherPhoneNo}
-              onChange={handleChange}
-              className={errors.fatherPhoneNo ? 'error' : ''}
-            />
-            {errors.fatherPhoneNo && <div className="error-message">{errors.fatherPhoneNo}</div>}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Occupation
+              </label>
+              <input
+                type="text"
+                name="fatherOccupation"
+                value={formData.fatherOccupation}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter occupation"
+              />
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="fatherEmail">EMAIL</label>
-            <input
-              type="email"
-              name="fatherEmail"
-              value={formData.fatherEmail}
-              onChange={handleChange}
-              className={errors.fatherEmail ? 'error' : ''}
-            />
-            {errors.fatherEmail && <div className="error-message">{errors.fatherEmail}</div>}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                name="fatherEmail"
+                value={formData.fatherEmail}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter email address"
+              />
+            </div>
           </div>
         </div>
 
         {/* Mother's Information */}
-        <div className="form-section">
-          <h3>Mother's Information</h3>
-          <div className="form-group">
-            <label htmlFor="motherName">MOTHER'S NAME *</label>
-            <input
-              type="text"
-              name="motherName"
-              value={formData.motherName}
-              onChange={handleChange}
-              className={errors.motherName ? 'error' : ''}
-            />
-            {errors.motherName && <div className="error-message">{errors.motherName}</div>}
-          </div>
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
+            Mother's Information
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Mother's Name *
+              </label>
+              <input
+                type="text"
+                name="motherName"
+                value={formData.motherName}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.motherName ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Enter mother's full name"
+              />
+              {errors.motherName && <p className="text-red-500 text-sm mt-1">{errors.motherName}</p>}
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="motherQualification">QUALIFICATION</label>
-            <input
-              type="text"
-              name="motherQualification"
-              value={formData.motherQualification}
-              onChange={handleChange}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Mobile Number *
+              </label>
+              <input
+                type="tel"
+                name="motherPhoneNo"
+                value={formData.motherPhoneNo}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  errors.motherPhoneNo ? 'border-red-500' : 'border-gray-300'
+                }`}
+                placeholder="Enter 10-digit mobile number"
+                maxLength="10"
+              />
+              {errors.motherPhoneNo && <p className="text-red-500 text-sm mt-1">{errors.motherPhoneNo}</p>}
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="motherOccupation">OCCUPATION</label>
-            <input
-              type="text"
-              name="motherOccupation"
-              value={formData.motherOccupation}
-              onChange={handleChange}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Qualification
+              </label>
+              <input
+                type="text"
+                name="motherQualification"
+                value={formData.motherQualification}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter qualification"
+              />
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="motherPhoneNo">PHONE NUMBER *</label>
-            <input
-              type="number"
-              name="motherPhoneNo"
-              value={formData.motherPhoneNo}
-              onChange={handleChange}
-              className={errors.motherPhoneNo ? 'error' : ''}
-            />
-            {errors.motherPhoneNo && <div className="error-message">{errors.motherPhoneNo}</div>}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Occupation
+              </label>
+              <input
+                type="text"
+                name="motherOccupation"
+                value={formData.motherOccupation}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter occupation"
+              />
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="motherEmail">EMAIL</label>
-            <input
-              type="email"
-              name="motherEmail"
-              value={formData.motherEmail}
-              onChange={handleChange}
-              className={errors.motherEmail ? 'error' : ''}
-            />
-            {errors.motherEmail && <div className="error-message">{errors.motherEmail}</div>}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                name="motherEmail"
+                value={formData.motherEmail}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter email address"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Additional Information */}
-        <div className="form-section">
-          <h3>Additional Information</h3>
-          <div className="form-group">
-            <label htmlFor="residentialAddress">RESIDENTIAL ADDRESS *</label>
+        {/* Address */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
+            Address Information
+          </h2>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Residential Address *
+            </label>
             <textarea
               name="residentialAddress"
               value={formData.residentialAddress}
               onChange={handleChange}
-              rows="3"
-              className={errors.residentialAddress ? 'error' : ''}
+              rows={3}
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.residentialAddress ? 'border-red-500' : 'border-gray-300'
+              }`}
+              placeholder="Enter complete residential address"
             />
-            {errors.residentialAddress && <div className="error-message">{errors.residentialAddress}</div>}
-          </div>
-
-          <div className="form-group checkbox-group">
-            <label htmlFor="haveYouVisitedOurWebsite">Have you visited our website?</label>
-            <input
-              type="checkbox"
-              name="haveYouVisitedOurWebsite"
-              checked={formData.haveYouVisitedOurWebsite}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="howDoYouKnowAboutSUNVILLEKIDZ">How did you know about SUNVILLE KIDZ?</label>
-            <select
-              name="howDoYouKnowAboutSUNVILLEKIDZ"
-              value={formData.howDoYouKnowAboutSUNVILLEKIDZ}
-              onChange={handleChange}
-            >
-              <option value="">Select how you know about SUNVILLE KIDZ</option>
-              <option value="website">School Website</option>
-              <option value="social_media">Social Media</option>
-              <option value="referral">Referral</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="references">References (if any)</label>
-            <textarea
-              name="references"
-              value={formData.references}
-              onChange={handleChange}
-              rows="3"
-            />
+            {errors.residentialAddress && <p className="text-red-500 text-sm mt-1">{errors.residentialAddress}</p>}
           </div>
         </div>
 
-        <button type="submit">Submit Inquiry</button>
-      </form>
+        {/* Siblings Information */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
+            Siblings Information
+          </h2>
+          
+          <div className="mb-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="doYouHaveSiblings"
+                checked={formData.doYouHaveSiblings}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              Does the student have siblings?
+            </label>
+          </div>
+
+          {formData.doYouHaveSiblings && (
+            <div className="space-y-4">
+              {formData.siblings.map((sibling, index) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Sibling Name
+                    </label>
+                    <input
+                      type="text"
+                      value={sibling.name}
+                      onChange={(e) => handleSiblingChange(index, 'name', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter sibling's name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Age
+                    </label>
+                    <input
+                      type="number"
+                      value={sibling.age}
+                      onChange={(e) => handleSiblingChange(index, 'age', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter age"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={addSibling}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                    >
+                      Add
+                    </button>
+                    {formData.siblings.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeSibling(index)}
+                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Additional Information */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">
+            Additional Information
+          </h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="haveYouVisitedOurWebsite"
+                  checked={formData.haveYouVisitedOurWebsite}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Have you visited our website?
+              </label>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                How did you know about SUNVILLE KIDZ?
+              </label>
+              <select
+                name="howDoYouKnowAboutSUNVILLEKIDZ"
+                value={formData.howDoYouKnowAboutSUNVILLEKIDZ}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select how you know about SUNVILLE KIDZ</option>
+                <option value="website">School Website</option>
+                <option value="social_media">Social Media</option>
+                <option value="referral">Referral</option>
+                <option value="advertisement">Advertisement</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                References (if any)
+              </label>
+              <textarea
+                name="references"
+                value={formData.references}
+                onChange={handleChange}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Please provide any references"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg"
+          >
+            Submit Inquiry
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

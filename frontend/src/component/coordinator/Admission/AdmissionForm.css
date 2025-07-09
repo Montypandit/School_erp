@@ -839,3 +839,34 @@
     color: #333;
   }
   
+
+ @media print {
+  .CoordinatorNavbar,
+  .progress-container,
+  .submit-section,
+  .print-btn,
+  .remove-photo-btn,
+  input[type="file"] {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    margin: 0;
+    padding: 0;
+  }
+  .admission-form-container {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    background: #fff !important;
+    color: #222 !important;
+    font-size: 13pt !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 18mm 12mm 18mm 12mm;
+  }
+}

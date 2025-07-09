@@ -10,8 +10,60 @@ const StudentListPage = () => {
     const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [studentStatus, setStudentStatus] = useState([]);
+
+
+    const studentMap = React.useMemo(() => {
+        const map = new Map();
+        studentStatus.forEach(item => {
+            map.set(item.admissionId, item.status);
+        });
+        return map;
+    }, [studentStatus]);
 
     useEffect(() => {
+
+
+        const fetchStudentStatuses = async () => {
+            setLoading(true);
+            try {
+                const token = sessionStorage.getItem('principalToken') || sessionStorage.getItem('coordinatorToken');
+
+                if (!token) {
+                    toast.info('Please login to continue')
+                    navigate('/');
+                    return;
+                }
+
+                const response = await fetch('http://localhost:5000/api/student/status/get/all/student/status', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Failed to fetch student statuses.');
+                }
+
+                const data = await response.json();
+                setStudentStatus(data.data || []);
+            } catch (err) {
+                toast.error(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+
+
+
+
+
+
+
         const fetchStudents = async () => {
             setLoading(true);
             try {
@@ -46,8 +98,10 @@ const StudentListPage = () => {
             }
         };
 
+        fetchStudentStatuses();
         fetchStudents();
     }, [navigate]);
+
 
     useEffect(() => {
         const lowercasedQuery = query.toLowerCase();
@@ -95,7 +149,7 @@ const StudentListPage = () => {
                                 <div>Actions</div>
                             </div>
                             {filteredStudents.length > 0 ? (
-                                filteredStudents.map((student) => (
+                                filteredStudents.filter(student =>( studentMap.get(student.admissionId) !== 'Inactive') ).map(student => (
                                     <div className="table-row" key={student.admissionId || student._id}>
                                         <div>{student.admissionId}</div>
                                         <div>{student.name}</div>

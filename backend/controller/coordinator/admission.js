@@ -7,6 +7,7 @@ const AdmissionApproval = require('../../models/principal/admissionApproval');
 const InquiryForm = require('../../models/parents/inquiryForm');
 const Attendance = require('../../models/teacher/attendanceSchema');
 const router = express.Router();
+const StudentStatus = require('../../models/admin/studentStatus');
 
 // ======================= SAVE ATTENDANCE =======================
 router.post('/save/attendence', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
@@ -146,7 +147,18 @@ router.post('/create/admission', authMiddleware, authorizeRoles('admin', 'coordi
 
     const inquiryId = savedAdmission.inquiryId;
     await AdmissionApproval.findOneAndDelete({ inquiryId });
-    await InquiryForm.findOneAndDelete({ inquiryId });
+
+    const studentStatus = new StudentStatus({
+      admissionId:savedAdmission.admissionId,
+      status:'Active',
+      reason:'',
+      leaveDate:'',
+      leaveType:'',
+      leaveReason:'',
+      remarks:''
+    });
+
+    await studentStatus.save();
 
     res.status(201).json({ message: 'Admission form submitted successfully', data: savedAdmission });
   } catch (error) {

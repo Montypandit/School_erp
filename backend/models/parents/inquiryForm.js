@@ -18,7 +18,14 @@ const inquiryFormSchema =new mongoose.Schema({
     residentialAddress:{type:String},
     haveYouVisitedOurWebsite:{type:Boolean},
     howDoYouKnowAboutSUNVILLEKIDZ:{type:String},
-    references:{type:String}
+    references:{type:String},
+    doYouHaveSiblings:{type:Boolean},
+    siblings:[
+        {
+            name:{type:String},
+            age:{type:String}
+        }
+    ]
 },{timestamps:true});
 
 const inquiryFormModel = mongoose.model('INQUIRYFORM',inquiryFormSchema);
