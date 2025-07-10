@@ -197,6 +197,26 @@ const Button = styled.button`
   }
 `;
 
+const StyledButton = styled.button`
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  &.primary {
+    background: #4a90e2;
+    color: white;
+    &:hover { background: #357abd; }
+  }
+  &.danger {
+    background: #e74c3c;
+    color: white;
+    &:hover { background: #c0392b; }
+  }
+`;
+
 const activityTypes = [
   'Sports', 'Cultural', 'Academic', 'Workshop', 'Seminar', 'Competition', 'Field Trip', 'Exhibition', 'Meeting', 'Celebration', 'Training', 'Other'
 ];
@@ -226,6 +246,7 @@ const ActivityPlanner = () => {
   });
   const [loading, setLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
 
   const navigate = useNavigate();
 
@@ -318,6 +339,7 @@ const ActivityPlanner = () => {
       classesInvolved: [],
       status: 'planned'
     });
+    setIsUpdateMode(false);
     setShowModal(true);
   };
 
@@ -419,6 +441,25 @@ const ActivityPlanner = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = async (act) => {
+    setFormData({
+      title: act.title,
+      description: act.description,
+      activityType: act.activityType,
+      startDate: format(parseISO(act.startDate), 'yyyy-MM-dd'),
+      endDate: format(parseISO(act.endDate), 'yyyy-MM-dd'),
+      time: {
+        startTime: act.time.startTime,
+        endTime: act.time.endTime
+      },
+      venue: act.venue,
+      classesInvolved: act.classesInvolved,
+      status: act.status
+    });
+    setIsUpdateMode(true);
+    setShowModal(true);
   };
 
   return (
@@ -620,12 +661,32 @@ const ActivityPlanner = () => {
                     </select>
                   </FormGroup>
                   <ButtonGroup>
-                    <Button type="button" className="secondary" onClick={() => setShowModal(false)}>
+                    <StyledButton 
+                      type="button" 
+                      className="secondary"
+                      onClick={() => setShowModal(false)}
+                      style={{ 
+                        fontSize: '1rem', 
+                        padding: '10px 20px', 
+                        borderRadius: '8px',
+                        minWidth: '120px'
+                      }}
+                    >
                       Cancel
-                    </Button>
-                    <Button type="submit" className="primary" disabled={loading}>
-                      {loading ? 'Saving...' : 'Create'}
-                    </Button>
+                    </StyledButton>
+                    <StyledButton 
+                      type="submit" 
+                      className="primary"
+                      disabled={loading}
+                      style={{ 
+                        fontSize: '1rem', 
+                        padding: '10px 20px', 
+                        borderRadius: '8px',
+                        minWidth: '120px'
+                      }}
+                    >
+                      {loading ? 'Saving...' : isUpdateMode ? 'Update' : 'Create'}
+                    </StyledButton>
                   </ButtonGroup>
                 </form>
               </ModalContent>
@@ -697,24 +758,32 @@ const ActivityPlanner = () => {
                     {act.description}
                   </div>
                 )}
-                <button
-      onClick={() => handleDelete(act._id)}
-      style={{
-        position: 'absolute',
-        top: 8,
-        right: 8,
-        background: '#e53935',
-        color: '#fff',
-        border: 'none',
-        borderRadius: 4,
-        padding: '2px 10px',
-        cursor: 'pointer',
-        fontSize: '0.95em'
-      }}
-      title="Delete"
-    >
-      Delete
-    </button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8, gap: 12 }}>
+                  <StyledButton 
+                    onClick={() => handleEdit(act)}
+                    className="primary"
+                    style={{ 
+                      fontSize: '1rem', 
+                      padding: '10px 20px', 
+                      borderRadius: '8px',
+                      minWidth: '120px'
+                    }}
+                  >
+                    Update
+                  </StyledButton>
+                  <StyledButton 
+                    onClick={() => handleDelete(act._id)}
+                    className="danger"
+                    style={{ 
+                      fontSize: '1rem', 
+                      padding: '10px 20px', 
+                      borderRadius: '8px',
+                      minWidth: '120px'
+                    }}
+                  >
+                    Delete
+                  </StyledButton>
+                </div>
               </div>
             ))}
           </div>

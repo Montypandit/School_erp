@@ -365,14 +365,32 @@ const MonthlyPlanner = () => {
   };
 
   // Modal handlers
-  const openModal = (day) => {
-    setFormData({
-      ...formData,
-      startDate: format(day, 'yyyy-MM-dd'),
-      endDate: format(day, 'yyyy-MM-dd'),
-      month: day.getMonth() + 1,
-      year: day.getFullYear()
-    });
+  const openModal = (day, plan) => {
+    if(plan){
+      setFormData({
+        ...formData,
+        title: plan.title,
+        class: plan.class,
+        description: plan.description,
+        month: plan.month,
+        year: plan.year,
+        startDate: plan.startDate,
+        endDate: plan.endDate,
+        eventType: plan.eventType,
+        status: plan.status,
+        academicYear: plan.academicYear,
+        venue: plan.venue,
+        _id: plan._id
+      });
+    } else {
+      setFormData({
+        ...formData,
+        startDate: format(day, 'yyyy-MM-dd'),
+        endDate: format(day, 'yyyy-MM-dd'),
+        month: day.getMonth() + 1,
+        year: day.getFullYear()
+      });
+    }
     setShowModal(true);
   };
 
@@ -394,16 +412,29 @@ const MonthlyPlanner = () => {
         navigate('/');
         return;
       }
-      const res = await fetch('http://localhost:5000/api/monthly/planner/create/monthly/planner', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      });
-      if (!res.ok) throw new Error('Failed to create plan');
-      toast.success('Planner Created Successfully');
+      if(formData._id){
+        const res = await fetch(`http://localhost:5000/api/monthly/planner/update/monthly/plan/by/${formData._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+        if (!res.ok) throw new Error('Failed to update plan');
+        toast.success('Planner Updated Successfully');
+      } else {
+        const res = await fetch('http://localhost:5000/api/monthly/planner/create/monthly/planner', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(formData)
+        });
+        if (!res.ok) throw new Error('Failed to create plan');
+        toast.success('Planner Created Successfully');
+      }
       setShowModal(false);
     } catch (err) {
       console.log(err);
@@ -578,7 +609,7 @@ const MonthlyPlanner = () => {
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={e => e.stopPropagation()}
               >
-                <h2>Create Monthly Plan</h2>
+                <h2>{formData._id ? 'Update Monthly Plan' : 'Create Monthly Plan'}</h2>
                 <form onSubmit={handleSubmit}>
                   <FormGroup>
                     <Label>Title</Label>
@@ -682,7 +713,7 @@ const MonthlyPlanner = () => {
                       Cancel
                     </Button>
                     <Button type="submit" className="primary" disabled={loading}>
-                      {loading ? 'Saving...' : 'Create'}
+                      {loading ? (formData._id ? 'Updating...' : 'Saving...') : (formData._id ? 'Update' : 'Create')}
                     </Button>
                   </ButtonGroup>
                 </form>
@@ -703,8 +734,8 @@ const MonthlyPlanner = () => {
               boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
               borderRadius: 14,
               minWidth: 320,
-              maxWidth: 420,
-              maxHeight: 400,
+              maxWidth: 480,
+              maxHeight: 420,
               overflowY: 'auto',
               padding: '1.5rem 2rem',
               fontSize: '1em',
@@ -715,7 +746,7 @@ const MonthlyPlanner = () => {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div style={{ fontWeight: 700, color: '#1976d2', fontSize: '1.15em' }}>
-                Scheduled Tasks for {format(new Date(selectedDay), 'dd MMM yyyy')} ({getPlansForDay(new Date(selectedDay)).length})
+                Plans for {format(new Date(selectedDay), 'dd MMM yyyy')} ({getPlansForDay(new Date(selectedDay)).length})
               </div>
               <button
                 onClick={() => setSelectedDay(null)}
@@ -736,41 +767,36 @@ const MonthlyPlanner = () => {
             {getPlansForDay(new Date(selectedDay)).map(plan => (
               <div key={plan._id} style={{ marginBottom: 16, borderBottom: '1px solid #f0f0f0', paddingBottom: 8, position: 'relative' }}>
                 <div style={{ fontWeight: 600, color: '#333', fontSize: '1.05em' }}>{plan.title}</div>
-                <div style={{ fontSize: '0.95em', color: '#1976d2', fontWeight: 500 }}>Class: {plan.class}</div>
-                <div style={{ fontSize: '0.92em', color: '#888' }}>
-                  Type: {plan.eventType} 
-                </div>
-                <div style={{ fontSize: '0.92em', color: '#888' }}>
-                  Status: {plan.status}
+                <div style={{ fontSize: '0.95em', color: '#1976d2', fontWeight: 500 }}>{plan.class}</div>
+                <div style={{ fontSize: '0.85em', color: '#888' }}>
+                  {plan.eventType} | {plan.status}
                 </div>
                 {plan.venue && (
-                  <div style={{ fontSize: '0.92em', color: '#888' }}>
+                  <div style={{ fontSize: '0.85em', color: '#888' }}>
                     Venue: {plan.venue}
                   </div>
                 )}
                 {plan.description && (
-                  <div style={{ fontSize: '0.92em', color: '#555', marginTop: 2 }}>
+                  <div style={{ fontSize: '0.85em', color: '#555', marginTop: 2 }}>
                     {plan.description}
                   </div>
                 )}
-                <button
-      onClick={() => handleDelete(plan._id)}
-      style={{
-        position: 'absolute',
-        top: 8,
-        right: 8,
-        background: '#e53935',
-        color: '#fff',
-        border: 'none',
-        borderRadius: 4,
-        padding: '2px 10px',
-        cursor: 'pointer',
-        fontSize: '0.95em'
-      }}
-      title="Delete"
-    >
-      Delete
-    </button>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8, gap: 8 }}>
+                  <Button 
+                    onClick={() => openModal(null, plan)}
+                    className="primary"
+                    style={{ fontSize: '0.85em', padding: '4px 12px' }}
+                  >
+                    Update
+                  </Button>
+                  <Button 
+                    onClick={() => handleDelete(plan._id)}
+                    className="danger"
+                    style={{ fontSize: '0.85em', padding: '4px 12px' }}
+                  >
+                    Delete
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
