@@ -49,6 +49,7 @@ import ViewStudentReport from "./component/principal/viewReport";
 import MonthlyFeePaid from "./coordinator/MonthlyFeePaid";
 import Teacher from "./component/coordinator/Teacher";  
 import Profile from "./component/teacher/ProfilePage";
+import Announcement  from "./admin/Messages";
 
 
 
@@ -75,6 +76,7 @@ const App = () => {
         <Route path="/admin/attendence" element={<Attendence />} />
         <Route path="/admin/employee/page" element={<Employee/>}/>
         <Route path="/parent/inquiry/form" element={<InquiryForm />} />
+        <Route path="/admin/announcement" element={<Announcement/>} />
 
         {/* Coordinator Module */}
         <Route path="/coordinator/home" element={<CoordinatorHome />} />
