@@ -1,0 +1,113 @@
+/* Graceful grayish layout */
+.employee-form-container {
+    max-width: 800px;
+    margin: 90px auto;
+    padding: 30px;
+    background-color: #f0f2f5; /* very light gray background */
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  /* Blue heading – unchanged */
+  .employee-form-container h2 {
+    background-color: #56f473;
+    color: white;
+    padding: 10px 20px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 40px;
+    width: fit-content;
+    margin: 0 auto 30px;
+    box-shadow: 0 1px 5px rgba(0, 123, 255, 0.4);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  
+  /* Each form group */
+  .employee-form .form-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Labels */
+  .employee-form label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333; /* dark gray for readability */
+  }
+  
+  /* Inputs, Selects, Textareas */
+  .employee-form input,
+  .employee-form select,
+  .employee-form textarea {
+    padding: 10px 14px;
+    font-size: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    background-color: #ffffff; /* white fields */
+    color: #000;
+  }
+  
+  /* Focus Effect */
+  .employee-form input:focus,
+  .employee-form select:focus,
+  .employee-form textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+  }
+  
+  /* Error Styling */
+  .employee-form .error {
+    border-color: #dc3545;
+  }
+  
+  .employee-form .error-message {
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  
+  /* Submit Button */
+  .employee-form .submit-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .employee-form .submit-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .employee-form-container {
+      padding: 20px;
+    }
+  
+    .employee-form-container h2 {
+      font-size: 20px;
+      padding: 10px 20px;
+    }
+  
+    .employee-form input,
+    .employee-form select,
+    .employee-form textarea {
+      font-size: 14px;
+    }
+  
+    .employee-form .submit-btn {
+      font-size: 15px;
+      padding: 10px 16px;
+    }
+  }
+  
