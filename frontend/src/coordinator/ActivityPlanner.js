@@ -116,7 +116,7 @@ const ModalOverlay = styled(motion.div)`
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex; justify-content: center; align-items: center;
-  z-index: 1000;
+  z-index: 10000;
 `;
 
 const ModalContent = styled(motion.div)`
@@ -237,8 +237,8 @@ const ActivityPlanner = () => {
     startDate: format(new Date(), 'yyyy-MM-dd'),
     endDate: format(new Date(), 'yyyy-MM-dd'),
     time: {
-      startTime: String,
-      endTime: String
+      startTime: '',
+      endTime: ''
     },
     venue: '',
     classesInvolved: [],
@@ -332,8 +332,8 @@ const ActivityPlanner = () => {
       startDate: format(day, 'yyyy-MM-dd'),
       endDate: format(day, 'yyyy-MM-dd'),
       time: {
-        startTime: String,
-        endTime: String
+        startTime: '',
+        endTime: ''
       },
       venue: '',
       classesInvolved: [],
@@ -395,29 +395,31 @@ const ActivityPlanner = () => {
       }
 
       // Prepare the payload
-      const payload = {
-        ...formData,
-        time: {
-          startTime: formData.time.startTime,
-          endTime: formData.time.endTime
-        }
-        // ...add coordinator/createdBy if needed
-      };
+      const payload = { ...formData };
 
-      const res = await fetch('http://localhost:5000/api/activity/planner/create/new/activity', {
-        method: 'POST',
+      const url =`http://localhost:5000/api/activity/planner/update/activity/${formData._id}`
+      
+      const method = 'PUT';
+
+      const res = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) throw new Error('Failed to create activity');
-      toast.success('Activity Created Successfully');
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to 'update' activity`);
+      }
+
+      toast.success(`Activity Updated Successfully`);
       setShowModal(false);
       fetchActivities();
     } catch (err) {
-      toast.error('Failed to create activity');
+      toast.error(err.message || `An error occurred`);
     } finally {
       setLoading(false);
     }
@@ -445,17 +447,18 @@ const ActivityPlanner = () => {
 
   const handleEdit = async (act) => {
     setFormData({
+      _id: act._id,
       title: act.title,
       description: act.description,
       activityType: act.activityType,
       startDate: format(parseISO(act.startDate), 'yyyy-MM-dd'),
       endDate: format(parseISO(act.endDate), 'yyyy-MM-dd'),
       time: {
-        startTime: act.time.startTime,
-        endTime: act.time.endTime
+        startTime: act.time?.startTime || '',
+        endTime: act.time?.endTime || ''
       },
       venue: act.venue,
-      classesInvolved: act.classesInvolved,
+      classesInvolved: act.classesInvolved || [],
       status: act.status
     });
     setIsUpdateMode(true);
@@ -533,7 +536,7 @@ const ActivityPlanner = () => {
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={e => e.stopPropagation()}
               >
-                <h2>Create Activity</h2>
+                <h2>{isUpdateMode ? 'Update Activity' : 'Create Activity'}</h2>
                 <form onSubmit={handleSubmit}>
                   <FormGroup>
                     <Label>Title</Label>

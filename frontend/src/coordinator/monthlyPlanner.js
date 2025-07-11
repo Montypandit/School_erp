@@ -147,7 +147,7 @@ const ModalOverlay = styled(motion.div)`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 10000;
 `;
 
 const ModalContent = styled(motion.div)`
@@ -413,7 +413,7 @@ const MonthlyPlanner = () => {
         return;
       }
       if(formData._id){
-        const res = await fetch(`http://localhost:5000/api/monthly/planner/update/monthly/plan/by/${formData._id}`, {
+        const res = await fetch(`http://localhost:5000/api/monthly/planner/update/monthly-plan/by/${formData._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -472,6 +472,7 @@ const MonthlyPlanner = () => {
       };
       fetchPlans();
     } catch (err) {
+      console.log(err);
       toast.error('Failed to delete plan');
     } finally {
       setLoading(false);
