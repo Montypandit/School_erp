@@ -254,6 +254,7 @@ const AdminHome = () => {
         <ActionButton to="/admin/attendence" icon="📅" label="Attendance" />
         <ActionButton to="/admin/weeklyschedule" icon="�" label="Weekly Schedule" />
         <ActionButton to="/admin/leaveapproval" icon="📝" label="Leave Approval" />
+        <ActionButton to="/admin/announcement" icon="📢" label="Send Announcement" />
       </div>
 
       {/* Recent Activity Section */}

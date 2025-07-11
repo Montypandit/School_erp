@@ -41,45 +41,43 @@ const StudentAllotmentManager = () => {
     console.log(`Navigating to: ${path}`);
   };
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      setLoading(true);
-      try {
-       
-        const token = sessionStorage.getItem('coordinatorToken');
-        if (!token) {
-          toast.info('Please login to continue');
-          navigate('/coordinator/login');
-          return;
-        }
-
-        const res = await fetch('http://localhost:5000/api/final/admission/get/all/admissions', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (!res.ok) {
-          throw new Error('Failed to fetch student data');
-        }
-
-        const data = await res.json();
-        const mockStudents = data.data || [];
-
-
-        setStudents(mockStudents);
-        setFilteredStudents(mockStudents);
-        calculateClassStats(mockStudents);
-      } catch (error) {
-        console.error('Error fetching students:', error);
-        toast.error(error.message || 'Error fetching student data.');
-      } finally {
-        setLoading(false);
+  const fetchStudents = async () => {
+    setLoading(true);
+    try {
+      const token = sessionStorage.getItem('coordinatorToken');
+      if (!token) {
+        toast.info('Please login to continue');
+        navigate('/coordinator/login');
+        return;
       }
-    };
 
+      const res = await fetch('http://localhost:5000/api/final/admission/get/all/admissions', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to fetch student data');
+      }
+
+      const data = await res.json();
+      const mockStudents = data.data || [];
+
+      setStudents(mockStudents);
+      setFilteredStudents(mockStudents);
+      calculateClassStats(mockStudents);
+    } catch (error) {
+      console.error('Error fetching students:', error);
+      toast.error(error.message || 'Error fetching student data.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchStudents();
   }, []);
 
@@ -152,8 +150,52 @@ const StudentAllotmentManager = () => {
     setShowUniformModal(true);
   };
 
-  // Save section/academicYear/allocated to backend
-  const saveAllotment = async () => {
+  // Calculate class and section statistics for the modal
+  const getClassSectionStats = (student) => {
+    if (!student) return { classTotal: 0, sectionTotal: 0 };
+    
+    const studentClass = student.class || student.grade;
+    const currentSection = allotmentData.section || student.section;
+    
+    const classStudents = students.filter(s => 
+      (s.class === studentClass || s.grade === studentClass)
+    );
+    
+    const sectionStudents = classStudents.filter(s => 
+      s.section === currentSection
+    );
+    
+    return {
+      classTotal: classStudents.length,
+      sectionTotal: currentSection ? sectionStudents.length : 0,
+      className: studentClass,
+      currentSection: currentSection
+    };
+  };
+
+  const getNextRollNumber = (students, studentClass, section) => {
+    // Filter students by class and section
+    const classSectionStudents = students.filter(student => 
+      (student.class === studentClass || student.grade === studentClass) && 
+      student.section === section
+    );
+
+    // If no students in this class/section yet, start with 1
+    if (classSectionStudents.length === 0) return 1;
+
+    // Extract all roll numbers and find the maximum
+    const rollNumbers = classSectionStudents
+      .map(student => {
+        // Handle both string and numeric roll numbers
+        const rollNo = student.rollNo || student.rollNumber || '0';
+        return typeof rollNo === 'string' ? parseInt(rollNo, 10) || 0 : rollNo;
+      });
+
+    // Return the next sequential number
+    return Math.max(...rollNumbers) + 1;
+  };
+
+  const handleSaveAllotment = async () => {
     if (!allotmentData.academicYear || !allotmentData.section) {
       toast.error('Please select section and enter academic year.');
       return;
@@ -165,26 +207,68 @@ const StudentAllotmentManager = () => {
         navigate('/coordinator/login');
         return;
       }
-      const res = await fetch('http://localhost:5000/api/coordinator/students/allocate/students/allocate/section', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          admissionId: selectedStudent.admissionId || selectedStudent.studentId || selectedStudent.id,
-          section: allotmentData.section,
-          academicYear: allotmentData.academicYear,
-          alloted: true
-        })
+      // Get the next sequential roll number for this class and section
+      const nextRollNumber = getNextRollNumber(
+        students, 
+        selectedStudent.class || selectedStudent.grade, 
+        allotmentData.section
+      );
+
+      // Update the student's section, academic year, and roll number
+      const updatedStudents = students.map(student => {
+        if (student.admissionId === selectedStudent.admissionId || student.studentId === selectedStudent.studentId || student.id === selectedStudent.id) {
+          return {
+            ...student,
+            section: allotmentData.section,
+            academicYear: allotmentData.academicYear,
+            rollNo: nextRollNumber.toString(),
+            rollNumber: nextRollNumber.toString() // Update both rollNo and rollNumber for compatibility
+          };
+        }
+        return student;
       });
-      if (!res.ok) throw new Error('Failed to save allotment');
-      toast.success('Allotment saved successfully!');
+
+      // Update the state
+      setStudents(updatedStudents);
+      setFilteredStudents(updatedStudents);
+      calculateClassStats(updatedStudents);
+
+      // Send the update to the backend
+      const response = await fetch(
+        'http://localhost:5000/api/coordinator/students/allocate/students/allocate/section',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            admissionId: selectedStudent.admissionId || selectedStudent.studentId || selectedStudent.id,
+            section: allotmentData.section,
+            academicYear: allotmentData.academicYear,
+            rollNumber: nextRollNumber.toString()
+          })
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to update student section');
+      }
+
+      toast.success(`Section allocated successfully. Roll number assigned: ${nextRollNumber}`);
       setShowAllotmentModal(false);
-      // Optionally refetch students here
+      setSelectedStudent(null);
+      setAllotmentData({
+        section: '',
+        books: [],
+        academicYear: ''
+      });
+      
+      // Refresh the student list
+      fetchStudents();
     } catch (error) {
-      console.error('Error saving allotment:', error);
-      toast.error('Failed to save allotment');
+      console.error('Error updating student section:', error);
+      toast.error(error.message || 'Error updating student section');
     }
   };
 
@@ -223,6 +307,7 @@ const StudentAllotmentManager = () => {
     return 'Pending';
   };
 
+  // Add new styles for the enhanced modal
   const styles = {
     container: {
       minHeight: '100vh',
@@ -396,22 +481,80 @@ const StudentAllotmentManager = () => {
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
-      padding: '16px'
+      padding: '16px',
+      backdropFilter: 'blur(2px)'
     },
     modalContent: {
       backgroundColor: 'white',
-      borderRadius: '8px',
+      borderRadius: '12px',
       maxWidth: '600px',
       width: '100%',
       maxHeight: '90vh',
-      overflow: 'auto'
+      overflow: 'auto',
+      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
     },
     modalHeader: {
-      padding: '24px',
-      borderBottom: '1px solid #e5e7eb'
+      padding: '20px 24px',
+      borderBottom: '1px solid #e5e7eb',
+      position: 'sticky',
+      top: 0,
+      backgroundColor: 'white',
+      zIndex: 10,
+      borderRadius: '12px 12px 0 0'
     },
     modalBody: {
-      padding: '24px'
+      padding: '24px',
+      backgroundColor: '#f9fafb'
+    },
+    
+    statsContainer: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+      gap: '16px',
+      marginBottom: '24px'
+    },
+    
+    statCard: {
+      backgroundColor: 'white',
+      borderRadius: '8px',
+      padding: '16px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
+      border: '1px solid #e5e7eb'
+    },
+    
+    statIcon: {
+      width: '40px',
+      height: '40px',
+      borderRadius: '8px',
+      backgroundColor: '#f0f9ff',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#0ea5e9'
+    },
+    
+    statLabel: {
+      fontSize: '13px',
+      color: '#6b7280',
+      marginBottom: '4px'
+    },
+    
+    statValue: {
+      fontSize: '18px',
+      fontWeight: '600',
+      color: '#111827'
+    },
+    
+    infoBox: {
+      backgroundColor: '#f3f4f6',
+      padding: '10px 12px',
+      borderRadius: '6px',
+      fontSize: '14px',
+      color: '#111827',
+      border: '1px solid #e5e7eb'
     },
     formGroup: {
       marginBottom: '20px'
@@ -446,19 +589,50 @@ const StudentAllotmentManager = () => {
       cursor: 'pointer'
     },
     modalFooter: {
-      padding: '24px',
+      padding: '20px 24px',
       borderTop: '1px solid #e5e7eb',
       display: 'flex',
       justifyContent: 'flex-end',
-      gap: '12px'
+      gap: '12px',
+      backgroundColor: 'white',
+      position: 'sticky',
+      bottom: 0,
+      borderRadius: '0 0 12px 12px'
     },
     cancelButton: {
-      padding: '8px 16px',
+      padding: '10px 20px',
       backgroundColor: '#f3f4f6',
       color: '#374151',
       border: 'none',
-      borderRadius: '6px',
-      cursor: 'pointer'
+      borderRadius: '8px',
+      cursor: 'pointer',
+      fontWeight: '500',
+      transition: 'all 0.2s ease',
+      '&:hover': {
+        backgroundColor: '#e5e7eb'
+      }
+    },
+    
+    button: {
+      backgroundColor: '#2563eb',
+      color: 'white',
+      padding: '10px 20px',
+      border: 'none',
+      borderRadius: '8px',
+      fontSize: '14px',
+      cursor: 'pointer',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: '8px',
+      fontWeight: '500',
+      transition: 'all 0.2s ease',
+      '&:hover': {
+        backgroundColor: '#1d4ed8'
+      },
+      '&:disabled': {
+        opacity: '0.7',
+        cursor: 'not-allowed'
+      }
     }
   };
 
@@ -680,39 +854,108 @@ const StudentAllotmentManager = () => {
         </div>
 
         {/* Allotment Modal */}
-        {showAllotmentModal && (
+        {showAllotmentModal && selectedStudent && (
           <div style={styles.modal}>
             <div style={styles.modalContent}>
               <div style={styles.modalHeader}>
                 <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#111827', margin: 0 }}>
-                  Student Allotment - {selectedStudent?.name}
+                  Section Allotment - {selectedStudent?.name}
                 </h3>
-                <p style={{ fontSize: '14px', color: '#6b7280', margin: '4px 0 0 0' }}>Class: {selectedStudent?.class || selectedStudent?.grade}</p>
+                <p style={{ fontSize: '14px', color: '#6b7280', margin: '4px 0 0 0' }}>
+                  Student ID: {selectedStudent.studentId || selectedStudent.id}
+                </p>
               </div>
+              
               <div style={styles.modalBody}>
-                <div style={styles.formGroup}>
-                  <label style={styles.label}>Assign Section</label>
-                  <select
-                    style={styles.input}
-                    value={allotmentData.section}
-                    onChange={(e) => setAllotmentData(prev => ({ ...prev, section: e.target.value }))}
-                  >
-                    <option value="">Select Section</option>
-                    {sections.map(section => (
-                      <option key={section} value={section}>Section {section}</option>
-                    ))}
-                  </select>
+                {/* Class and Section Stats */}
+                <div style={styles.statsContainer}>
+                  <div style={styles.statCard}>
+                    <div style={styles.statIcon}>
+                      <School size={20} />
+                    </div>
+                    <div>
+                      <div style={styles.statLabel}>Class</div>
+                      <div style={styles.statValue}>
+                        {selectedStudent.class || selectedStudent.grade || 'N/A'}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div style={styles.statCard}>
+                    <div style={styles.statIcon}>
+                      <Users size={20} />
+                    </div>
+                    <div>
+                      <div style={styles.statLabel}>Total in Class</div>
+                      <div style={styles.statValue}>
+                        {getClassSectionStats(selectedStudent).classTotal}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div style={styles.statCard}>
+                    <div style={styles.statIcon}>
+                      <Users size={20} />
+                    </div>
+                    <div>
+                      <div style={styles.statLabel}>
+                        {allotmentData.section ? `Section ${allotmentData.section} Total` : 'Select Section'}
+                      </div>
+                      <div style={styles.statValue}>
+                        {allotmentData.section ? getClassSectionStats(selectedStudent).sectionTotal : '--'}
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                
+                <div style={{ margin: '20px 0', borderTop: '1px solid #e5e7eb' }}></div>
+                
+                {/* Student Info */}
                 <div style={styles.formGroup}>
-                  <label style={styles.label}>Academic Year</label>
-                  <input
-                    style={styles.input}
-                    value={allotmentData.academicYear}
-                    onChange={(e) => setAllotmentData(prev => ({ ...prev, academicYear: e.target.value }))}
-                    placeholder="Academic Year"
-                  />
+                  <label style={styles.label}>Roll Number</label>
+                  <div style={styles.infoBox}>
+                    {selectedStudent.rollNumber || 'Not assigned'}
+                  </div>
+                </div>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Assign Section</label>
+                    <select
+                      style={styles.input}
+                      value={allotmentData.section}
+                      onChange={(e) => setAllotmentData(prev => ({ ...prev, section: e.target.value }))}
+                    >
+                      <option value="">Select Section</option>
+                      {sections.map(section => (
+                        <option key={section} value={section}>
+                          Section {section} 
+                          {classStats[selectedStudent.class || selectedStudent.grade]?.sections[section] > 0 && 
+                            `(${classStats[selectedStudent.class || selectedStudent.grade]?.sections[section]})`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div style={styles.formGroup}>
+                    <label style={styles.label}>Academic Year</label>
+                    <select
+                      style={styles.input}
+                      value={allotmentData.academicYear}
+                      onChange={(e) => setAllotmentData(prev => ({ ...prev, academicYear: e.target.value }))}
+                    >
+                      <option value="">Select Academic Year</option>
+                      {Array.from({ length: 5 }, (_, i) => {
+                        const year = new Date().getFullYear() + i;
+                        return `${year}-${year + 1}`;
+                      }).map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
+              
               <div style={styles.modalFooter}>
                 <button
                   onClick={() => setShowAllotmentModal(false)}
@@ -721,8 +964,13 @@ const StudentAllotmentManager = () => {
                   Cancel
                 </button>
                 <button
-                  onClick={saveAllotment}
-                  style={styles.button}
+                  onClick={handleSaveAllotment}
+                  style={{
+                    ...styles.button,
+                    opacity: !allotmentData.section || !allotmentData.academicYear ? 0.7 : 1,
+                    cursor: !allotmentData.section || !allotmentData.academicYear ? 'not-allowed' : 'pointer'
+                  }}
+                  disabled={!allotmentData.section || !allotmentData.academicYear}
                 >
                   <Save size={16} />
                   Save Allotment
