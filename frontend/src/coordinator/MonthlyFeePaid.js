@@ -11,8 +11,9 @@ const FeeManagementPage = () => {
     const [showReceiptModal, setShowReceiptModal] = useState(false);
     const [generatedReceipt, setGeneratedReceipt] = useState(null);
     const [error, setError] = useState('');
-    const [showPaidFeesModal, setShowPaidFeesModal] = useState(false); // New state for paid fees modal
-    const [paidFees, setPaidFees] = useState([]); // New state for paid fees data
+    const [showPaidFeesModal, setShowPaidFeesModal] = useState(false);
+    const [paidFees, setPaidFees] = useState([]);
+    const [admissionFee, setAdmissionFee] = useState(null);
 
     // Fee form state
     const [feeData, setFeeData] = useState({
@@ -81,9 +82,28 @@ const FeeManagementPage = () => {
             setFeeData(prev => ({
                 ...prev,
                 className: studentData.class || '',
-                section: studentData.section || 'A'
+                section: studentData.section || ''
             }));
 
+
+            const resp = await fetch(`http://localhost:5000/api/admission/fees/get/admission/fee/${admissionId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!resp.ok) {
+                throw new Error('failed to fetch student admission fee');
+            }
+
+            const admissionFeeData = await resp.json();
+            if (admissionFeeData.data) {
+                setAdmissionFee(admissionFeeData.data);
+            } else {
+                setAdmissionFee(null);
+            }
         } catch (error) {
             console.error('Error fetching student:', error);
             setError(`Error: ${error.message}`);
@@ -324,6 +344,11 @@ Thank you!
     useEffect(() => {
         fetchStudent();
     }, []);
+
+    const handleUpdateFees = () => {
+        navigate(`/coordinator/update/admission-fees/${admissionId}`);
+    }
+
 
     return (
         <div>
@@ -669,17 +694,56 @@ Thank you!
                     </div>
                 )}
 
+
                 {/* New: Paid Fees Modal */}
                 {showPaidFeesModal && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
                             <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
                                 Previous Paid Fees for {student?.name}
                             </h2>
+                            <div className="border-2 border-gray-200 p-4 rounded-lg my-4 w-full bg-blue-50">
+                                <div className='flex justify-between items-center mb-4'>
+                                    <h3 className="text-lg font-semibold text-center mb-2 text-blue-800">Student Admission Fee Details</h3>
+                                    <button onClick={handleUpdateFees} className="w-60 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                                        Update Fees
+                                    </button>
+                                </div>
+                                {admissionFee ? (
+                                    <div className="bg-white p-3 rounded-md space-y-1 shadow-sm">
+                                        {Object.entries(admissionFee)
+                                            .filter(([key, value]) => typeof value === 'number' && value > 0 && !['totalPaidAmount'].includes(key))
+                                            .map(([key, value]) => (
+                                                <div key={key} className="flex justify-between text-sm">
+                                                    <span>{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</span>
+                                                    <span className="font-medium">₹{value}</span>
+                                                </div>
+                                            ))
+                                        }
+                                        {admissionFee.others && admissionFee.others.map((other, index) => (
+                                            other.amount > 0 && (
+                                                <div key={`other-${index}`} className="flex justify-between text-sm">
+                                                    <span>{other.name || 'Other Fee'}:</span>
+                                                    <span className="font-medium">₹{other.amount}</span>
+                                                </div>
+                                            )
+                                        ))}
+                                        <div className="flex justify-between font-bold text-blue-600 border-t pt-2 mt-2">
+                                            <span>Total Amount:</span>
+                                            <span>₹{admissionFee.totalPaidAmount}</span>
+                                        </div>
+                                        <div className="text-xs text-gray-500 text-right mt-1">
+                                            Paid on: {new Date(admissionFee.createdAt).toLocaleDateString()}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-500 text-center">No admission fee details found.</p>
+                                )}
+                            </div>
                             {paidFees.length === 0 ? (
                                 <p className="text-center text-gray-600">No paid fees found for this student.</p>
                             ) : (
-                                <div className="max-h-96 overflow-y-auto">
+                                <div>
                                     <table className="min-w-full divide-y divide-gray-200">
                                         <thead className="bg-gray-50">
                                             <tr>
