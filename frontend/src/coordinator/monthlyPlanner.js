@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO } from 'date-fns';
+import { format, startOfMonth, endOfMonth,startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, parseISO } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
 import CoordinatorNavbar from '../component/coordinator/CoordinatorNavbar';
 import { useNavigate } from 'react-router-dom';
+import { utils, writeFileXLSX } from 'xlsx';
+
 
 // Styled Components
 const PlannerContainer = styled.div`
@@ -84,8 +86,8 @@ const DayHeader = styled.div`
 
 const DayCell = styled(motion.div)`
   aspect-ratio: 1;
-  background: ${({ isCurrentMonth, isToday }) => 
-    isToday ? '#e3f2fd' : isCurrentMonth ? 'white' : '#f9f9f9'};
+  background: ${({ $isCurrentMonth, $isToday }) =>
+    $isToday ? '#e3f2fd' : $isCurrentMonth ? 'white' : '#f9f9f9'};
   border: 1px solid #eee;
   border-radius: 8px;
   padding: 0.5rem;
@@ -102,8 +104,8 @@ const DayCell = styled(motion.div)`
 
 const DayNumber = styled.div`
   font-weight: 600;
-  color: ${({ isCurrentMonth, isToday }) => 
-    isToday ? '#1e88e5' : isCurrentMonth ? '#2c3e50' : '#bdc3c7'};
+  color: ${({ $isCurrentMonth, $isToday }) =>
+    $isToday ? '#1e88e5' : $isCurrentMonth ? '#2c3e50' : '#bdc3c7'};
   margin-bottom: 0.5rem;
 `;
 
@@ -158,6 +160,20 @@ const ModalContent = styled(motion.div)`
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+  &:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
 `;
 
 const FormGroup = styled.div`
@@ -298,6 +314,14 @@ const MonthlyPlanner = () => {
   const [loading, setLoading] = useState(false);
   const [hoveredDay, setHoveredDay] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [filterOptions, setFilterOptions] = useState({
+    type: 'month', // 'month', 'week', 'date'
+    month: currentDate.getMonth(),
+    year: currentDate.getFullYear(),
+    selectedDate: format(currentDate, 'yyyy-MM-dd'),
+  });
+
 
   // Fetch all plans for the month
   useEffect(() => {
@@ -306,19 +330,20 @@ const MonthlyPlanner = () => {
       try {
         const token = sessionStorage.getItem('coordinatorToken');
         const res = await fetch('http://localhost:5000/api/monthly/planner/get/all/monthly/planners', {
-          method:'GET',
-          headers: { 
-            'Authorization': `Bearer ${token}` }
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
         const data = await res.json();
         setPlans(data.data || []);
       } catch (err) {
         console.log(err);
-        toast.error('Failed to update planner')
+        toast.error('Failed to fetch planner data');
       } finally {
         setLoading(false);
       }
-    };
+    }
     fetchPlans();
   }, [showModal]);
 
@@ -326,7 +351,7 @@ const MonthlyPlanner = () => {
   const monthPlans = plans.filter(
     plan => plan.month === (currentDate.getMonth() + 1) && plan.year === currentDate.getFullYear()
   );
-  
+
   const navigate = useNavigate();
 
   // Calendar logic (same as before)
@@ -366,7 +391,7 @@ const MonthlyPlanner = () => {
 
   // Modal handlers
   const openModal = (day, plan) => {
-    if(plan){
+    if (plan) {
       setFormData({
         ...formData,
         title: plan.title,
@@ -407,12 +432,12 @@ const MonthlyPlanner = () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('coordinatorToken');
-      if(!token){
+      if (!token) {
         toast.error('Please login to continue');
         navigate('/');
         return;
       }
-      if(formData._id){
+      if (formData._id) {
         const res = await fetch(`http://localhost:5000/api/monthly/planner/update/monthly-plan/by/${formData._id}`, {
           method: 'PUT',
           headers: {
@@ -444,6 +469,60 @@ const MonthlyPlanner = () => {
     }
   };
 
+  const handleDownload = () => {
+    let filteredPlans = [];
+    const { type, month, year, selectedDate } = filterOptions;
+
+    if (type === 'month') {
+      const selectedMonth = parseInt(month, 10);
+      const selectedYear = parseInt(year, 10);
+      filteredPlans = plans.filter(plan => {
+        const planDate = parseISO(plan.startDate);
+        return planDate.getMonth() === selectedMonth && planDate.getFullYear() === selectedYear;
+      });
+    } else if (type === 'week') {
+      const selected = parseISO(selectedDate);
+      const weekStart = startOfWeek(selected, { weekStartsOn: 1 });
+      const weekEnd = endOfWeek(selected, { weekStartsOn: 1 });
+      filteredPlans = plans.filter(plan => {
+        const planStart = parseISO(plan.startDate);
+        return planStart >= weekStart && planStart <= weekEnd;
+      });
+    } else if (type === 'date') {
+      filteredPlans = plans.filter(plan => isSameDay(parseISO(plan.startDate), parseISO(selectedDate)));
+    }
+
+    if (filteredPlans.length === 0) {
+      toast.warn('No plans found for the selected filter.');
+      return;
+    }
+
+    const dataForExcel = filteredPlans.map(plan => ({
+      'Title': plan.title,
+      'Class': plan.class,
+      'Event Type': plan.eventType,
+      'Start Date': format(parseISO(plan.startDate), 'dd-MM-yyyy'),
+      'End Date': format(parseISO(plan.endDate), 'dd-MM-yyyy'),
+      'Status': plan.status,
+      'Venue': plan.venue || 'N/A',
+      'Academic Year': plan.academicYear,
+      'Description': plan.description,
+    }));
+
+    const worksheet = utils.json_to_sheet(dataForExcel);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Monthly Plans');
+
+    const cols = Object.keys(dataForExcel[0]).map(key => ({
+      wch: Math.max(key.length, ...dataForExcel.map(row => (row[key] || '').toString().length)) + 2
+    }));
+    worksheet['!cols'] = cols;
+
+    const fileName = `Monthly_Plan_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
+    writeFileXLSX(workbook, fileName);
+    setShowDownloadModal(false);
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this plan?')) return;
     setLoading(true);
@@ -461,7 +540,7 @@ const MonthlyPlanner = () => {
         try {
           const token = sessionStorage.getItem('coordinatorToken');
           const res = await fetch('http://localhost:5000/api/monthly/planner/get/all/monthly/planners', {
-            method:'GET',
+            method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
           });
           const data = await res.json();
@@ -490,7 +569,10 @@ const MonthlyPlanner = () => {
             <MonthTitle>{format(currentDate, 'MMMM yyyy')}</MonthTitle>
             <NavButton onClick={nextMonth}>Next <span>›</span></NavButton>
           </MonthSelector>
-          <NavButton onClick={() => openModal(new Date())}>+ Create Plan</NavButton>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <NavButton onClick={() => setShowDownloadModal(true)}>Download Report</NavButton>
+            <NavButton onClick={() => openModal(new Date())}>+ Create Plan</NavButton>
+          </div>
         </Header>
 
         <DaysGrid>
@@ -504,15 +586,15 @@ const MonthlyPlanner = () => {
             return (
               <DayCell
                 key={i}
-                isCurrentMonth={isCurrentMonth}
-                isToday={isToday}
+                $isCurrentMonth={isCurrentMonth}
+                $isToday={isToday}
                 onClick={() => setSelectedDay(format(day, 'yyyy-MM-dd'))}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.2, delay: i * 0.01 }}
                 style={{ position: 'relative' }}
               >
-                <DayNumber isCurrentMonth={isCurrentMonth} isToday={isToday}>
+                <DayNumber $isCurrentMonth={isCurrentMonth} $isToday={isToday}>
                   {format(day, 'd')}
                 </DayNumber>
                 <AnimatePresence>
@@ -783,14 +865,14 @@ const MonthlyPlanner = () => {
                   </div>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8, gap: 8 }}>
-                  <Button 
+                  <Button
                     onClick={() => openModal(null, plan)}
                     className="primary"
                     style={{ fontSize: '0.85em', padding: '4px 12px' }}
                   >
                     Update
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() => handleDelete(plan._id)}
                     className="danger"
                     style={{ fontSize: '0.85em', padding: '4px 12px' }}
@@ -803,6 +885,78 @@ const MonthlyPlanner = () => {
           </div>
         )}
       </PlannerContainer>
+
+      {/* Download Modal */}
+      <AnimatePresence>
+        {showDownloadModal && (
+          <ModalOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowDownloadModal(false)}
+          >
+            <ModalContent
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <h2>Download Monthly Plan Report</h2>
+              <FormGroup>
+                <Label>Filter Type</Label>
+                <Select
+                  value={filterOptions.type}
+                  onChange={e => setFilterOptions(prev => ({ ...prev, type: e.target.value }))}
+                >
+                  <option value="month">By Month</option>
+                  <option value="week">By Week</option>
+                  <option value="date">By Date</option>
+                </Select>
+              </FormGroup>
+
+              {filterOptions.type === 'month' && (
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <FormGroup style={{ flex: 1 }}>
+                    <Label>Month</Label>
+                    <Select
+                      value={filterOptions.month}
+                      onChange={e => setFilterOptions(prev => ({ ...prev, month: e.target.value }))}
+                    >
+                      {Array.from({ length: 12 }, (_, i) => (
+                        <option key={i} value={i}>{format(new Date(0, i), 'MMMM')}</option>
+                      ))}
+                    </Select>
+                  </FormGroup>
+                  <FormGroup style={{ flex: 1 }}>
+                    <Label>Year</Label>
+                    <Input type="number" value={filterOptions.year} onChange={e => setFilterOptions(prev => ({ ...prev, year: e.target.value }))} />
+                  </FormGroup>
+                </div>
+              )}
+
+              {filterOptions.type === 'week' && (
+                <FormGroup>
+                  <Label>Select any date in the week</Label>
+                  <Input type="date" value={filterOptions.selectedDate} onChange={e => setFilterOptions(prev => ({ ...prev, selectedDate: e.target.value }))} />
+                </FormGroup>
+              )}
+
+              {filterOptions.type === 'date' && (
+                <FormGroup>
+                  <Label>Select Date</Label>
+                  <Input type="date" value={filterOptions.selectedDate} onChange={e => setFilterOptions(prev => ({ ...prev, selectedDate: e.target.value }))} />
+                </FormGroup>
+              )}
+
+              <ButtonGroup>
+                <Button type="button" className="secondary" onClick={() => setShowDownloadModal(false)}>Cancel</Button>
+                <Button type="button" className="primary" onClick={handleDownload}>Download</Button>
+              </ButtonGroup>
+            </ModalContent>
+          </ModalOverlay>
+        )}
+      </AnimatePresence>
+  
     </>
   );
 };

@@ -3,6 +3,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSam
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
+import { utils, writeFileXLSX } from 'xlsx';
 import CoordinatorNavbar from '../component/coordinator/CoordinatorNavbar';
 import { useNavigate } from 'react-router-dom';
 
@@ -197,6 +198,20 @@ const Button = styled.button`
   }
 `;
 
+const Select = styled.select`
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+  &:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+`;
+
 const StyledButton = styled.button`
   padding: 0.75rem 1.5rem;
   border: none;
@@ -247,6 +262,14 @@ const ActivityPlanner = () => {
   const [loading, setLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [filterOptions, setFilterOptions] = useState({
+    type: 'month',
+    month: currentDate.getMonth(), // 0-11
+    year: currentDate.getFullYear(),
+    startDate: format(new Date(), 'yyyy-MM-dd'),
+    endDate: format(new Date(), 'yyyy-MM-dd')
+  });
 
   const navigate = useNavigate();
 
@@ -397,9 +420,11 @@ const ActivityPlanner = () => {
       // Prepare the payload
       const payload = { ...formData };
 
-      const url =`http://localhost:5000/api/activity/planner/update/activity/${formData._id}`
+      const url = isUpdateMode
+        ? `http://localhost:5000/api/activity/planner/update/activity/${formData._id}`
+        : 'http://localhost:5000/api/activity/planner/create/new/activity';
       
-      const method = 'PUT';
+      const method = isUpdateMode ? 'PUT' : 'POST';
 
       const res = await fetch(url, {
         method: method,
@@ -412,10 +437,10 @@ const ActivityPlanner = () => {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to 'update' activity`);
+        throw new Error(errorData.message || `Failed to ${isUpdateMode ? 'update' : 'create'} activity`);
       }
 
-      toast.success(`Activity Updated Successfully`);
+      toast.success(`Activity ${isUpdateMode ? 'Updated' : 'Created'} Successfully`);
       setShowModal(false);
       fetchActivities();
     } catch (err) {
@@ -465,6 +490,57 @@ const ActivityPlanner = () => {
     setShowModal(true);
   };
 
+  const handleDownload = () => {
+    let filteredActivities = [];
+    if (filterOptions.type === 'month') {
+      const selectedMonth = parseInt(filterOptions.month, 10);
+      const selectedYear = parseInt(filterOptions.year, 10);
+      filteredActivities = activities.filter(act => {
+        const actDate = parseISO(act.startDate);
+        return actDate.getMonth() === selectedMonth && actDate.getFullYear() === selectedYear;
+      });
+    } else { // dateRange
+      const start = new Date(filterOptions.startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(filterOptions.endDate);
+      end.setHours(23, 59, 59, 999);
+      filteredActivities = activities.filter(act => {
+        const actStart = parseISO(act.startDate);
+        return actStart >= start && actStart <= end;
+      });
+    }
+
+    if (filteredActivities.length === 0) {
+      toast.warn('No activities found for the selected filter.');
+      return;
+    }
+
+    const dataForExcel = filteredActivities.map(act => ({
+      'Title': act.title,
+      'Activity Type': act.activityType,
+      'Start Date': format(parseISO(act.startDate), 'dd-MM-yyyy'),
+      'End Date': format(parseISO(act.endDate), 'dd-MM-yyyy'),
+      'Start Time': act.time?.startTime || 'N/A',
+      'End Time': act.time?.endTime || 'N/A',
+      'Venue': act.venue,
+      'Status': act.status,
+      'Classes Involved': act.classesInvolved?.map(c => `${c.class}${c.section ? '-' + c.section : ''}`).join(', ') || 'N/A',
+      'Description': act.description
+    }));
+
+    const worksheet = utils.json_to_sheet(dataForExcel);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Activities');
+
+    const cols = Object.keys(dataForExcel[0]).map(key => ({
+      wch: Math.max(key.length, ...dataForExcel.map(row => (row[key] || '').toString().length)) + 2
+    }));
+    worksheet['!cols'] = cols;
+
+    writeFileXLSX(workbook, `Activity_Report_${filterOptions.type === 'month' ? `${filterOptions.month + 1}-${filterOptions.year}` : `${filterOptions.startDate}_to_${filterOptions.endDate}`}.xlsx`);
+    setShowDownloadModal(false);
+  };
+
   return (
     <>
       <CoordinatorNavbar />
@@ -476,7 +552,10 @@ const ActivityPlanner = () => {
             <MonthTitle>{format(currentDate, 'MMMM yyyy')}</MonthTitle>
             <NavButton onClick={nextMonth}>Next <span>›</span></NavButton>
           </MonthSelector>
-          <NavButton onClick={() => openModal(new Date())}>+ Create Activity</NavButton>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <NavButton onClick={() => setShowDownloadModal(true)}>Download Report</NavButton>
+            <NavButton onClick={() => openModal(new Date())}>+ Create Activity</NavButton>
+          </div>
         </Header>
 
         <DaysGrid>
@@ -490,8 +569,8 @@ const ActivityPlanner = () => {
             return (
               <DayCell
                 key={i}
-                $isCurrentMonth={isCurrentMonth}
-                $isToday={isToday}
+                $isCurrentMonth={isCurrentMonth} // transient prop
+                $isToday={isToday} // transient prop
                 onClick={() => setSelectedDay(format(day, 'yyyy-MM-dd'))}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -791,6 +870,73 @@ const ActivityPlanner = () => {
             ))}
           </div>
         )}
+
+        {/* Download Modal */}
+        <AnimatePresence>
+          {showDownloadModal && (
+            <ModalOverlay
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowDownloadModal(false)}
+            >
+              <ModalContent
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+              >
+                <h2>Download Activity Report</h2>
+                <FormGroup>
+                  <Label>Filter Type</Label>
+                  <Select
+                    value={filterOptions.type}
+                    onChange={e => setFilterOptions(prev => ({ ...prev, type: e.target.value }))}
+                  >
+                    <option value="month">By Month</option>
+                    <option value="dateRange">By Date Range</option>
+                  </Select>
+                </FormGroup>
+
+                {filterOptions.type === 'month' ? (
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <FormGroup style={{ flex: 1 }}>
+                      <Label>Month</Label>
+                      <Select
+                        value={filterOptions.month}
+                        onChange={e => setFilterOptions(prev => ({ ...prev, month: e.target.value }))}
+                      >
+                        {Array.from({ length: 12 }, (_, i) => (
+                          <option key={i} value={i}>{format(new Date(0, i), 'MMMM')}</option>
+                        ))}
+                      </Select>
+                    </FormGroup>
+                    <FormGroup style={{ flex: 1 }}>
+                      <Label>Year</Label>
+                      <Input type="number" value={filterOptions.year} onChange={e => setFilterOptions(prev => ({ ...prev, year: e.target.value }))} />
+                    </FormGroup>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <FormGroup style={{ flex: 1 }}>
+                      <Label>Start Date</Label>
+                      <Input type="date" value={filterOptions.startDate} onChange={e => setFilterOptions(prev => ({ ...prev, startDate: e.target.value }))} />
+                    </FormGroup>
+                    <FormGroup style={{ flex: 1 }}>
+                      <Label>End Date</Label>
+                      <Input type="date" value={filterOptions.endDate} onChange={e => setFilterOptions(prev => ({ ...prev, endDate: e.target.value }))} />
+                    </FormGroup>
+                  </div>
+                )}
+
+                <ButtonGroup>
+                  <Button type="button" className="secondary" onClick={() => setShowDownloadModal(false)}>Cancel</Button>
+                  <Button type="button" className="primary" onClick={handleDownload}>Download</Button>
+                </ButtonGroup>
+              </ModalContent>
+            </ModalOverlay>
+          )}
+        </AnimatePresence>
       </PlannerContainer>
     </>
   );
