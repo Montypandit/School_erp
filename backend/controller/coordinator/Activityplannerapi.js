@@ -27,6 +27,18 @@ router.get('/get/all/activities', authMiddleware, authorizeRoles('admin', 'coord
   }
 });
 
+
+// Get activities by class and section
+router.get('/get/activities/class/:className/section/:section', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher', 'principal'), async (req, res) => {
+  try {
+    const { className, section } = req.params;
+    const activities = await ActivityPlanner.find({ class: className, section }).sort({ startDate: 1 });
+    res.status(200).json({ data: activities });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: 'Failed to fetch activities for class and section', error: error.message });
+  }
+});
 //  GET: Activity by ID
 router.get('/get/activity/by/:id', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher', 'principal'), async (req, res) => {
   try {

@@ -36,6 +36,17 @@ router.get('/get/all/monthly/planners', authMiddleware, authorizeRoles('admin', 
   }
 });
 
+// Get All Monthly Plans by Class
+router.get('/get/monthly/plans/class/:className', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try {
+    const { className } = req.params;
+    const plans = await MonthlyPlanner.find({ class: className }).sort({ startDate: 1 });
+    res.status(200).json({ message: 'Monthly plans for class fetched', data: plans });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch monthly plans for class', error: err.message });
+  }
+});
+
 // Get Monthly Plan by ID
 router.get('/get/monthly-plan/by/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {
