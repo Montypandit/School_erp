@@ -118,7 +118,7 @@ const StudentListPage = () => {
     };
 
     const handleFees = (admissionId) => {
-        navigate(`/coordinator/admission-fees/${admissionId}`);
+        navigate(`/coordinator/monthly-fees/${admissionId}`);
     };
 
     return (

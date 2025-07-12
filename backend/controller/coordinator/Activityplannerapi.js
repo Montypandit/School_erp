@@ -16,6 +16,17 @@ router.post('/create/new/activity', authMiddleware, authorizeRoles('admin', 'coo
   }
 });
 
+//  PUT: Update Activity
+router.put('/update/activity/:id', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try {
+    const activity = await ActivityPlanner.findByIdAndUpdate({_id:req.params.id}, req.body, { new: true });
+    if (!activity) return res.status(404).json({ message: 'Activity not found' });
+    res.status(200).json({ message: 'Activity updated successfully', data: activity });
+  } catch (error) {
+    res.status(400).json({ message: 'Failed to update activity', error: error.message });
+  }
+})
+
 //  GET: All Activities
 router.get('/get/all/activities', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher', 'principal'), async (req, res) => {
   try {

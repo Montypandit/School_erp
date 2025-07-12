@@ -49,6 +49,7 @@ import ViewStudentReport from "./component/principal/viewReport";
 import MonthlyFeePaid from "./coordinator/MonthlyFeePaid";
 import Teacher from "./component/coordinator/Teacher";  
 import Profile from "./component/teacher/ProfilePage";
+import UpdateAdmissionFee from './coordinator/UpdateAdmissionFee';
 import Announcement  from "./admin/Messages";
 
 
@@ -93,7 +94,10 @@ const App = () => {
         <Route path="/coordinator/monthly/planner" element={<MonthlyPlanner />} />
         <Route path="/coordinator/teacher/page" element={<Teacher />} />
         <Route path="/coordinator/admission/fees/:admissionId" element={<AdmissionFees />} />
-        <Route path="/coordinator/admission-fees/:admissionId" element={<MonthlyFeePaid />} />
+        <Route path="/coordinator/monthly-fees/:admissionId" element={<MonthlyFeePaid />} />
+        <Route path="/coordinator/update/admission-fees/:admissionId" element={<UpdateAdmissionFee />} />
+        
+
 
         {/* Teacher Module */}
         <Route path="/teacher/login" element={<TeacherLogin />} />
