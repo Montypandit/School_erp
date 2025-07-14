@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, BookOpen, Search, Save, Edit, ChevronDown, ChevronUp, School, Shirt } from 'lucide-react';
 import CoordinatorNavbar from './CoordinatorNavbar';
+import { toast } from 'react-toastify';
 
 
 
@@ -235,7 +236,7 @@ const StudentAllotmentManager = () => {
 
       // Send the update to the backend
       const response = await fetch(
-        'http://localhost:5000/api/coordinator/students/allocate/students/allocate/section',
+        'http://localhost:5000/api/final/admission/students/allocate/section',
         {
           method: 'POST',
           headers: {
@@ -255,7 +256,7 @@ const StudentAllotmentManager = () => {
         throw new Error('Failed to update student section');
       }
 
-      toast.success(`Section allocated successfully. Roll number assigned: ${nextRollNumber}`);
+      toast.success("Section allocated successfully." );
       setShowAllotmentModal(false);
       setSelectedStudent(null);
       setAllotmentData({
@@ -790,7 +791,7 @@ const StudentAllotmentManager = () => {
                           </div>
                           <div>
                             <div style={{ fontSize: '14px', fontWeight: '500', color: '#111827' }}>{student.name || 'N/A'}</div>
-                            <div style={{ fontSize: '14px', color: '#6b7280' }}>{student.studentId || student.id}</div>
+                            <div style={{ fontSize: '14px', color: '#6b7280' }}>{student.admissionId || student.id}</div>
                           </div>
                         </div>
                       </td>
@@ -862,7 +863,7 @@ const StudentAllotmentManager = () => {
                   Section Allotment - {selectedStudent?.name}
                 </h3>
                 <p style={{ fontSize: '14px', color: '#6b7280', margin: '4px 0 0 0' }}>
-                  Student ID: {selectedStudent.studentId || selectedStudent.id}
+                  Student ID: {selectedStudent.admissionId || selectedStudent.id}
                 </p>
               </div>
               
