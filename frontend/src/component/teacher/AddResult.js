@@ -1,5 +1,4 @@
-// import { useState } from "react";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Trash2,
@@ -12,10 +11,9 @@ import {
 } from "lucide-react";
 import {toast}  from "react-toastify";
 import TeacherNavbar from "./TeacherNavbar";
-import { useNavigate } from "react-router-dom";
 
 export default function ExamResultPage() {
-  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [admissionId, setAdmissionId] = useState("");
   const [student, setStudent] = useState(null);
   const [subjects, setSubjects] = useState([]);
   const [results, setResults] = useState([]);
@@ -23,13 +21,26 @@ export default function ExamResultPage() {
   const [error, setError] = useState("");
   const [completeResult, setCompleteResult] = useState(null);
   const [viewingResult, setViewingResult] = useState(false);
-  const [allStudentsData, setAllStudentsData] = useState([]);
-  const [filteredStudents, setFilteredStudents] = useState([]);
-  const [studentSearchTerm, setStudentSearchTerm] = useState("");
   const [resultIdToUpdate, setResultIdToUpdate] = useState(null);
-  const [teacherClassSection, setTeacherClassSection] = useState([]);
-  const [empId, setEmpId] = useState("");
-  const [hiddenStudents, setHiddenStudents] = useState([]);
+
+  // ----------------------
+  // Predefined foundational skill subjects
+  // ----------------------
+  const predefinedSubjects = [
+    { id: "eng-skill", name: "English Skill", code: "ENGSK" },
+    { id: "num-skill", name: "Number Skill", code: "NUMSK" },
+    { id: "hin-skill", name: "Hindi Skill", code: "HINSK" },
+    { id: "evs-gk-fm-skill", name: "EVS/GK/Fine Motor Skill", code: "EVSGKFM" },
+    { id: "gross-motor-skill", name: "Gross Motor Skill", code: "GMSK" },
+    { id: "self-learning-skill", name: "Self Learning Skill", code: "SLSK" },
+    { id: "social-skill", name: "Social Skill", code: "SOCSK" },
+  ];
+
+  // Initialize subjects with predefined list on component mount
+  useEffect(() => {
+    setSubjects(predefinedSubjects);
+  }, []);
+
 
 
   const [newSubject, setNewSubject] = useState({ name: "", code: "" });
@@ -41,139 +52,46 @@ export default function ExamResultPage() {
     examType: "",
   });
 
-  const navigate = useNavigate();
+  const searchStudent = async () => {
+    if (!admissionId.trim()) return;
+    setLoading(true);
+    setError("");
+    setCompleteResult(null); // Clear previous results
 
-  useEffect(() => {
-    const token = sessionStorage.getItem("teacherToken");
-    if (!token) {
-      toast.info('Please login to continue');
-      navigate('/');
-      return;
-    }
-
-    const fetchAllStudents = async () => {
-      try {
-        const res = await fetch('http://localhost:5000/api/final/admission/get/all/admissions', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        if (!res.ok) {
-          throw new Error('Failed to fetch students')
-        }
-
-        const data = await res.json();
-        setAllStudentsData(data.data);
-
-      } catch (err) {
-        console.error('Error fetching students:', err);
+    try {
+      const token = sessionStorage.getItem("teacherToken");
+      if (!token) {
+        setError("You must be logged in to perform this action.");
+        setLoading(false);
+        return;
       }
-    }
 
-    const fetchEmpId = async () => {
-      try {
-        const email = sessionStorage.getItem('email');
-        if (!email) {
-          console.error("Email not found in session storage.");
-          return;
-        }
-        const res = await fetch(`http://localhost:5000/api/employees/get/employee/email/${email}`, {
-          method: 'GET',
+      const res = await fetch(
+        `http://localhost:5000/api/final/admission/get/student/${admissionId}`,
+        {
+          method: "GET",
           headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        })
-
-        if (!res.ok) {
-          throw new Error('Failed to fetch empId');
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
-
-        const data = await res.json();
-        setEmpId(data.empId);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    fetchAllStudents();
-    fetchEmpId();
-  }, [navigate]);
-
-  useEffect(() => {
-    const token = sessionStorage.getItem("teacherToken");
-    if (!empId || !token) return;
-
-    const fetchTeacherClassSection = async () => {
-      try {
-        const res = await fetch(`http://localhost:5000/api/teaching/schedule/get/teaching/schedule/${empId}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        })
-
-        if (!res.ok) {
-          throw new Error('Failed to fetch teacher class and section');
-        }
-        const data = await res.json();
-        const schedules = data.map((item) => ({
-          class: item.className,
-          section: item.section
-        }));
-        setTeacherClassSection(schedules);
-      } catch (er) {
-        console.log(er);
-      }
-    };
-
-    fetchTeacherClassSection();
-  }, [empId, navigate]);
-
-  useEffect(() => {
-    if (allStudentsData.length > 0 && teacherClassSection.length > 0) {
-      const studentsForTeacher = allStudentsData.filter(student =>
-        teacherClassSection.some(schedule =>
-          student.class === schedule.class && student.section === schedule.section
-        )
       );
 
-      const searchedStudents = studentsForTeacher.filter(student =>
-        student.name.toLowerCase().includes(studentSearchTerm.toLowerCase()) ||
-        student.admissionId.toLowerCase().includes(studentSearchTerm.toLowerCase())
-      );
+      const data = await res.json();
 
-      setFilteredStudents(searchedStudents);
-    } else {
-      setFilteredStudents([]);
-    }
-  }, [allStudentsData, teacherClassSection, studentSearchTerm]);
-
-  const handleSelectStudent = (selectedStudent) => {
-    setStudent(selectedStudent);
-    setSubjects([]);
-    setResults([]);
-    setCompleteResult(null);
-    setViewingResult(false);
-    setResultIdToUpdate(null);
-  };
-
-  const toggleSelectStudent = (studentId) => {
-    if (selectedStudents.includes(studentId)) {
-      setSelectedStudents(selectedStudents.filter(id => id !== studentId));
-    } else {
-      setSelectedStudents([...selectedStudents, studentId]);
-    }
-  };
-
-  const toggleHideStudent = (studentId) => {
-    if (hiddenStudents.includes(studentId)) {
-      setHiddenStudents(hiddenStudents.filter(id => id !== studentId));
-    } else {
-      setHiddenStudents([...hiddenStudents, studentId]);
+      if (res.ok && data?.data) {
+        setStudent(data.data);
+        setSubjects(predefinedSubjects);
+        setResults([]);
+      } else {
+        setError("Student not found.");
+        setStudent(null);
+      }
+    } catch (err) {
+      setError("Something went wrong while fetching student data.");
+      setStudent(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -253,7 +171,7 @@ export default function ExamResultPage() {
   console.log("Complete result data:", data); // Debug log
   setCompleteResult(data);
 
-  // ⬇️ SET resultIdToUpdate from fetched result
+  // ⬇ SET resultIdToUpdate from fetched result
   setResultIdToUpdate(data?._id || null);
 
   // Optional: Pre-fill subjects & results if you want to allow updating
@@ -329,7 +247,7 @@ export default function ExamResultPage() {
       const data = await res.json();
       if (res.ok) {
         toast.success("Result submitted successfully!");
-        setSubjects([]);
+        setSubjects(predefinedSubjects);
         setResults([]);
       } else {
        toast.error(data.message || "Failed to submit result.");
@@ -383,7 +301,7 @@ export default function ExamResultPage() {
 
 //   try {
 //     const res = await fetch(
-//       `http://localhost:5000/api/teacher/results/update/result/${resultIdToUpdate}`,
+//       http://localhost:5000/api/teacher/results/update/result/${resultIdToUpdate},
 //       {
 //         method: "PUT",
 //         headers: {
@@ -397,7 +315,7 @@ export default function ExamResultPage() {
 //     const data = await res.json();
 //     if (res.ok) {
 //       toast.success("Result updated successfully!");
-//       setSubjects([]);
+//       setSubjects(predefinedSubjects);
 //       setResults([]);
 //     } else {
 //       toast.error(data.message || "Failed to update result.");
@@ -416,67 +334,26 @@ export default function ExamResultPage() {
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4">Exam Result Management</h1>
 
-      {/* Student List and Search */}
+      {/* Student Search */}
       <div className="bg-white p-4 rounded shadow mb-6">
         <div className="flex items-center gap-2 mb-2">
           <Search className="w-5 h-5" />
-          <h2 className="text-xl font-semibold">Select a Student</h2>
+          <h2 className="text-xl font-semibold">Search Student</h2>
         </div>
-        <input
-          type="text"
-          placeholder="Search by name or admission ID..."
-          value={studentSearchTerm}
-          onChange={(e) => setStudentSearchTerm(e.target.value)}
-          className="w-full border p-2 rounded mb-4"
-        />
-        <div className="overflow-x-auto max-h-96">
-          <table className="w-full text-left">
-            <thead className="bg-gray-100 sticky top-0">
-              <tr>
-                <th className="p-2">Name</th>
-                <th className="p-2">Admission ID</th>
-                <th className="p-2">Class</th>
-                <th className="p-2">Section</th>
-                <th className="p-2">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredStudents.length > 0 ? (
-                filteredStudents
-                  .filter(s => !hiddenStudents.includes(s._id))
-                  .map((s) => (
-                    <tr key={s._id} className="hover:bg-gray-50">
-                      <td className="p-2">
-                        <input
-                          type="checkbox"
-                          checked={selectedStudents.includes(s._id)}
-                          onChange={() => toggleSelectStudent(s._id)}
-                          className="mr-2"
-                        />
-                        {s.name}
-                      </td>
-                      <td className="p-2">{s.admissionId}</td>
-                      <td className="p-2">{s.class}</td>
-                      <td className="p-2">{s.section}</td>
-                      <td className="p-2">
-                        <button
-                          onClick={() => toggleHideStudent(s._id)}
-                          className="bg-red-600 text-white px-3 py-1 rounded text-sm"
-                        >
-                          {hiddenStudents.includes(s._id) ? "Unhide" : "Hide"}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-              ) : (
-                <tr>
-                  <td colSpan="5" className="text-center p-4 text-gray-500">
-                    {loading ? "Loading students..." : "No students found."}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        <div className="flex gap-4">
+          <input
+            type="text"
+            placeholder="Enter Admission ID"
+            value={admissionId}
+            onChange={(e) => setAdmissionId(e.target.value)}
+            className="flex-1 border p-2 rounded"
+          />
+          <button
+            onClick={searchStudent}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            {loading ? "Loading..." : "Search"}
+          </button>
         </div>
         {error && <p className="text-red-500 mt-2">{error}</p>}
       </div>
@@ -773,6 +650,6 @@ export default function ExamResultPage() {
         </div>
       )}
     </div>
-      </>
-  );
+      </>
+  );
 }
