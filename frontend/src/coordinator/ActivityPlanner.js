@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { utils, writeFileXLSX } from 'xlsx';
 import CoordinatorNavbar from '../component/coordinator/CoordinatorNavbar';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 
 // Styled Components (reuse from monthlyPlanner.js)
 const PlannerContainer = styled.div`
@@ -335,6 +336,43 @@ const ActivityPlanner = () => {
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+  const [selectedClass, setSelectedClass] = useState('');
+  const [selectedSection, setSelectedSection] = useState('');
+
+  
+const downloadExcel = () => {
+  const filteredActivities = monthActivities.filter(act => 
+    act.classesInvolved?.some(cls => 
+      cls.class === selectedClass && cls.section === selectedSection
+    )
+  );
+
+  if (filteredActivities.length === 0) {
+    toast.info("No activities found for selected class & section");
+    return;
+  }
+
+  const data = filteredActivities.map(act => ({
+    Date: `${format(parseISO(act.startDate), 'dd MMM yyyy')} - ${format(parseISO(act.endDate), 'dd MMM yyyy')}`,
+    Time: `${act.time?.startTime} - ${act.time?.endTime}`,
+    Title: act.title,
+    ActivityType: act.activityType,
+    Venue: act.venue,
+    Status: act.status,
+    Description: act.description || '',
+    Classes: act.classesInvolved?.map(c => `${c.class}${c.section ? '-' + c.section : ''}`).join(', ')
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Monthly Activities");
+
+  const fileName = `Activity_${selectedClass}_${selectedSection}_${format(currentDate, 'MMM_yyyy')}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+  toast.success("Excel file downloaded successfully");
+};
+
+
 
   // Get activities for a specific day
   const getActivitiesForDay = (day) => {
@@ -599,6 +637,59 @@ const ActivityPlanner = () => {
             );
           })}
         </DaysGrid>
+        
+<div style={{ marginTop: '1rem', textAlign: 'center' }}>
+          
+          <h2 style={{ marginBottom: '0.5rem', color: 'blue',   }}>Download Monthly Activity Report</h2>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+
+        <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+  <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}>
+    <option value="">Select Class</option>
+    {classOptions.map(c => <option key={c} value={c}>{c}</option>)}
+  </select>
+  <select value={selectedSection} onChange={e => setSelectedSection(e.target.value)}>
+    <option value="">Select Section</option>
+    {sectionOptions.map(s => <option key={s} value={s}>{s}</option>)}
+  </select>
+  <button 
+    onClick={downloadExcel}
+    disabled={!selectedClass || !selectedSection}
+    style={{
+      padding: '0.6rem 1rem',
+      border: 'none',
+      borderRadius: '6px',
+      background: '#2ecc71',
+      color: 'white',
+      cursor: 'pointer'
+    }}
+  >
+    📥 Download Excel
+  </button>
+
+ <button 
+  onClick={() => {
+    const message = `Hello! Please find the activity report for Class ${selectedClass}, Section ${selectedSection}.`;
+    const whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappURL, '_blank');
+  }}
+  disabled={!selectedClass || !selectedSection}
+  style={{
+    padding: '0.6rem 1rem',
+    border: 'none',
+    borderRadius: '6px',
+    background: '#25D366', // WhatsApp green
+    color: 'white',
+    cursor: 'pointer'
+  }}
+>
+  📥 Share via WhatsApp
+</button>
+
+</div>
+        </div>
+        </div>
+
 
         {/* Modal for creating an activity */}
         <AnimatePresence>
