@@ -63,7 +63,7 @@ server.use('/api/teaching/schedule',teachingSchedule);
 server.use('/api/homework/for/students', homeworkRoutes);
 server.use('/api/teacher/attendance', teacherAttendanceRoutes);
 server.use('/api/monthly/fees',monthlyFeePaidApi)
-server.use('/api/ptm/for/students',ptmApi);
+server.use('/api/ptm',ptmApi);
 server.use('/api/teacher/results', examResult);
 server.use('/api/student/status',studentStatusApi);
 server.use('/api/promoted/students',studentPromotionApi);

@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const ptmSchema = new mongoose.Schema({
+  meetingId: {
+    type: String,
+    unique: true,
+    required: true
+  },
   scheduledBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User', 
@@ -18,7 +23,10 @@ const ptmSchema = new mongoose.Schema({
   class: { type: String, required: true },
   section: { type: String, required: true },
   scheduledDate: { type: Date, required: true },
+  title: { type: String },
+  description: { type: String },
+  venue: { type: String },
+  remarks: { type: String }
 }, { timestamps: true });
 
 module.exports = mongoose.model('PTM', ptmSchema);
-

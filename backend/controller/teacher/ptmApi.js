@@ -4,28 +4,41 @@ const PTM = require('../../models/teacher/ptmSchema');
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 
+// ✅ Helper to generate a unique meeting ID
+const generateMeetingId = () => {
+  const timestamp = Date.now().toString(36);
+  const randomPart = Math.random().toString(36).substring(2, 7);
+  return `PTM-${timestamp}-${randomPart}`.toUpperCase();
+};
+
 // ✅ POST: Schedule PTM for multiple students
-router.post('/schedule/ptm/for/students', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
+router.post('/schedule', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
   try {
-    const { students, class: className, section, scheduledDate } = req.body;
+    const { students, class: className, section, scheduledDate, title, description, venue, remarks } = req.body;
 
     const ptm = new PTM({
+      meetingId: generateMeetingId(),
       scheduledBy: req.user._id,
       class: className,
       section,
       students,
-      scheduledDate
+      scheduledDate,
+      title,
+      description,
+      venue,
+      remarks
     });
 
     await ptm.save();
     res.status(201).json({ message: 'PTM scheduled successfully', data: ptm });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Failed to schedule PTM', error: error.message });
   }
 });
 
 // ✅ GET: All PTMs (for admin/coordinator/teacher)
-router.get('/get/ptms', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
+router.get('/get/all/ptm', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
   try {
     const filter = {};
     if (req.query.class) filter.class = req.query.class;
