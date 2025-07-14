@@ -5,12 +5,9 @@ import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import CoordinatorNavbar from '../component/coordinator/CoordinatorNavbar';
 import { useNavigate } from 'react-router-dom';
-<<<<<<< HEAD
-import * as XLSX from 'xlsx';
-=======
-import { utils, writeFileXLSX } from 'xlsx';
+// import { utils, writeFileXLSX } from 'xlsx';
+ import * as XLSX from 'xlsx';
 
->>>>>>> 5f070ff29c6055bce40fdb4ebe46498e5bafbc19
 
 // Styled Components
 const PlannerContainer = styled.div`
@@ -416,6 +413,8 @@ const MonthlyPlanner = () => {
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+  const [selectedClass, setSelectedClass] = useState('');
+
   //const sectionOptions = ['A', 'B', 'C', 'D', 'E', 'F']; // or dynamic from backend
 
   // Get plans for a specific day
@@ -548,9 +547,15 @@ const MonthlyPlanner = () => {
       'Description': plan.description,
     }));
 
-    const worksheet = utils.json_to_sheet(dataForExcel);
-    const workbook = utils.book_new();
-    utils.book_append_sheet(workbook, worksheet, 'Monthly Plans');
+     const worksheet = XLSX.utils.json_to_sheet(dataForExcel);
+     const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Monthly Plans');
+
+
+//     const wb = XLSX.utils.book_new();
+// const ws = XLSX.utils.json_to_sheet(dataForExcel);
+// XLSX.utils.book_append_sheet(wb, ws, 'Monthly Planner');
+// XLSX.writeFile(wb, 'monthly_plan.xlsx');
 
     const cols = Object.keys(dataForExcel[0]).map(key => ({
       wch: Math.max(key.length, ...dataForExcel.map(row => (row[key] || '').toString().length)) + 2
@@ -558,7 +563,7 @@ const MonthlyPlanner = () => {
     worksheet['!cols'] = cols;
 
     const fileName = `Monthly_Plan_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
-    writeFileXLSX(workbook, fileName);
+    XLSX.writeFileXLSX(workbook, fileName);
     setShowDownloadModal(false);
   };
 
