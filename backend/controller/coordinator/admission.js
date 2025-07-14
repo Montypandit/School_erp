@@ -6,6 +6,7 @@ const authorizeRoles = require('../../middleware/authorizeRules');
 const AdmissionApproval = require('../../models/principal/admissionApproval');
 const InquiryForm = require('../../models/parents/inquiryForm');
 const Attendance = require('../../models/teacher/attendanceSchema');
+//const StudentAllocationSchema = require('../../models/coordinator/studentAllocation');
 const router = express.Router();
 const StudentStatus = require('../../models/admin/studentStatus');
 
@@ -185,6 +186,39 @@ router.put('/update/admission/:admissionId', authMiddleware, authorizeRoles('adm
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Failed to update admission', error });
+  }
+});
+
+
+// add section 
+// ======================= ALLOCATE STUDENT SECTION =======================
+router.post('/students/allocate/section', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try {
+    const { admissionId, section, academicYear, rollNumber } = req.body;
+
+    if (!admissionId || !section || !academicYear || !rollNumber) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const updatedStudent = await Admission.findOneAndUpdate(
+      { admissionId },
+      {
+        section,
+        academicYear,
+        rollNumber,
+        rollNo: rollNumber // also update rollNo if needed
+      },
+      { new: true }
+    );
+
+    if (!updatedStudent) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    res.status(200).json({ message: "✅ Student section allocated successfully", data: updatedStudent });
+  } catch (error) {
+    console.error("❌ Error allocating section:", error);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 });
 

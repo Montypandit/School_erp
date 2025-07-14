@@ -3,8 +3,10 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSam
 import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
+import { utils, writeFileXLSX } from 'xlsx';
 import CoordinatorNavbar from '../component/coordinator/CoordinatorNavbar';
 import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
 
 // Styled Components (reuse from monthlyPlanner.js)
 const PlannerContainer = styled.div`
@@ -116,7 +118,7 @@ const ModalOverlay = styled(motion.div)`
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex; justify-content: center; align-items: center;
-  z-index: 1000;
+  z-index: 10000;
 `;
 
 const ModalContent = styled(motion.div)`
@@ -197,6 +199,20 @@ const Button = styled.button`
   }
 `;
 
+const Select = styled.select`
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+  &:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+`;
+
 const StyledButton = styled.button`
   padding: 0.75rem 1.5rem;
   border: none;
@@ -237,8 +253,8 @@ const ActivityPlanner = () => {
     startDate: format(new Date(), 'yyyy-MM-dd'),
     endDate: format(new Date(), 'yyyy-MM-dd'),
     time: {
-      startTime: String,
-      endTime: String
+      startTime: '',
+      endTime: ''
     },
     venue: '',
     classesInvolved: [],
@@ -247,6 +263,14 @@ const ActivityPlanner = () => {
   const [loading, setLoading] = useState(false);
   const [selectedDay, setSelectedDay] = useState(null);
   const [isUpdateMode, setIsUpdateMode] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [filterOptions, setFilterOptions] = useState({
+    type: 'month',
+    month: currentDate.getMonth(), // 0-11
+    year: currentDate.getFullYear(),
+    startDate: format(new Date(), 'yyyy-MM-dd'),
+    endDate: format(new Date(), 'yyyy-MM-dd')
+  });
 
   const navigate = useNavigate();
 
@@ -312,6 +336,43 @@ const ActivityPlanner = () => {
 
   const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
   const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+  const [selectedClass, setSelectedClass] = useState('');
+  const [selectedSection, setSelectedSection] = useState('');
+
+  
+const downloadExcel = () => {
+  const filteredActivities = monthActivities.filter(act => 
+    act.classesInvolved?.some(cls => 
+      cls.class === selectedClass && cls.section === selectedSection
+    )
+  );
+
+  if (filteredActivities.length === 0) {
+    toast.info("No activities found for selected class & section");
+    return;
+  }
+
+  const data = filteredActivities.map(act => ({
+    Date: `${format(parseISO(act.startDate), 'dd MMM yyyy')} - ${format(parseISO(act.endDate), 'dd MMM yyyy')}`,
+    Time: `${act.time?.startTime} - ${act.time?.endTime}`,
+    Title: act.title,
+    ActivityType: act.activityType,
+    Venue: act.venue,
+    Status: act.status,
+    Description: act.description || '',
+    Classes: act.classesInvolved?.map(c => `${c.class}${c.section ? '-' + c.section : ''}`).join(', ')
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Monthly Activities");
+
+  const fileName = `Activity_${selectedClass}_${selectedSection}_${format(currentDate, 'MMM_yyyy')}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+  toast.success("Excel file downloaded successfully");
+};
+
+
 
   // Get activities for a specific day
   const getActivitiesForDay = (day) => {
@@ -332,8 +393,8 @@ const ActivityPlanner = () => {
       startDate: format(day, 'yyyy-MM-dd'),
       endDate: format(day, 'yyyy-MM-dd'),
       time: {
-        startTime: String,
-        endTime: String
+        startTime: '',
+        endTime: ''
       },
       venue: '',
       classesInvolved: [],
@@ -395,29 +456,33 @@ const ActivityPlanner = () => {
       }
 
       // Prepare the payload
-      const payload = {
-        ...formData,
-        time: {
-          startTime: formData.time.startTime,
-          endTime: formData.time.endTime
-        }
-        // ...add coordinator/createdBy if needed
-      };
+      const payload = { ...formData };
 
-      const res = await fetch('http://localhost:5000/api/activity/planner/create/new/activity', {
-        method: 'POST',
+      const url = isUpdateMode
+        ? `http://localhost:5000/api/activity/planner/update/activity/${formData._id}`
+        : 'http://localhost:5000/api/activity/planner/create/new/activity';
+      
+      const method = isUpdateMode ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) throw new Error('Failed to create activity');
-      toast.success('Activity Created Successfully');
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to ${isUpdateMode ? 'update' : 'create'} activity`);
+      }
+
+      toast.success(`Activity ${isUpdateMode ? 'Updated' : 'Created'} Successfully`);
       setShowModal(false);
       fetchActivities();
     } catch (err) {
-      toast.error('Failed to create activity');
+      toast.error(err.message || `An error occurred`);
     } finally {
       setLoading(false);
     }
@@ -445,21 +510,73 @@ const ActivityPlanner = () => {
 
   const handleEdit = async (act) => {
     setFormData({
+      _id: act._id,
       title: act.title,
       description: act.description,
       activityType: act.activityType,
       startDate: format(parseISO(act.startDate), 'yyyy-MM-dd'),
       endDate: format(parseISO(act.endDate), 'yyyy-MM-dd'),
       time: {
-        startTime: act.time.startTime,
-        endTime: act.time.endTime
+        startTime: act.time?.startTime || '',
+        endTime: act.time?.endTime || ''
       },
       venue: act.venue,
-      classesInvolved: act.classesInvolved,
+      classesInvolved: act.classesInvolved || [],
       status: act.status
     });
     setIsUpdateMode(true);
     setShowModal(true);
+  };
+
+  const handleDownload = () => {
+    let filteredActivities = [];
+    if (filterOptions.type === 'month') {
+      const selectedMonth = parseInt(filterOptions.month, 10);
+      const selectedYear = parseInt(filterOptions.year, 10);
+      filteredActivities = activities.filter(act => {
+        const actDate = parseISO(act.startDate);
+        return actDate.getMonth() === selectedMonth && actDate.getFullYear() === selectedYear;
+      });
+    } else { // dateRange
+      const start = new Date(filterOptions.startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(filterOptions.endDate);
+      end.setHours(23, 59, 59, 999);
+      filteredActivities = activities.filter(act => {
+        const actStart = parseISO(act.startDate);
+        return actStart >= start && actStart <= end;
+      });
+    }
+
+    if (filteredActivities.length === 0) {
+      toast.warn('No activities found for the selected filter.');
+      return;
+    }
+
+    const dataForExcel = filteredActivities.map(act => ({
+      'Title': act.title,
+      'Activity Type': act.activityType,
+      'Start Date': format(parseISO(act.startDate), 'dd-MM-yyyy'),
+      'End Date': format(parseISO(act.endDate), 'dd-MM-yyyy'),
+      'Start Time': act.time?.startTime || 'N/A',
+      'End Time': act.time?.endTime || 'N/A',
+      'Venue': act.venue,
+      'Status': act.status,
+      'Classes Involved': act.classesInvolved?.map(c => `${c.class}${c.section ? '-' + c.section : ''}`).join(', ') || 'N/A',
+      'Description': act.description
+    }));
+
+    const worksheet = utils.json_to_sheet(dataForExcel);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Activities');
+
+    const cols = Object.keys(dataForExcel[0]).map(key => ({
+      wch: Math.max(key.length, ...dataForExcel.map(row => (row[key] || '').toString().length)) + 2
+    }));
+    worksheet['!cols'] = cols;
+
+    writeFileXLSX(workbook, `Activity_Report_${filterOptions.type === 'month' ? `${filterOptions.month + 1}-${filterOptions.year}` : `${filterOptions.startDate}_to_${filterOptions.endDate}`}.xlsx`);
+    setShowDownloadModal(false);
   };
 
   return (
@@ -473,7 +590,10 @@ const ActivityPlanner = () => {
             <MonthTitle>{format(currentDate, 'MMMM yyyy')}</MonthTitle>
             <NavButton onClick={nextMonth}>Next <span>›</span></NavButton>
           </MonthSelector>
-          <NavButton onClick={() => openModal(new Date())}>+ Create Activity</NavButton>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <NavButton onClick={() => setShowDownloadModal(true)}>Download Report</NavButton>
+            <NavButton onClick={() => openModal(new Date())}>+ Create Activity</NavButton>
+          </div>
         </Header>
 
         <DaysGrid>
@@ -487,8 +607,8 @@ const ActivityPlanner = () => {
             return (
               <DayCell
                 key={i}
-                $isCurrentMonth={isCurrentMonth}
-                $isToday={isToday}
+                $isCurrentMonth={isCurrentMonth} // transient prop
+                $isToday={isToday} // transient prop
                 onClick={() => setSelectedDay(format(day, 'yyyy-MM-dd'))}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -517,6 +637,59 @@ const ActivityPlanner = () => {
             );
           })}
         </DaysGrid>
+        
+<div style={{ marginTop: '1rem', textAlign: 'center' }}>
+          
+          <h2 style={{ marginBottom: '0.5rem', color: 'blue',   }}>Download Monthly Activity Report</h2>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
+
+        <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+  <select value={selectedClass} onChange={e => setSelectedClass(e.target.value)}>
+    <option value="">Select Class</option>
+    {classOptions.map(c => <option key={c} value={c}>{c}</option>)}
+  </select>
+  <select value={selectedSection} onChange={e => setSelectedSection(e.target.value)}>
+    <option value="">Select Section</option>
+    {sectionOptions.map(s => <option key={s} value={s}>{s}</option>)}
+  </select>
+  <button 
+    onClick={downloadExcel}
+    disabled={!selectedClass || !selectedSection}
+    style={{
+      padding: '0.6rem 1rem',
+      border: 'none',
+      borderRadius: '6px',
+      background: '#2ecc71',
+      color: 'white',
+      cursor: 'pointer'
+    }}
+  >
+    📥 Download Excel
+  </button>
+
+ <button 
+  onClick={() => {
+    const message = `Hello! Please find the activity report for Class ${selectedClass}, Section ${selectedSection}.`;
+    const whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappURL, '_blank');
+  }}
+  disabled={!selectedClass || !selectedSection}
+  style={{
+    padding: '0.6rem 1rem',
+    border: 'none',
+    borderRadius: '6px',
+    background: '#25D366', // WhatsApp green
+    color: 'white',
+    cursor: 'pointer'
+  }}
+>
+  📥 Share via WhatsApp
+</button>
+
+</div>
+        </div>
+        </div>
+
 
         {/* Modal for creating an activity */}
         <AnimatePresence>
@@ -533,7 +706,7 @@ const ActivityPlanner = () => {
                 exit={{ scale: 0.9, opacity: 0 }}
                 onClick={e => e.stopPropagation()}
               >
-                <h2>Create Activity</h2>
+                <h2>{isUpdateMode ? 'Update Activity' : 'Create Activity'}</h2>
                 <form onSubmit={handleSubmit}>
                   <FormGroup>
                     <Label>Title</Label>
@@ -788,6 +961,73 @@ const ActivityPlanner = () => {
             ))}
           </div>
         )}
+
+        {/* Download Modal */}
+        <AnimatePresence>
+          {showDownloadModal && (
+            <ModalOverlay
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowDownloadModal(false)}
+            >
+              <ModalContent
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+              >
+                <h2>Download Activity Report</h2>
+                <FormGroup>
+                  <Label>Filter Type</Label>
+                  <Select
+                    value={filterOptions.type}
+                    onChange={e => setFilterOptions(prev => ({ ...prev, type: e.target.value }))}
+                  >
+                    <option value="month">By Month</option>
+                    <option value="dateRange">By Date Range</option>
+                  </Select>
+                </FormGroup>
+
+                {filterOptions.type === 'month' ? (
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <FormGroup style={{ flex: 1 }}>
+                      <Label>Month</Label>
+                      <Select
+                        value={filterOptions.month}
+                        onChange={e => setFilterOptions(prev => ({ ...prev, month: e.target.value }))}
+                      >
+                        {Array.from({ length: 12 }, (_, i) => (
+                          <option key={i} value={i}>{format(new Date(0, i), 'MMMM')}</option>
+                        ))}
+                      </Select>
+                    </FormGroup>
+                    <FormGroup style={{ flex: 1 }}>
+                      <Label>Year</Label>
+                      <Input type="number" value={filterOptions.year} onChange={e => setFilterOptions(prev => ({ ...prev, year: e.target.value }))} />
+                    </FormGroup>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <FormGroup style={{ flex: 1 }}>
+                      <Label>Start Date</Label>
+                      <Input type="date" value={filterOptions.startDate} onChange={e => setFilterOptions(prev => ({ ...prev, startDate: e.target.value }))} />
+                    </FormGroup>
+                    <FormGroup style={{ flex: 1 }}>
+                      <Label>End Date</Label>
+                      <Input type="date" value={filterOptions.endDate} onChange={e => setFilterOptions(prev => ({ ...prev, endDate: e.target.value }))} />
+                    </FormGroup>
+                  </div>
+                )}
+
+                <ButtonGroup>
+                  <Button type="button" className="secondary" onClick={() => setShowDownloadModal(false)}>Cancel</Button>
+                  <Button type="button" className="primary" onClick={handleDownload}>Download</Button>
+                </ButtonGroup>
+              </ModalContent>
+            </ModalOverlay>
+          )}
+        </AnimatePresence>
       </PlannerContainer>
     </>
   );

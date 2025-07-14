@@ -2,13 +2,11 @@ const mongoose = require("mongoose");
 
 const SubjectResultSchema = new mongoose.Schema({
   subjectName: { type: String, required: true },
-  subjectCode: { type: String },
-  obtainedMarks: { type: Number, required: true },
-  totalMarks: { type: Number, required: true },
+  grade:{type:String, required:true}
 });
 
 const ExamSchema = new mongoose.Schema({
-  examType: { type: String, enum: ["Monthly Test", "Mid Term", "Final Exam"], required: true },
+  examType: { type: String, enum: ["Term I", "Term II", "Term III"], required: true },
   examDate: { type: Date, required: true },
   subjects: [SubjectResultSchema],
   totalObtained: Number,

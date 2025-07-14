@@ -34,6 +34,19 @@ router.post('/create/admission/fee', authMiddleware, authorizeRoles('admin', 'co
   }
 });
 
+// PUT API to update admission fees
+router.put('/update/student/admission-fees/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try{
+    const admissionId = req.params.admissionId;
+    const feesData = req.body;
+    const updatedFees = await AdmissionFees.findOneAndUpdate({ admissionId }, { $set: feesData }, { new: true });
+    res.status(200).json({ message: 'Admission fees updated successfully', data: updatedFees });
+  }catch(err){
+    console.error('Error updating admission fees:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+})
+
 // ✅ GET API to fetch all admission fee records
 router.get('/get/admission/fees', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {

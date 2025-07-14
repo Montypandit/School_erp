@@ -39,6 +39,7 @@ const ptmApi = require('./controller/teacher/ptmApi');
 const examResult = require('./controller/teacher/examResult');
 const attendanceApi = require('./controller/teacher/attendance');
 const studentStatusApi = require('./controller/admin/studentStatusApi');
+const studentPromotionApi = require('./controller/principal/studentPromotionApi');
 
 // Use APIs (with consistent route prefix)
 server.use('/api/auth', userLoginApi);
@@ -62,9 +63,10 @@ server.use('/api/teaching/schedule',teachingSchedule);
 server.use('/api/homework/for/students', homeworkRoutes);
 server.use('/api/teacher/attendance', teacherAttendanceRoutes);
 server.use('/api/monthly/fees',monthlyFeePaidApi)
-server.use('/api/ptm',ptmApi);
+server.use('/api/ptm/for/students',ptmApi);
 server.use('/api/teacher/results', examResult);
 server.use('/api/student/status',studentStatusApi);
+server.use('/api/promoted/students',studentPromotionApi);
 
 
 

@@ -7,6 +7,8 @@ const admissionFormSchema =new  mongoose.Schema({
     name: { type: String, required: true },
     gender:{type:String, required:true},
     class:{type:String, required:true},
+    section:{type:String},
+    rollNumber:{type:String, unique:true},
     dob:{type:Date},
     childImageUrl:{type:String},
     fatherImageUrl:{type:String},

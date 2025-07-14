@@ -100,13 +100,14 @@ const AdminHome = () => {
       }
     }
 
+    
     const fetchTotalPresntAbsentStudents = async () => {
       try {
         const res = await fetch(`http://localhost:5000/api/final/admission/get/all-attendance/${new Date().toISOString().split('T')[0]}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorizartion': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`
           }
         });
 
@@ -254,6 +255,7 @@ const AdminHome = () => {
         <ActionButton to="/admin/attendence" icon="📅" label="Attendance" />
         <ActionButton to="/admin/weeklyschedule" icon="�" label="Weekly Schedule" />
         <ActionButton to="/admin/leaveapproval" icon="📝" label="Leave Approval" />
+        <ActionButton to="/admin/announcement" icon="📢" label="Send Announcement" />
       </div>
 
       {/* Recent Activity Section */}

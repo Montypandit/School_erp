@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, Edit, Search, User, Mail, Phone, Calendar, MapPin, Briefcase, DollarSign, X, Save } from 'lucide-react';
+import { Eye, Edit, Search, User, Mail, Phone, X, Save, KeyIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 import AdminNavbar from '../../admin/AdminNavbar';
 import { useNavigate } from 'react-router-dom';
@@ -14,43 +14,68 @@ const AdminEmployeeManagement = () => {
     const [updateFormData, setUpdateFormData] = useState({});
     const [isUpdating, setIsUpdating] = useState(false);
 
-
-    useEffect(() => {
-        fetchEmployees();
-    }, []);
-
-
     const navigate = useNavigate();
 
-    const fetchEmployees = async () => {
-        try {
+    useEffect(() => {
+        const fetchEmployees = async () => {
             setLoading(true);
-            const token = sessionStorage.getItem('adminToken');
-            if(!token){
-                toast.info('Please login to continue');
-                navigate('/');
-                return;
-            }
-            const res = await fetch('http://localhost:5000/api/employees/get/all/employees', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+            try {
+                const token = sessionStorage.getItem('adminToken');
+                if (!token) {
+                    toast.info('Please login to continue');
+                    navigate('/');
+                    return;
                 }
-            });
 
-            if (!res.ok) {
-                throw new Error('Failed to fetch employees');
+                // 1. Fetch all employees
+                const employeeRes = await fetch('http://localhost:5000/api/employees/get/all/employees', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!employeeRes.ok) {
+                    throw new Error('Failed to fetch employees');
+                }
+                const employeeData = await employeeRes.json();
+
+                // 2. Fetch account status for each employee and combine data
+                const employeesWithStatus = await Promise.all(
+                    employeeData.map(async (employee) => {
+                        try {
+                            const statusRes = await fetch(`http://localhost:5000/api/auth/get/user/${employee.email}`, {
+                                method: 'GET',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                }
+                            });
+                            if (statusRes.ok) {
+                                const statusData = await statusRes.json();
+                                return { ...employee, accountStatus: statusData.status };
+                            }
+                            return { ...employee, accountStatus: false }; // Default to inactive if status check fails
+                        } catch (err) {
+                            console.error(`Failed to fetch status for ${employee.email}`, err);
+                            return { ...employee, accountStatus: false }; // Default to inactive on error
+                        }
+                    })
+                );
+
+                setEmployees(employeesWithStatus);
+
+            } catch (error) {
+                console.error('Error fetching employees:', error);
+                toast.error(error.message || 'Failed to load employee data.');
+            } finally {
+                setLoading(false);
             }
+        };
 
-            const data = await res.json();
-            setEmployees(data);
-        } catch (error) {
-            console.error('Error fetching employees:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+        fetchEmployees();
+    }, [navigate]);
 
     const handleViewEmployee = (employee) => {
         setSelectedEmployee(employee);
@@ -91,7 +116,6 @@ const AdminEmployeeManagement = () => {
             setIsUpdateModalOpen(false);
             setUpdateFormData({});
 
-            fetchEmployees(); // Refresh the list after update
         } catch (error) {
             console.error('Error updating employee:', error);
         } finally {
@@ -99,11 +123,11 @@ const AdminEmployeeManagement = () => {
         }
     };
 
-    const handleInputChange = (e) => { // Corrected function name
+    const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUpdateFormData(prev => ({
             ...prev,
-            [name]: value // Corrected property access
+            [name]: value
         }));
     };
 
@@ -139,7 +163,7 @@ const AdminEmployeeManagement = () => {
 
     return (
         <div>
-        <AdminNavbar/>
+            <AdminNavbar />
             <div className="min-h-screen bg-gray-50 p-6">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
@@ -183,11 +207,14 @@ const AdminEmployeeManagement = () => {
                                             Join Date
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Account Status
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-white divide-y divide-gray-200 ">
                                     {filteredEmployees.length === 0 ? (
                                         <tr>
                                             <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
@@ -242,8 +269,20 @@ const AdminEmployeeManagement = () => {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                                     {formatDate(employee.doj)}
                                                 </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${employee.accountStatus ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                        {employee.accountStatus ? 'Active' : 'Inactive'}
+                                                    </span>
+                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                     <div className="flex space-x-2">
+                                                        <button
+                                                            className="bg-yellow-100 text-red-700 hover:bg-yellow-200 p-2 rounded-lg transition-colors"
+                                                            title='Employee Status'
+                                                            onClick={() => navigate(`/admin/employee/status/${employee.email}`)}
+                                                        >
+                                                            <KeyIcon className='h-4 w-4' />
+                                                        </button>
                                                         <button
                                                             onClick={() => handleViewEmployee(employee)}
                                                             className="bg-blue-100 text-blue-700 hover:bg-blue-200 p-2 rounded-lg transition-colors"

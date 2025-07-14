@@ -1,21 +1,21 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AdminNavbar from "./AdminNavbar";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 
-const EmployeeLogin = ({ onClose = () => {} }) => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    role: "",
-  });
+const EmployeeLogin = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const roles = ["Teacher", "Student",  "Principal", "Coordinator"];
+  const { email } = useParams();
+  const [formData, setFormData] = useState({
+    email: email,
+    password: "",
+    role: "",
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,15 +26,84 @@ const EmployeeLogin = ({ onClose = () => {} }) => {
     setMessage("");
   };
 
-  const handleRoleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      role: e.target.value,
-    }));
-    setMessage("");
-  };
 
   const navigate = useNavigate();
+
+  const removeUserAccess = async () => {
+    const token = sessionStorage.getItem('adminToken');
+    if (!token) {
+      toast.error('Please login as admin to continue');
+      navigate('/');
+      return;
+    }
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/auth/delete/user/${email}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if(!res.ok){
+      throw new Error('Something went wrong')
+    }
+
+    const data = res.json();
+    toast.success(data.message);
+    navigate('/admin/employees')
+    
+    } catch (err) {
+      console.log(err);
+      toast.error(err.message);
+    }
+
+    
+
+
+  }
+
+  useEffect(() => {
+    const fetchEmployeeRole = async () => {
+      const token = sessionStorage.getItem('adminToken');
+      if (!token) {
+        toast.error('Please login as admin to continue');
+        navigate('/');
+        return;
+      }
+
+      try {
+        const resp = await fetch(`http://localhost:5000/api/employees/get/employee/email/${email}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!resp.ok) {
+          throw new Error('Failed to fetch employee details. Please try again later.');
+        }
+
+        const data = await resp.json();
+
+        if (data.role) {
+          setFormData(prev => ({
+            ...prev,
+            role: data.role
+          }));
+        } else {
+          toast.error('Could not determine employee role.');
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error(err.message);
+      }
+    };
+    fetchEmployeeRole();
+  }, [email, navigate]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
@@ -42,34 +111,41 @@ const EmployeeLogin = ({ onClose = () => {} }) => {
 
     try {
       const token = sessionStorage.getItem('adminToken');
-      if(!token){
+      if (!token) {
         toast.error('Please login as admin to continue');
         navigate('/');
         return;
       }
       const res = await fetch('http://localhost:5000/api/auth/create/user', {
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization':`Bearer ${token}`
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-        body:JSON.stringify(formData)
-      } );
+        body: JSON.stringify(formData)
+      });
 
-      if(!res.ok){
-        throw new Error('Failed to create user, Please try again later');
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Failed to create user. Please try again later.');
       }
       const data = await res.json();
-        setMessage(data.message);
-        setIsSuccess(true);
-        setFormData({
-          email: "",
-          password: "",
-          role: "",
-        });
+      setMessage(data.message);
+      toast.success(data.message || "User created successfully!");
+      setIsSuccess(true);
+      setFormData({
+        email: "",
+        password: "",
+        role: "",
+      });
+
+
+
     } catch (err) {
+      toast.error(err.message);
       setMessage(err.message);
       setIsSuccess(false);
+      console.log(err)
     } finally {
       setLoading(false);
     }
@@ -91,9 +167,9 @@ const EmployeeLogin = ({ onClose = () => {} }) => {
           animation: spin 1s linear infinite;
         }
       `}</style>
-      <AdminNavbar/>
+      <AdminNavbar />
 
-      <div style={{marginTop:'20px', minHeight: "100vh", backgroundColor: "#f9fafb", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+      <div style={{ marginTop: '20px', minHeight: "100vh", backgroundColor: "#f9fafb", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
         <div style={{ maxWidth: "450px", width: "100%", padding: "2rem", backgroundColor: "#fff", borderRadius: "12px", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", border: "1px solid #e5e7eb" }}>
           <h3 style={{ fontSize: "1.5rem", fontWeight: 600, marginBottom: "1.5rem", textAlign: "center", color: "#1f2937" }}>
             Set Employee Login Credentials
@@ -122,7 +198,7 @@ const EmployeeLogin = ({ onClose = () => {} }) => {
                 type="email"
                 name="email"
                 value={formData.email}
-                onChange={handleChange}
+                disabled
                 required
                 placeholder="Enter employee's email"
                 style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "1rem" }}
@@ -144,20 +220,15 @@ const EmployeeLogin = ({ onClose = () => {} }) => {
 
             <div>
               <label style={{ display: "block", marginBottom: "0.5rem", color: "#374151", fontSize: "0.875rem", fontWeight: "500" }}>Role</label>
-              <select
+              <input
+                type="role"
                 name="role"
                 value={formData.role}
-                onChange={handleRoleChange}
+                disabled
                 required
+                placeholder="Enter employee's role"
                 style={{ width: "100%", padding: "0.75rem 1rem", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "1rem" }}
-              >
-                <option value="">-- Select Role --</option>
-                {roles.map((role) => (
-                  <option key={role} value={role.toLowerCase()}>
-                    {role}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
@@ -188,7 +259,7 @@ const EmployeeLogin = ({ onClose = () => {} }) => {
 
               <button
                 type="button"
-                onClick={()=>window.location.reload()}
+                onClick={() => window.location.reload()}
                 style={{
                   flex: 1,
                   padding: "0.75rem 1.5rem",
@@ -202,6 +273,26 @@ const EmployeeLogin = ({ onClose = () => {} }) => {
                 }}
               >
                 Cancel
+              </button>
+              <button
+                type="button"
+
+                style={{
+                  flex: 1,
+                  padding: "0.75rem 1.5rem",
+                  borderRadius: "6px",
+                  fontSize: "0.875rem",
+                  fontWeight: "500",
+                  border: "1px solid rgb(201, 207, 216)",
+                  backgroundColor: "#f51414ff",
+                  color: "#374151",
+                  cursor: "pointer"
+                }}
+
+                onClick={() => removeUserAccess()}
+
+              >
+                Remove Access
               </button>
             </div>
           </form>
