@@ -1,18 +1,24 @@
 const mongoose = require('mongoose');
 
 const ptmSchema = new mongoose.Schema({
-    admissionId: { type: String, required: true },
-    meetingId:{type:String, required:true, unique:true},
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    scheduleDate:{type:Date, required:true},
-    scheduleTime:{type:String, required:true},
-    venue:{type:String},
-    remarks:{type:String},
-    attendBy:{type:String, required:true},
-    attendiesPhoneNo:{type:String},
-    meetingStatus:{type:String, required:true},
-
-},{timestamps:true} );
+  scheduledBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', 
+    required: true,
+  },
+  students: [
+    {
+      admissionId: { type: String, required: true },
+      name: { type: String, required: true },
+      status: { type: String, enum: ['pending', 'completed', 'rejected'], default: 'pending' },
+      feedback: { type: String },
+      rejectionReason: { type: String }
+    }
+  ],
+  class: { type: String, required: true },
+  section: { type: String, required: true },
+  scheduledDate: { type: Date, required: true },
+}, { timestamps: true });
 
 module.exports = mongoose.model('PTM', ptmSchema);
+
