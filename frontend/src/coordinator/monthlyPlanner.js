@@ -318,10 +318,6 @@ const MonthlyPlanner = () => {
   const [loading, setLoading] = useState(false);
   const [hoveredDay, setHoveredDay] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
-<<<<<<< HEAD
-   const [selectedClass, setSelectedClass] = useState('');
-   
-=======
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const [filterOptions, setFilterOptions] = useState({
     type: 'month', // 'month', 'week', 'date'
@@ -330,7 +326,6 @@ const MonthlyPlanner = () => {
     selectedDate: format(currentDate, 'yyyy-MM-dd'),
   });
 
->>>>>>> 5f070ff29c6055bce40fdb4ebe46498e5bafbc19
 
     
 
