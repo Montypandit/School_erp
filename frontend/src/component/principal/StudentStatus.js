@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Users, CheckCircle, XCircle, Edit, Search, Filter, Eye, Phone, Mail, Calendar, MapPin, User, UserCheck, AlertCircle } from 'lucide-react';
 import PrincipalNavbar from './PrincipalNavbar';
+import { useNavigate } from 'react-router-dom';
 
 const StudentManagement = () => {
     const [students, setStudents] = useState([]);
@@ -21,13 +22,17 @@ const StudentManagement = () => {
         remarks: ''
     });
 
+    const navigate = useNavigate();
+
     const fetchStudentStatuses = async () => {
         setLoading(true);
         setError(null);
         try {
             const token = sessionStorage.getItem('principalToken');
             if (!token) {
-                throw new Error('No authentication token found. Please log in.');
+                toast.info('Please login to continue')
+                navigate('/');
+                return;
             }
 
             const response = await fetch('http://localhost:5000/api/student/status/get/all/student/status', {
@@ -57,7 +62,9 @@ const StudentManagement = () => {
         try {
             const token = sessionStorage.getItem('principalToken');
             if (!token) {
-                throw new Error('No authentication token found. Please log in.');
+                toast.info('Please login to continue')
+                navigate('/');
+                return;
             }
 
             const response = await fetch(`http://localhost:5000/api/final/admission/get/student/${admissionId}`, {
@@ -142,7 +149,9 @@ const StudentManagement = () => {
         try {
             const token = sessionStorage.getItem('principalToken');
             if (!token) {
-                throw new Error('No authentication token found. Please log in.');
+                toast.info('Please login to continue')
+                navigate('/');
+                return;
             }
 
             const response = await fetch(`http://localhost:5000/api/student/status/student/update/status/${selectedStudent.admissionId}`, {
@@ -210,6 +219,10 @@ const StudentManagement = () => {
                 </div>
             </div>
         );
+    }
+
+    const openPromotionModal = (student) =>{
+        navigate(`/student/promotion/page/${student.admissionId}`)
     }
 
     return (
@@ -366,6 +379,12 @@ const StudentManagement = () => {
                                                         >
                                                             <Edit className="w-4 h-4 mr-1" />
                                                             Update
+                                                        </button>
+                                                        <button 
+                                                        onClick={() => openPromotionModal(student)}
+                                                        className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 transition-colors flex items-center"
+                                                        >
+                                                            Promotion
                                                         </button>
                                                     </div>
                                                 </td>

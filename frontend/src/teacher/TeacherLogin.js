@@ -84,7 +84,7 @@ const TeacherLogin = () => {
     
     try {
 
-      const res = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${formData.email}`, { 
+      const res = await fetch(`http://localhost:5000/api/auth/get/user/role/${formData.email}`, { 
               method: 'GET',
               headers: {
                 'Content-Type': 'application/json'

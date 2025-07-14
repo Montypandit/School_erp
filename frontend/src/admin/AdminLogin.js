@@ -77,7 +77,7 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${formData.email}`, {
+      const res = await fetch(`http://localhost:5000/api/auth/get/user/role/${formData.email}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -85,6 +85,9 @@ const AdminLogin = () => {
       });
 
       const data = await res.json();
+      if(!res.ok){
+        throw new Error('Failed to fetch user role')
+      }
       if (data.role !== 'admin') {
         toast.info(`Please login with ${data.role} portal`);
         navigate('/');
@@ -118,24 +121,8 @@ const AdminLogin = () => {
       navigate('/admin/home');
 
     } catch (error) {
-      console.error('Login error:', error);
-      let errorMessage = 'Login failed. Please try again.';
-
-      if (error.response && error.response.data) {
-        if (error.response.status === 401) {
-          errorMessage = 'Invalid email or password';
-        } else if (error.response.data.message) {
-          errorMessage = error.response.data.message;
-        } else if (error.response.status) {
-          errorMessage = `Login failed: ${error.response.data.error || `Server error ${error.response.status}`}`;
-        }
-      } else if (error.message && (error.message.includes('Failed to fetch') || error.name === 'TypeError')) {
-        errorMessage = 'Unable to connect to the server. Please check your connection or API configuration.';
-      } else if (error.response && error.response.status) {
-        errorMessage = `Login failed with status: ${error.response.status}`;
-      }
-
-      toast.error(errorMessage);
+      console.log(error)
+      toast.error('Something went wrong');
     } finally {
       setIsLoading(false);
     }
