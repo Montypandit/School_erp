@@ -84,7 +84,7 @@ const CoordinatorLogin = () => {
 
     try {
 
-      const res = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${formData.email}`, { // Pass email as query parameter
+      const res = await fetch(`http://localhost:5000/api/auth/get/user/role/${formData.email}`, { // Pass email as query parameter
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

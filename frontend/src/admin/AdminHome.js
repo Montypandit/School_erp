@@ -100,13 +100,14 @@ const AdminHome = () => {
       }
     }
 
+    
     const fetchTotalPresntAbsentStudents = async () => {
       try {
         const res = await fetch(`http://localhost:5000/api/final/admission/get/all-attendance/${new Date().toISOString().split('T')[0]}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Authorizartion': `Bearer ${token}`
+            'Authorization': `Bearer ${token}`
           }
         });
 

@@ -51,7 +51,7 @@ import Teacher from "./component/coordinator/Teacher";
 import Profile from "./component/teacher/ProfilePage";
 import UpdateAdmissionFee from './coordinator/UpdateAdmissionFee';
 import Announcement  from "./admin/Messages";
-
+import StudentPromotionPage from "./component/principal/StudentPromotionPage";
 
 
 
@@ -67,7 +67,7 @@ const App = () => {
         <Route path='/admin/login' element={<AdminLogin />} />
         <Route path='/admin/home' element={<AdminHome />} />
         <Route path="/admin/employee/form" element={<EmployeeForm />} />
-        <Route path="/admin/employees" element={<EmployeeLogin />} />
+        <Route path="/admin/employee/status/:email" element={<EmployeeLogin />} />
         <Route path="/admin/allteachers" element={<GetAllTeacher />} />
         <Route path="/admin/allstudents" element={<GetAllStudent />} />
         <Route path="/admin/teacher/:empId" element={<GetTeacher />} />
@@ -119,6 +119,8 @@ const App = () => {
         <Route path="/employee/profile/:email" element={<EmployeeProfile />} />
         <Route path="/principal/admission/approvals" element={<AdmissionApproval />} />
         <Route path="/student/status/page" element={<StudentStatus/>}/>
+        <Route path="/student/promotion/page/:admissionId" element={<StudentPromotionPage/>}/>
+
       </Routes>
     </Router>
   );

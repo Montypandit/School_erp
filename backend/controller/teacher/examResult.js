@@ -22,9 +22,7 @@ router.post('/create/result', authMiddleware, authorizeRoles('teacher'), async (
       examDate: exam.examDate,
       subjects: exam.subjects.map((s) => ({
         subjectName: s.subjectName,
-        subjectCode: s.subjectCode || "",
-        obtainedMarks: s.obtainedMarks,
-        totalMarks: s.totalMarks,
+        grade: s.grade,
       })),
     }));
 

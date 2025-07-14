@@ -14,6 +14,7 @@ const AdminNavbar = () => {
     }
   }, []);
 
+
   const handleLogout = () => {
     sessionStorage.removeItem('adminToken');
     sessionStorage.removeItem('email')

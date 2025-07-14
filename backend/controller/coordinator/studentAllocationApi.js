@@ -70,4 +70,16 @@ router.get('/get/student/allocation/by/:admissionId', authMiddleware, authorizeR
   }
 });
 
+// Get number of student class wise and section wise
+router.get('/get/student/class/section/count/:className/:section', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
+  try{
+      const { className, section } = req.params;
+      const count = await StudentAllocation.countDocuments({ class: className, section:section });
+      res.status(200).json({ data: count });
+  }catch(error){
+    console.log(error);
+    res.status(500).json({ message: 'Failed to fetch count', error: error.message });
+  }
+})
+
 module.exports = router;

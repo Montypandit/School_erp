@@ -32,12 +32,47 @@ router.post('/user/login', async (req, res) => {
     }
 });
 
+router.get('/get/user/:email', authMiddleware, authorizeRoles('admin'), async (req,res) =>{
+    const {email} = req.params;
+    try{
+        const user = await USERLOGIN.findOne({email});
+        if(!user){
+            return res.status(404).json({message: 'User not found', status:false});
+        }
+
+        res.status(200).json({user, status:true});
+    }catch(error){
+        console.log(error);
+        res.status(500).json({message: 'Internal Server Error', status:false});
+    }
+})
+
+router.delete('/delete/user/:email',authMiddleware, authorizeRoles('admin'), async(req,res) =>{
+    const {email} = req.params;
+    try{
+        const user = await USERLOGIN.findOneAndDelete({email});
+        if(!user){
+            return res.status(404).json({message: 'User not found'});
+        }
+
+        res.status(200).json({message: 'User deleted successfully'});
+    }catch(error){
+        console.log(error);
+        res.status(500).json({message: 'Internal Server Error'});
+    }
+})
+
 router.post('/create/user', authMiddleware, authorizeRoles('admin'), async (req, res) => {
     const { email, password, role } = req.body;
+
+    if (!email || !password || !role) {
+        return res.status(400).json({ message: 'Email, password, and role are required.' });
+    }
+
     try {
         const existingUser = await USERLOGIN.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
+            return res.status(400).json({ message: 'A user with this email already has login credentials.' });
         }
         const userPassword = await bcrypt.hash(password, 11);
         const newUser = new USERLOGIN({ email, password: userPassword, role });
@@ -49,9 +84,9 @@ router.post('/create/user', authMiddleware, authorizeRoles('admin'), async (req,
     }
 })
 
-router.get('/get/user/role', async (req, res) => {
+router.get('/get/user/role/:email', async (req, res) => {
     try {
-        const { email } = req.query; 
+        const  {email}  = req.params; 
         const user = await USERLOGIN.findOne({ email });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
