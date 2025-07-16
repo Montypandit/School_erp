@@ -39,9 +39,11 @@ const CoordinatorNavbar = () => {
           {/* Logo Section */}
           <div className="flex items-center flex-shrink-0">
             <div className="flex items-center">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-xl shadow-md hover:shadow-lg transition-shadow duration-200">
+              <Link
+              to="/"
+               className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-bold text-xl shadow-md hover:shadow-lg transition-shadow duration-200">
                 ERP
-              </div>
+              </Link>
               <span className="ml-3 text-xl font-semibold text-gray-800 hidden sm:block">
                 Coordinator Portal
               </span>

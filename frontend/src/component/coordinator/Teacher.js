@@ -26,11 +26,11 @@ const TeacherAllocationPage = () => {
   const [teacherSchedule, setTeacherSchedule] = useState([]);
 
   // Days of the week options
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const daysOfWeek = ['All Days','Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   
   // Time slots (you can customize these)
   const timeSlots = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'
+    'All Time','08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'
   ];
 
   const navigate = useNavigate();
@@ -332,14 +332,14 @@ const TeacherAllocationPage = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Subject *
+                    Subject 
                   </label>
                   <input
                     type="text"
                     name="subject"
                     value={allocationForm.subject}
                     onChange={handleFormChange}
-                    required
+                    
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter subject name"
                   />
@@ -378,7 +378,7 @@ const TeacherAllocationPage = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Day *
+                    Day 
                   </label>
                   <select
                     name="day"
@@ -397,13 +397,13 @@ const TeacherAllocationPage = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Start Time *
+                      Start Time 
                     </label>
                     <select
                       name="startTime"
                       value={allocationForm.startTime}
                       onChange={handleFormChange}
-                      required
+                      
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">Select Time</option>
@@ -414,13 +414,13 @@ const TeacherAllocationPage = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      End Time *
+                      End Time 
                     </label>
                     <select
                       name="endTime"
                       value={allocationForm.endTime}
                       onChange={handleFormChange}
-                      required
+                     
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">Select Time</option>
@@ -433,14 +433,14 @@ const TeacherAllocationPage = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Room Number *
+                    Room Number 
                   </label>
                   <input
                     type="text"
                     name="roomNumber"
                     value={allocationForm.roomNumber}
                     onChange={handleFormChange}
-                    required
+                    
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="e.g., R-101"
                   />
