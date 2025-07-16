@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@mui/icons-material": "^7.2.0",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.23.0",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
+    "styled-components": "^6.1.19"
+  }
+}

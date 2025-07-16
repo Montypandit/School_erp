@@ -1,5 +1,4 @@
-// import { useState } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Trash2,
@@ -24,12 +23,30 @@ export default function ExamResultPage() {
   const [viewingResult, setViewingResult] = useState(false);
   const [resultIdToUpdate, setResultIdToUpdate] = useState(null);
 
+  // ----------------------
+  // Predefined foundational skill subjects
+  // ----------------------
+  const predefinedSubjects = [
+    { id: "eng-skill", name: "English Skill", code: "ENGSK" },
+    { id: "num-skill", name: "Number Skill", code: "NUMSK" },
+    { id: "hin-skill", name: "Hindi Skill", code: "HINSK" },
+    { id: "evs-gk-fm-skill", name: "EVS/GK/Fine Motor Skill", code: "EVSGKFM" },
+    { id: "gross-motor-skill", name: "Gross Motor Skill", code: "GMSK" },
+    { id: "self-learning-skill", name: "Self Learning Skill", code: "SLSK" },
+    { id: "social-skill", name: "Social Skill", code: "SOCSK" },
+  ];
 
-  const [newSubject, setNewSubject] = useState({ name: "", code: "" });
+  // Initialize subjects with predefined list on component mount
+  useEffect(() => {
+    setSubjects(predefinedSubjects);
+  }, []);
+
+
+
+  const [newSubject, setNewSubject] = useState({ name: "" });
   const [newResult, setNewResult] = useState({
     subjectId: "",
-    obtainedMarks: "",
-    totalMarks: "",
+    grade: "",
     examDate: "",
     examType: "",
   });
@@ -63,7 +80,7 @@ export default function ExamResultPage() {
 
       if (res.ok && data?.data) {
         setStudent(data.data);
-        setSubjects([]);
+        setSubjects(predefinedSubjects);
         setResults([]);
       } else {
         setError("Student not found.");
@@ -78,10 +95,10 @@ export default function ExamResultPage() {
   };
 
   const addSubject = () => {
-    if (!newSubject.name || !newSubject.code) return;
+    if (!newSubject.name) return;
     const id = Date.now().toString();
-    setSubjects([...subjects, { id, ...newSubject }]);
-    setNewSubject({ name: "", code: "" });
+    setSubjects([...subjects, { id, name: newSubject.name }]);
+    setNewSubject({ name: "" });
   };
 
   const removeSubject = (id) => {
@@ -90,8 +107,8 @@ export default function ExamResultPage() {
   };
 
   const addResult = () => {
-    const { subjectId, obtainedMarks, totalMarks, examDate, examType } = newResult;
-    if (!subjectId || !obtainedMarks || !totalMarks || !examDate || !examType) return;
+    const { subjectId, grade, examDate, examType } = newResult;
+    if (!subjectId || !grade || !examDate || !examType) return;
 
     const subject = subjects.find((s) => s.id === subjectId);
     const id = Date.now().toString();
@@ -101,8 +118,7 @@ export default function ExamResultPage() {
         id,
         subjectId,
         subjectName: subject.name,
-        obtainedMarks: +obtainedMarks,
-        totalMarks: +totalMarks,
+        grade,
         examDate,
         examType,
       },
@@ -110,8 +126,7 @@ export default function ExamResultPage() {
 
     setNewResult({
       subjectId: "",
-      obtainedMarks: "",
-      totalMarks: "",
+      grade: "",
       examDate: "",
       examType: "",
     });
@@ -153,7 +168,7 @@ export default function ExamResultPage() {
   console.log("Complete result data:", data); // Debug log
   setCompleteResult(data);
 
-  // ⬇️ SET resultIdToUpdate from fetched result
+  // ⬇ SET resultIdToUpdate from fetched result
   setResultIdToUpdate(data?._id || null);
 
   // Optional: Pre-fill subjects & results if you want to allow updating
@@ -172,8 +187,7 @@ export default function ExamResultPage() {
         id,
         subjectId: id,
         subjectName: subject.subjectName,
-        obtainedMarks: subject.obtainedMarks,
-        totalMarks: subject.totalMarks,
+        grade: subject.grade,
         examDate: exam.examDate,
         examType: exam.examType,
       });
@@ -229,7 +243,7 @@ export default function ExamResultPage() {
       const data = await res.json();
       if (res.ok) {
         toast.success("Result submitted successfully!");
-        setSubjects([]);
+        setSubjects(predefinedSubjects);
         setResults([]);
       } else {
        toast.error(data.message || "Failed to submit result.");
@@ -254,8 +268,7 @@ export default function ExamResultPage() {
         subjectName: result.subjectName,
         subjectCode:
           subjects.find((s) => s.id === result.subjectId)?.code || "",
-        obtainedMarks: result.obtainedMarks,
-        totalMarks: result.totalMarks,
+        grade: result.grade,
       });
     });
 
@@ -283,7 +296,7 @@ export default function ExamResultPage() {
 
 //   try {
 //     const res = await fetch(
-//       `http://localhost:5000/api/teacher/results/update/result/${resultIdToUpdate}`,
+//       http://localhost:5000/api/teacher/results/update/result/${resultIdToUpdate},
 //       {
 //         method: "PUT",
 //         headers: {
@@ -297,7 +310,7 @@ export default function ExamResultPage() {
 //     const data = await res.json();
 //     if (res.ok) {
 //       toast.success("Result updated successfully!");
-//       setSubjects([]);
+//       setSubjects(predefinedSubjects);
 //       setResults([]);
 //     } else {
 //       toast.error(data.message || "Failed to update result.");
@@ -456,28 +469,14 @@ export default function ExamResultPage() {
               <BookOpen className="w-5 h-5" />
               <h2 className="text-lg font-semibold">Add Subjects</h2>
             </div>
-            <input
-              className="border p-2 mb-2 w-full rounded"
-              placeholder="Subject Name"
-              value={newSubject.name}
-              onChange={(e) =>
-                setNewSubject({ ...newSubject, name: e.target.value })
-              }
-            />
-            <input
-              className="border p-2 mb-2 w-full rounded"
-              placeholder="Subject Code"
-              value={newSubject.code}
-              onChange={(e) =>
-                setNewSubject({ ...newSubject, code: e.target.value })
-              }
-            />
+
             <button
               onClick={addSubject}
               className="bg-green-600 text-white px-4 py-2 rounded w-full"
             >
               <Plus className="inline w-4 h-4 mr-1" /> Add Subject
             </button>
+
             {subjects.length > 0 && (
               <ul className="mt-4 space-y-2">
                 {subjects.map((s) => (
@@ -486,7 +485,7 @@ export default function ExamResultPage() {
                     className="flex justify-between items-center border p-2 rounded"
                   >
                     <span>
-                      {s.name} ({s.code})
+                      {s.name}
                     </span>
                     <button
                       onClick={() => removeSubject(s.id)}
@@ -520,24 +519,20 @@ export default function ExamResultPage() {
                 </option>
               ))}
             </select>
-            <input
-              type="number"
-              placeholder="Obtained Marks"
+            <select
               className="border p-2 mb-2 w-full rounded"
-              value={newResult.obtainedMarks}
+              value={newResult.grade}
               onChange={(e) =>
-                setNewResult({ ...newResult, obtainedMarks: e.target.value })
+                setNewResult({ ...newResult, grade: e.target.value })
               }
-            />
-            <input
-              type="number"
-              placeholder="Total Marks"
-              className="border p-2 mb-2 w-full rounded"
-              value={newResult.totalMarks}
-              onChange={(e) =>
-                setNewResult({ ...newResult, totalMarks: e.target.value })
-              }
-            />
+            >
+              <option value="">Select Grade</option>
+              <option value="A+">A+</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+            </select>
             <select
               className="border p-2 mb-2 w-full rounded"
               value={newResult.examType}
@@ -601,7 +596,7 @@ export default function ExamResultPage() {
               <thead>
                 <tr className="bg-gray-100">
                   <th className="p-2 border border-gray-300 text-left">Subject</th>
-                  <th className="p-2 border border-gray-300 text-center">Marks</th>
+                  <th className="p-2 border border-gray-300 text-center">Grade</th>
                   <th className="p-2 border border-gray-300 text-center">Exam Type</th>
                   <th className="p-2 border border-gray-300 text-center">Date</th>
                   <th className="p-2 border border-gray-300 text-center">Action</th>
@@ -611,9 +606,7 @@ export default function ExamResultPage() {
                 {results.map((result) => (
                   <tr key={result.id}>
                     <td className="p-2 border border-gray-300">{result.subjectName}</td>
-                    <td className="p-2 border border-gray-300 text-center">
-                      {result.obtainedMarks}/{result.totalMarks}
-                    </td>
+                    <td className="p-2 border border-gray-300 text-center">{result.grade}</td>
                     <td className="p-2 border border-gray-300 text-center">{result.examType}</td>
                     <td className="p-2 border border-gray-300 text-center">{result.examDate}</td>
                     <td className="p-2 border border-gray-300 text-center">
@@ -632,8 +625,6 @@ export default function ExamResultPage() {
         </div>
       )}
     </div>
-      </>
-  );
+      </>
+  );
 }
-
-

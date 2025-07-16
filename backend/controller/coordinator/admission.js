@@ -153,6 +153,10 @@ router.put('/update/admission/:admissionId', authMiddleware, authorizeRoles('adm
   }
 });
 
+<<<<<<< HEAD
+=======
+// add section 
+>>>>>>> c932c65eed7be6729288d9fc69ff4f46b619ffb7
 // ======================= ALLOCATE STUDENT SECTION =======================
 router.post('/students/allocate/section', authMiddleware, authorizeRoles('admin', 'coordinator'), async (req, res) => {
   try {

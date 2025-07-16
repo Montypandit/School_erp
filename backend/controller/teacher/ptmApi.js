@@ -4,87 +4,73 @@ const PTM = require('../../models/teacher/ptmSchema');
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 
-// Create a new PTM record
-router.post('/create/ptm/schedule', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
+// ✅ Helper to generate a unique meeting ID
+const generateMeetingId = () => {
+  const timestamp = Date.now().toString(36);
+  const randomPart = Math.random().toString(36).substring(2, 7);
+  return `PTM-${timestamp}-${randomPart}`.toUpperCase();
+};
+
+// ✅ POST: Schedule PTM for multiple students
+router.post('/schedule', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
   try {
-    const ptm = new PTM(req.body);
-    const savedPtm = await ptm.save();
-    res.status(201).json({ message: 'PTM created successfully', data: savedPtm });
+    const { students, class: className, section, scheduledDate, title, description, venue, remarks } = req.body;
+
+    const ptm = new PTM({
+      meetingId: generateMeetingId(),
+      scheduledBy: req.user._id,
+      class: className,
+      section,
+      students,
+      scheduledDate,
+      title,
+      description,
+      venue,
+      remarks
+    });
+
+    await ptm.save();
+    res.status(201).json({ message: 'PTM scheduled successfully', data: ptm });
   } catch (error) {
-    console.log(error);
-    if (error.code === 11000) { // Duplicate key error for meetingId
-        return res.status(400).json({ message: `Meeting ID '${req.body.meetingId}' already exists.` });
-    }
-    res.status(500).json({ message: 'Failed to create PTM', error: error.message });
+    console.error(error);
+    res.status(500).json({ message: 'Failed to schedule PTM', error: error.message });
   }
 });
 
-// Get all PTM records
-router.get('/get/all/ptm/schedules', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
+// ✅ GET: All PTMs (for admin/coordinator/teacher)
+router.get('/get/all/ptm', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
   try {
-    const ptms = await PTM.find().sort({ scheduleDate: -1 });
+    const filter = {};
+    if (req.query.class) filter.class = req.query.class;
+    if (req.query.section) filter.section = req.query.section;
+
+    const ptms = await PTM.find(filter).sort({ scheduledDate: -1 });
     res.status(200).json({ data: ptms });
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch PTMs', error: error.message });
   }
 });
 
-// Get a single PTM by meetingId
-router.get('/get/:meetingId', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
+// ✅ PUT: Update PTM status for a student (complete or reject)
+router.put('/update/ptm/status/:ptmId/:admissionId', authMiddleware, authorizeRoles('teacher'), async (req, res) => {
   try {
-    const ptm = await PTM.findOne({ meetingId: req.params.meetingId });
-    if (!ptm) {
-      return res.status(404).json({ message: 'PTM not found' });
-    }
-    res.status(200).json({ data: ptm });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching PTM', error: error.message });
-  }
-});
+    const { ptmId, admissionId } = req.params;
+    const { status, feedback, rejectionReason } = req.body;
 
-// Get PTMs by admissionId
-router.get('/get/by/:admissionId', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
-    try {
-      const ptms = await PTM.find({ admissionId: req.params.admissionId }).sort({ scheduleDate: -1 });
-      if (ptms.length === 0) {
-        return res.status(404).json({ message: 'No PTMs found for this admission ID' });
-      }
-      res.status(200).json({ data: ptms });
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching PTMs by admission ID', error: error.message });
-    }
-});
+    const ptm = await PTM.findById(ptmId);
+    if (!ptm) return res.status(404).json({ message: 'PTM not found' });
 
-// Update a PTM record
-router.put('/update/:meetingId', authMiddleware, authorizeRoles('admin', 'coordinator', 'teacher'), async (req, res) => {
-  try {
-    const updatedPtm = await PTM.findOneAndUpdate(
-      { meetingId: req.params.meetingId },
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!updatedPtm) {
-      return res.status(404).json({ message: 'PTM not found' });
-    }
-    res.status(200).json({ message: 'PTM updated successfully', data: updatedPtm });
-  } catch (error) {
-    if (error.code === 11000) {
-        return res.status(400).json({ message: `Meeting ID '${req.body.meetingId}' already exists.` });
-    }
-    res.status(500).json({ message: 'Failed to update PTM', error: error.message });
-  }
-});
+    const student = ptm.students.find(s => s.admissionId === admissionId);
+    if (!student) return res.status(404).json({ message: 'Student not found in PTM' });
 
-// Delete a PTM record
-router.delete('/delete/:meetingId', authMiddleware, authorizeRoles('admin'), async (req, res) => {
-  try {
-    const deletedPtm = await PTM.findOneAndDelete({ meetingId: req.params.meetingId });
-    if (!deletedPtm) {
-      return res.status(404).json({ message: 'PTM not found' });
-    }
-    res.status(200).json({ message: 'PTM deleted successfully' });
+    student.status = status;
+    if (status === 'completed') student.feedback = feedback;
+    if (status === 'rejected') student.rejectionReason = rejectionReason;
+
+    await ptm.save();
+    res.status(200).json({ message: 'Student PTM status updated', data: ptm });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to delete PTM', error: error.message });
+    res.status(500).json({ message: 'Failed to update PTM status', error: error.message });
   }
 });
 

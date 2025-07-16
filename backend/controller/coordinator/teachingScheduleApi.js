@@ -43,10 +43,9 @@ router.get('/get/teaching/schedule',authMiddleware, authorizeRoles('admin','coor
     }
 });
 
-
 router.get('/get/teaching/schedule/:empId',authMiddleware,authorizeRoles('admin','coordinator','teacher'), async (req,res)=>{
     try{
-        const empId = req.params.empId;
+        const { empId } = req.params;
         const schedule = await TeachingSchedule.find({empId:empId});
         if(!schedule){
             return res.status(404).json({message:"No teaching schedule found"});
