@@ -208,15 +208,11 @@ export default function AdmissionForm() {
     if (!formData.fatherName.trim()) newErrors.fatherName = "Father name is required"
     if (!formData.motherName.trim()) newErrors.motherName = "Mother name is required"
     if (!formData.fatherMobile.trim()) newErrors.fatherMobile = "Father mobile is required"
-    if (!formData.email.trim()) newErrors.email = "Email is required"
     if (!formData.residentialAddress.trim()) newErrors.residentialAddress = "Address is required"
     if (!formData.emergencyContactPhoneNo.trim()) newErrors.emergencyContactPhoneNo = "Contact mobile is required"
 
 
-    // Email validation
-    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address"
-    }
+    
 
     // Mobile number validation
     const mobileRegex = /^[0-9]{10}$/
@@ -580,7 +576,7 @@ export default function AdmissionForm() {
 
             <div className="email-section">
               <label>
-                Email : <span className="required">*</span>
+                Email :
               </label>
               <input
                 type="email"
