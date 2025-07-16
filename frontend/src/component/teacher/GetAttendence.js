@@ -49,7 +49,7 @@ const AttendancePage = () => {
           // Fetch saved attendance for selected class and date
           if (selectedClass && selectedDate) {
             const res2 = await fetch(
-              `http://localhost:5000/api/final/admission/get/attendance?class=${selectedClass}&date=${selectedDate}`,
+              `http://localhost:5000/api/final/attendance/get/attendance?class=${selectedClass}&date=${selectedDate}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -124,7 +124,7 @@ const AttendancePage = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/final/admission/save/attendence", {
+      const res = await fetch("http://localhost:5000/api/final/attendance/save/attendence", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

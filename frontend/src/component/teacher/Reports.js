@@ -30,7 +30,7 @@ const AttendanceReportPage = () => {
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/api/final/admission/get/all-attendance/${selectedDate}`, {
+        const response = await fetch(`http://localhost:5000/api/final/attendance/get/all-attendance/${selectedDate}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
