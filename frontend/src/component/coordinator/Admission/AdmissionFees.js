@@ -31,7 +31,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
   fontWeight: 600,
 }));
 
-const classes = ['Nursery', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
 
 const generateReceiptId = () => `RCP-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 

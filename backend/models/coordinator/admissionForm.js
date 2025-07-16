@@ -5,6 +5,7 @@ const admissionFormSchema =new  mongoose.Schema({
     admissionId:{type:String, required:true, unique:true},
     inquiryId:{type:String, required:true, unique:true},
     name: { type: String, required: true },
+    class:{type:String, required:true},
     gender:{type:String, required:true},
     class:{type:String},
     section:{type:String},
