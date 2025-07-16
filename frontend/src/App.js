@@ -47,10 +47,10 @@ import Report from "./component/teacher/Reports";
 import EmployeeProfile from "./component/employee/EmployeeProfile";
 import ViewStudentReport from "./component/principal/viewReport";
 import MonthlyFeePaid from "./coordinator/MonthlyFeePaid";
-import Teacher from "./component/coordinator/Teacher";  
+import Teacher from "./component/coordinator/Teacher";
 import Profile from "./component/teacher/ProfilePage";
 import UpdateAdmissionFee from './coordinator/UpdateAdmissionFee';
-import Announcement  from "./admin/Messages";
+import Announcement from "./admin/Messages";
 import StudentPromotionPage from "./component/principal/StudentPromotionPage";
 
 
@@ -62,6 +62,7 @@ const App = () => {
         {/* Common Routes */}
         <Route path='/' element={<Home />} />
         <Route path="/final/admission/form/:inquiryId/:admissionId" element={<AdmissionForm />} />
+        <Route path="/parent/inquiry/form" element={<InquiryForm />} />
 
         {/* Admin Module */}
         <Route path='/admin/login' element={<AdminLogin />} />
@@ -75,9 +76,8 @@ const App = () => {
         <Route path="/admin/leaveapproval" element={<LeaveApproval />} />
         <Route path="/admin/weeklyschedule" element={<WeeklySchedule />} />
         <Route path="/admin/attendence" element={<Attendence />} />
-        <Route path="/admin/employee/page" element={<Employee/>}/>
-        <Route path="/parent/inquiry/form" element={<InquiryForm />} />
-        <Route path="/admin/announcement" element={<Announcement/>} />
+        <Route path="/admin/employee/page" element={<Employee />} />
+        <Route path="/admin/announcement" element={<Announcement />} />
 
         {/* Coordinator Module */}
         <Route path="/coordinator/home" element={<CoordinatorHome />} />
@@ -96,7 +96,7 @@ const App = () => {
         <Route path="/coordinator/admission/fees/:admissionId" element={<AdmissionFees />} />
         <Route path="/coordinator/monthly-fees/:admissionId" element={<MonthlyFeePaid />} />
         <Route path="/coordinator/update/admission-fees/:admissionId" element={<UpdateAdmissionFee />} />
-        
+
 
 
         {/* Teacher Module */}
@@ -118,8 +118,8 @@ const App = () => {
         <Route path="/principal/report" element={<ViewStudentReport />} />
         <Route path="/employee/profile/:email" element={<EmployeeProfile />} />
         <Route path="/principal/admission/approvals" element={<AdmissionApproval />} />
-        <Route path="/student/status/page" element={<StudentStatus/>}/>
-        <Route path="/student/promotion/page/:admissionId" element={<StudentPromotionPage/>}/>
+        <Route path="/student/status/page" element={<StudentStatus />} />
+        <Route path="/student/promotion/page/:admissionId" element={<StudentPromotionPage />} />
 
       </Routes>
     </Router>
