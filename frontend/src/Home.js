@@ -73,34 +73,36 @@ const Home = () => {
 
                 {/* Nav Links */}
                 <div style={{ display: 'flex', gap: '20px',  }}>
-                    <a 
-                        href="#contact"
-                        style={navHovered === 'contact' ? {
+                    <Link 
+    to="/contact"
+    style={navHovered === 'contact' ? {
+        ...navLinkStyle,
+        background: 'linear-gradient(135deg, #667eea, #764ba2)',
+        color: 'white',
+        transform: 'translateY(-2px)',
+        boxShadow: '0 5px 15px rgba(102, 126, 234, 0.4)',
+    } : navLinkStyle}
+    onMouseEnter={() => setNavHovered('contact')}
+    onMouseLeave={() => setNavHovered(null)}
+>
+    Contact
+</Link>
+
+                    
+                      <Link 
+                        to="/about"
+                        style={navHovered === 'about' ? {
                             ...navLinkStyle,
                             background: 'linear-gradient(135deg, #667eea, #764ba2)',
                             color: 'white',
                             transform: 'translateY(-2px)',
                             boxShadow: '0 5px 15px rgba(102, 126, 234, 0.4)',
                         } : navLinkStyle}
-                        onMouseEnter={() => setNavHovered('contact')}
+                        onMouseEnter={() => setNavHovered('about')}
                         onMouseLeave={() => setNavHovered(null)}
                     >
-                        Contact
-                    </a>
-                    <a 
-                        href="#help"
-                        style={navHovered === 'help' ? {
-                            ...navLinkStyle,
-                            background: 'linear-gradient(135deg, #667eea, #764ba2)',
-                            color: 'white',
-                            transform: 'translateY(-2px)',
-                            boxShadow: '0 5px 15px rgba(102, 126, 234, 0.4)',
-                        } : navLinkStyle}
-                        onMouseEnter={() => setNavHovered('help')}
-                        onMouseLeave={() => setNavHovered(null)}
-                    >
-                        Help
-                    </a>
+                        About
+                    </Link>
                 </div>
             </nav>
 

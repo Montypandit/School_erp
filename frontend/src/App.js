@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import Home from './Home';
+import About from './About';
 import AdminLogin from './admin/AdminLogin';
 import AdminHome from './admin/AdminHome';
 import InquiryForm from "./component/coordinator/InquiryForm";
@@ -52,6 +53,7 @@ import Profile from "./component/teacher/ProfilePage";
 import UpdateAdmissionFee from './coordinator/UpdateAdmissionFee';
 import Announcement from "./admin/Messages";
 import StudentPromotionPage from "./component/principal/StudentPromotionPage";
+import Contact from "./Contact";
 
 
 
@@ -63,6 +65,8 @@ const App = () => {
         <Route path='/' element={<Home />} />
         <Route path="/final/admission/form/:inquiryId/:admissionId" element={<AdmissionForm />} />
         <Route path="/parent/inquiry/form" element={<InquiryForm />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<About />} />
 
         {/* Admin Module */}
         <Route path='/admin/login' element={<AdminLogin />} />
