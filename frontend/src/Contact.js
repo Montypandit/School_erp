@@ -138,7 +138,7 @@ const ContactPage = () => {
                 <MapPin className="w-5 h-5 text-gray-500 mt-1" />
                 <div>
                   <p className="font-medium">Headquarters</p>
-                  <p className="text-sm text-gray-600">123 Education Street<br />Springfield, ST 12345</p>
+                  <p className="text-sm text-gray-600">Ghaziabad<br />New Delhi</p>
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-3">

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const ActivityPlanner = require('../../models/coordinator/ActivityPlanner');
+const ActivityPlanner = require('../../models/coordinator/Activityplanner');
 const authMiddleware = require('../../middleware/authMiddleware');
 const authorizeRoles = require('../../middleware/authorizeRules');
 

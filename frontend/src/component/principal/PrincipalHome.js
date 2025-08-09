@@ -42,6 +42,7 @@ const PrincipalHome = () => {
   const [presentCount, setPresentCount] = useState(0);
   const [absentCount, setAbsentCount] = useState(0);
   const [lateCount, setLateCount] = useState(0);
+  const [totalTeachers, setTotalTeachers] = useState(0);
 
   // ✅ Fetch attendance stats
   useEffect(() => {
@@ -115,13 +116,40 @@ const PrincipalHome = () => {
     fetchStats();
   }, []);
 
+
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = sessionStorage.getItem("principalToken");
+        const response = await fetch(
+          "http://localhost:5000/api/final/admission/get/all/admissions",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const result = await response.json();
+        if (response.ok) {
+          setTotalTeachers(result.data.length);
+        }
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   const stats = {
     totalStudents,
     totalTeachers: 20,
     presentStudents: presentCount,
     absentStudents: absentCount,
     lateStudents: lateCount,
-    presentTeachers: 18, // Optional
+    totalTeachers // Optional
   };
 
   return (
@@ -139,17 +167,17 @@ const PrincipalHome = () => {
           <StatCard title="Total Students" value={stats.totalStudents} icon={<Users />} color="text-blue-600" />
           <StatCard title="Present" value={`${stats.presentStudents}/${stats.totalStudents}`} icon={<CheckCircle />} color="text-green-600" />
           <StatCard title="Absent" value={`${stats.absentStudents}/${stats.totalStudents}`} icon={<XCircle />} color="text-red-600" />
-          <StatCard title="Late Students" value={`${stats.lateStudents}/${stats.totalStudents}`} icon={<GraduationCap />} color="text-yellow-600" />
+          <StatCard title="Total Teachers" value={stats.totalTeachers} icon={<GraduationCap />} color="text-yellow-600" />
         </div>
 
         {/* Quick Actions */}
         <div>
           <h2 className="text-xl font-semibold text-gray-700 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <ActionButton href="/teacher/attendence" icon={<Calendar />} label="Attendance" />
-            <ActionButton href="/teacher/results" icon={<BarChart3 />} label="Results" />
-            <ActionButton href="/principal/report" icon={<FileText />} label="Reports" />
-            <ActionButton href="/teacher/homework" icon={<BookOpen />} label="Homework" />
+            <ActionButton href="" icon={<Calendar />} label="Admission Approval" />
+            <ActionButton href="" icon={<BarChart3 />} label="Teachers Report" />
+            <ActionButton href="/principal/report" icon={<FileText />} label="Student Reports" />
+            {/* <ActionButton href="/teacher/homework" icon={<BookOpen />} label="Homework" /> */}
           </div>
         </div>
 

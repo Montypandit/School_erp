@@ -10,6 +10,7 @@ const TeacherProfile = () => {
         const token = sessionStorage.getItem("teacherToken");
         const response = await fetch("http://localhost:5000/api/employees/get/teacher/profile", {
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });

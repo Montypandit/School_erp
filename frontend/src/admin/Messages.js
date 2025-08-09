@@ -38,8 +38,8 @@ ${text || 'No content'}
   };
 
   const shareToWhatsApp = () => {
-    if (!title && !text) return alert('⚠️ Please enter a title or content.');
-    if (selectedGroups.length === 0) return alert('📱 Select at least one group.');
+    if (!title && !text) return toast.error('⚠️ Please enter a title or content.');
+    if (selectedGroups.length === 0) return toast.error('📱 Select at least one group.');
 
     const message = encodeURIComponent(buildMessage());
     const whatsappUrl = `https://wa.me/?text=${message}`;

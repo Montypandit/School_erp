@@ -49,6 +49,7 @@ server.use('/api/admissions', admissionApprovalApi);
 server.use('/api/fees', feesRoutes);
 server.use('/api/employees', addEmployeeRoutes);
 server.use('/api/final/admission', finalAdmission);
+server.use('/api/final/attendance', attendanceApi);
 server.use('/api/student/allocation', studentAllocationApi);
 server.use('/api/teachers', teacherRoutes);
 server.use('/api/students', studentRoutes);

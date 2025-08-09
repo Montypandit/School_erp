@@ -7,30 +7,66 @@ const authMiddleware = require('../middleware/authMiddleware');
 const authorizeRoles = require('../middleware/authorizeRules');
 const bcrypt = require('bcryptjs');
 
+// router.post('/user/login', async (req, res) => {
+//     const { email, password } = req.body;
+
+//     try {
+//         const user = await USERLOGIN.findOne({ email });
+//         if (!user) {
+//             res.status(404).json({ message: "User not found" });
+//         }
+
+
+//         const isMatch = await bcrypt.compare(password, user.password);
+
+//         if (!isMatch) {
+//             console.error(`CRITICAL: Admin user ${user.email} is missing the 'role' field in the database.`);
+//             return res.status(500).send('Login failed: Server configuration error.');
+//         }
+
+//         const token = setUser(user);
+//         return res.send(token);
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({ message: 'Internal Server Error' });
+//     }
+// });
+
+
 router.post('/user/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
         const user = await USERLOGIN.findOne({ email });
         if (!user) {
-            res.status(404).json({ message: "User not found" });
+            return res.status(404).json({ message: "User not found" });
         }
-
 
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
-            console.error(`CRITICAL: Admin user ${user.email} is missing the 'role' field in the database.`);
-            return res.status(500).send('Login failed: Server configuration error.');
+            return res.status(401).json({ message: "Invalid credentials" });
         }
 
         const token = setUser(user);
-        return res.send(token);
+
+        // ✅ Return token and assigned class/section for teachers
+        return res.status(200).json({
+            token,
+            user: {
+                email: user.email,
+                role: user.role,
+                assignedClass: user.assignedClass || null,
+                assignedSection: user.assignedSection || null,
+            }
+        });
+
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 router.get('/get/user/:email', authMiddleware, authorizeRoles('admin'), async (req,res) =>{
     const {email} = req.params;
