@@ -66,7 +66,7 @@ const UpdateAdmissionFee = () => {
         }
 
         // Fetch student details
-        const studentRes = await fetch(`http://localhost:5000/api/final/admission/get/student/${admissionId}`, {
+        const studentRes = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/get/student/${admissionId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!studentRes.ok) throw new Error('Failed to fetch student details.');
@@ -74,7 +74,7 @@ const UpdateAdmissionFee = () => {
         setStudent(studentResult.data);
 
         // Fetch existing fee details
-        const feeRes = await fetch(`http://localhost:5000/api/admission/fees/get/admission/fee/${admissionId}`, {
+        const feeRes = await fetch(`https://school-erp-11-mr7k.onrender.com/api/admission/fees/get/admission/fee/${admissionId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (feeRes.ok) {
@@ -165,7 +165,7 @@ const UpdateAdmissionFee = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:5000/api/admission/fees/update/student/admission-fees/${admissionId}`, {
+      const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/admission/fees/update/student/admission-fees/${admissionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

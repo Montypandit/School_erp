@@ -117,7 +117,7 @@ const GetTeacher = () => {
                 setLoading(false);
                 return;
             }
-            const response = await fetch(`http://localhost:5000/api/teachers/getteacher/${searchTerm}`, {
+            const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/teachers/getteacher/${searchTerm}`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${token}` },
             });

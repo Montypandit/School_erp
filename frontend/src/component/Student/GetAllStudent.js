@@ -16,7 +16,7 @@ const apiService = {
       return;
     }
     try {
-      const response = await fetch(`http://localhost:5000/api/final/admission/get/all/admissions`, {
+      const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ const apiService = {
         window.location.href = '/'
         return;
       }
-      const response = await fetch(`http://localhost:5000/api/final/students/delete/student/${admissionId}`, {
+      const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/students/delete/student/${admissionId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

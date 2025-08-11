@@ -95,7 +95,7 @@ const FeesGeneration = () => {
 
         // First try the current endpoint
         try {
-          response = await fetch(`http://localhost:5000/api/final/admission/get/student/${admissionId}`, {
+          response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/get/student/${admissionId}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ const FeesGeneration = () => {
         // If first endpoint fails, try alternative endpoint
         if (!data) {
           try {
-            response = await fetch(`http://localhost:5000/api/admission/get/${admissionId}`, {
+            response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/admission/get/${admissionId}`, {
               method: 'GET',
               headers: {
                 'Content-Type': 'application/json',
@@ -420,7 +420,7 @@ const FeesGeneration = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/admission/fees/create/admission/fee', {
+      const response = await fetch('https://school-erp-11-mr7k.onrender.com/api/admission/fees/create/admission/fee', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

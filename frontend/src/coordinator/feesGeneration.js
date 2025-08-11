@@ -92,7 +92,7 @@ const FeesGeneration = () => {
         toast.info('Please login to continue');
         navigate('/coordinator/login');
       }
-      const response = await fetch(`http://localhost:5000/api/final/admission/get/student/${admissionId}`,{
+      const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/get/student/${admissionId}`,{
         method:'GET',
         headers:{
           'Content-Type': 'application/json',

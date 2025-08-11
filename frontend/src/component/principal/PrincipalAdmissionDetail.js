@@ -26,7 +26,7 @@ const PrincipalAdmissionDetail = () => {
         }
 
         // 1. Fetch student inquiry details
-        const inquiryRes = await fetch(`http://localhost:5000/api/inquiry/get/inquiry/${inquiryId}`, {
+        const inquiryRes = await fetch(`https://school-erp-11-mr7k.onrender.com/api/inquiry/get/inquiry/${inquiryId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!inquiryRes.ok) throw new Error('Failed to fetch inquiry details.');
@@ -34,7 +34,7 @@ const PrincipalAdmissionDetail = () => {
         setStudent(inquiryData);
 
         // 2. Fetch all admission records and find the one matching inquiryId
-        const admissionsRes = await fetch('http://localhost:5000/api/admissions/get/all/admission/approval/status', {
+        const admissionsRes = await fetch('https://school-erp-11-mr7k.onrender.com/api/admissions/get/all/admission/approval/status', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!admissionsRes.ok) throw new Error('Failed to fetch admission records.');
@@ -70,7 +70,7 @@ const PrincipalAdmissionDetail = () => {
         navigate('/principal/login');
         return;
       }
-      const response = await fetch('http://localhost:5000/api/admissions/update/admission/status', {
+      const response = await fetch('https://school-erp-11-mr7k.onrender.com/api/admissions/update/admission/status', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -13,7 +13,7 @@ import {
 const fetchScheduleData = async () => {
   try {
     const token = sessionStorage.getItem('adminToken');
-    const res = await fetch('http://localhost:5000/api/schedules/get/all/schedules', {
+    const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/schedules/get/all/schedules', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

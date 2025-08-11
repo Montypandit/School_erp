@@ -47,7 +47,7 @@ const FinalAdmissionsList = () => {
         }
 
         // This endpoint fetches all finally admitted students.
-        const res = await fetch('http://localhost:5000/api/final/admission/get/all/admissions', {
+        const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

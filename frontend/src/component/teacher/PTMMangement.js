@@ -41,7 +41,7 @@ const PTMManagement = () => {
     const fetchPTMMeetings = async () => {
       try {
 
-        const res = await fetch('http://localhost:5000/api/ptm/get/all/ptm', {
+        const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/ptm/get/all/ptm', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ const PTMManagement = () => {
           console.error("Email not found in session storage.");
           return;
         }
-        const res = await fetch(`http://localhost:5000/api/employees/get/employee/email/${email}`, {
+        const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/employees/get/employee/email/${email}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ const PTMManagement = () => {
           return;
         }
 
-        const res = await fetch('http://localhost:5000/api/final/admission/get/all/admissions', {
+        const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ const PTMManagement = () => {
     const fetchCurrTeacherClasses = async () => {
       try {
         const token = sessionStorage.getItem('teacherToken');
-        const res = await fetch(`http://localhost:5000/api/teaching/schedule/get/teaching/schedule/${empId}`, {
+        const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/teaching/schedule/get/teaching/schedule/${empId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ const PTMManagement = () => {
 
     try {
       const token = sessionStorage.getItem('teacherToken');
-      const res = await fetch('http://localhost:5000/api/ptm/schedule', {
+      const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/ptm/schedule', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -344,7 +344,7 @@ School Administration
 
     try {
       const token = sessionStorage.getItem('teacherToken');
-      const res = await fetch(`http://localhost:5000/api/ptm/update/ptm/status/${ptmId}/${student.admissionId}`, {
+      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/ptm/update/ptm/status/${ptmId}/${student.admissionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -138,7 +138,7 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
                 return;
             }
 
-            const response = await fetch(`http://localhost:5000/api/teachers/update/teacher/${teacherData.empId}`, {
+            const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/teachers/update/teacher/${teacherData.empId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json', // Set content type to JSON

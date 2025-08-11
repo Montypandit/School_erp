@@ -28,7 +28,7 @@ const StudentPromotionPage = () => {
                 }
 
                 // Fetch student admission info
-                const resStudent = await fetch(`http://localhost:5000/api/final/admission/get/student/${admissionId}`, {
+                const resStudent = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/get/student/${admissionId}`, {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -36,7 +36,7 @@ const StudentPromotionPage = () => {
                 const studentData = await resStudent.json();
 
                 // Fetch section info
-                const resAllocation = await fetch(`http://localhost:5000/api/allocation/get/student/${admissionId}`, {
+                const resAllocation = await fetch(`https://school-erp-11-mr7k.onrender.com/api/allocation/get/student/${admissionId}`, {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -46,7 +46,7 @@ const StudentPromotionPage = () => {
                 }
 
                 // Fetch promotion info
-                const resPromotion = await fetch(`http://localhost:5000/api/promoted/students/get/promoted/student/${admissionId}`, {
+                const resPromotion = await fetch(`https://school-erp-11-mr7k.onrender.com/api/promoted/students/get/promoted/student/${admissionId}`, {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -86,7 +86,7 @@ const StudentPromotionPage = () => {
                 newSection: updateForm.newSection
             };
 
-            const res = await fetch(`http://localhost:5000/api/principal/student-promotion/update/${admissionId}`, {
+            const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/principal/student-promotion/update/${admissionId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

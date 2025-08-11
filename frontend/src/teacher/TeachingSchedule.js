@@ -50,7 +50,7 @@ const TeacherSchedulePage = () => {
             }
 
             try {
-                const res = await fetch(`http://localhost:5000/api/employees/get/employee/email/${sessionStorage.getItem('email')}`, {
+                const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/employees/get/employee/email/${sessionStorage.getItem('email')}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ const TeacherSchedulePage = () => {
                 return;
             }
 
-            const response = await fetch(`http://localhost:5000/api/teaching/schedule/get/teaching/schedule/${empId}`,{
+            const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/teaching/schedule/get/teaching/schedule/${empId}`,{
                 method:'GET',
                 headers:{
                     'Content-Type':'application/json',

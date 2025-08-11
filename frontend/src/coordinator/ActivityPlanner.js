@@ -284,7 +284,7 @@ const ActivityPlanner = () => {
         navigate('/');
         return;
       }
-      const res = await fetch('http://localhost:5000/api/activity/planner/get/all/activities', {
+      const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/activity/planner/get/all/activities', {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -459,8 +459,8 @@ const downloadExcel = () => {
       const payload = { ...formData };
 
       const url = isUpdateMode
-        ? `http://localhost:5000/api/activity/planner/update/activity/${formData._id}`
-        : 'http://localhost:5000/api/activity/planner/create/new/activity';
+        ? `https://school-erp-11-mr7k.onrender.com/api/activity/planner/update/activity/${formData._id}`
+        : 'https://school-erp-11-mr7k.onrender.com/api/activity/planner/create/new/activity';
       
       const method = isUpdateMode ? 'PUT' : 'POST';
 
@@ -493,7 +493,7 @@ const downloadExcel = () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('coordinatorToken');
-      const res = await fetch(`http://localhost:5000/api/activity/planner/delete/activity/${id}`, {
+      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/activity/planner/delete/activity/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

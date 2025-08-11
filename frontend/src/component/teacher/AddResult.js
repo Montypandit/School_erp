@@ -58,7 +58,7 @@ export default function ExamResultPage() {
     }
     try {
       const res = await fetch(
-        `http://localhost:5000/api/employees/get/employee/email/${email}`,
+        `https://school-erp-11-mr7k.onrender.com/api/employees/get/employee/email/${email}`,
         {
           method: "GET",
           headers: {
@@ -88,7 +88,7 @@ export default function ExamResultPage() {
       }
       try {
         const res = await fetch(
-          `http://localhost:5000/api/teaching/schedule/get/teaching/schedule/${empIdParam}`,
+          `https://school-erp-11-mr7k.onrender.com/api/teaching/schedule/get/teaching/schedule/${empIdParam}`,
           {
             method: "GET",
             headers: {
@@ -119,7 +119,7 @@ export default function ExamResultPage() {
     }
     try {
       const res = await fetch(
-        "http://localhost:5000/api/final/admission/get/all/admissions",
+        "https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions",
         {
           method: "GET",
           headers: {

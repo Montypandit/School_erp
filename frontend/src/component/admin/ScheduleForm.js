@@ -70,7 +70,7 @@ export default function ScheduleForm() {
     e.preventDefault();
     const token = sessionStorage.getItem("adminToken");
 
-    const response = await fetch("http://localhost:5000/api/schedules/create/schedule", {
+    const response = await fetch("https://school-erp-11-mr7k.onrender.com/api/schedules/create/schedule", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

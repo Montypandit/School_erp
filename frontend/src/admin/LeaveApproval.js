@@ -21,7 +21,7 @@ export default function LeaveApproval() {
   const fetchLeaves = async () => {
     try {
       const token = sessionStorage.getItem("adminToken");
-      const res = await fetch("http://localhost:5000/api/leaves/get/all/leaves", {
+      const res = await fetch("https://school-erp-11-mr7k.onrender.com/api/leaves/get/all/leaves", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ export default function LeaveApproval() {
     try {
       const token = sessionStorage.getItem("adminToken");
 
-      const res = await fetch(`http://localhost:5000/api/leaves/update/leave/${id}`, {
+      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/leaves/update/leave/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

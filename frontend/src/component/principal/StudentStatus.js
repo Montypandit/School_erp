@@ -35,7 +35,7 @@ const StudentManagement = () => {
                 return;
             }
 
-            const response = await fetch('http://localhost:5000/api/student/status/get/all/student/status', {
+            const response = await fetch('https://school-erp-11-mr7k.onrender.com/api/student/status/get/all/student/status', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ const StudentManagement = () => {
                 return;
             }
 
-            const response = await fetch(`http://localhost:5000/api/final/admission/get/student/${admissionId}`, {
+            const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/get/student/${admissionId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const StudentManagement = () => {
                 return;
             }
 
-            const response = await fetch(`http://localhost:5000/api/student/status/student/update/status/${selectedStudent.admissionId}`, {
+            const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/student/status/student/update/status/${selectedStudent.admissionId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

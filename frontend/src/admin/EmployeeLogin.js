@@ -38,7 +38,7 @@ const EmployeeLogin = () => {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/api/auth/delete/user/${email}`, {
+      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/auth/delete/user/${email}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ const EmployeeLogin = () => {
       }
 
       try {
-        const resp = await fetch(`http://localhost:5000/api/employees/get/employee/email/${email}`, {
+        const resp = await fetch(`https://school-erp-11-mr7k.onrender.com/api/employees/get/employee/email/${email}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ const EmployeeLogin = () => {
         navigate('/');
         return;
       }
-      const res = await fetch('http://localhost:5000/api/auth/create/user', {
+      const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/auth/create/user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

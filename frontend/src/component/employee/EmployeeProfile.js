@@ -39,7 +39,7 @@ const EmployeeProfile = () => {
           return;
         }
 
-        const response = await fetch(`http://localhost:5000/api/employees/get/employee/email/${email}`, {
+        const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/employees/get/employee/email/${email}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ const EmployeeProfile = () => {
           }
         });
 
-        const roleResponse = await fetch(`http://localhost:5000/api/auth/get/user/role?email=${encodeURIComponent(email)}`, {
+        const roleResponse = await fetch(`https://school-erp-11-mr7k.onrender.com/api/auth/get/user/role?email=${encodeURIComponent(email)}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -107,7 +107,7 @@ const EmployeeProfile = () => {
         return;
       }
 
-      const response = await fetch(`http://localhost:5000/api/employee/update/employee/${employee.empId}`, {
+      const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/employee/update/employee/${employee.empId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

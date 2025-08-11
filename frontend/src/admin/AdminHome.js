@@ -77,7 +77,7 @@ const AdminHome = () => {
     // fetching students data
     const fetchTotalStudents = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/final/admission/get/admission/count', {
+        const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/final/admission/get/admission/count', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const AdminHome = () => {
     
     const fetchTotalPresntAbsentStudents = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/final/admission/get/all-attendance/${new Date().toISOString().split('T')[0]}`, {
+        const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all-attendance/${new Date().toISOString().split('T')[0]}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -124,7 +124,7 @@ const AdminHome = () => {
 
     const fetchTotalTeachers = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/employees/get/employee/count/role/teacher',{
+        const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/employees/get/employee/count/role/teacher',{
           method:'GET',
           headers:{
             'Content-Type':'application/json',

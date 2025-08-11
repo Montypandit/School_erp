@@ -364,7 +364,7 @@ const MonthlyPlanner = () => {
       setLoading(true);
       try {
         const token = sessionStorage.getItem('coordinatorToken');
-        const res = await fetch('http://localhost:5000/api/monthly/planner/get/all/monthly/planners', {
+        const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/monthly/planner/get/all/monthly/planners', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -476,7 +476,7 @@ const MonthlyPlanner = () => {
         return;
       }
       if (formData._id) {
-        const res = await fetch(`http://localhost:5000/api/monthly/planner/update/monthly-plan/by/${formData._id}`, {
+        const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/monthly/planner/update/monthly-plan/by/${formData._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -487,7 +487,7 @@ const MonthlyPlanner = () => {
         if (!res.ok) throw new Error('Failed to update plan');
         toast.success('Planner Updated Successfully');
       } else {
-        const res = await fetch('http://localhost:5000/api/monthly/planner/create/monthly/planner', {
+        const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/monthly/planner/create/monthly/planner', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -572,7 +572,7 @@ const MonthlyPlanner = () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('coordinatorToken');
-      const res = await fetch(`http://localhost:5000/api/monthly/planner/delete/monthly/plan/by/${id}`, {
+      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/monthly/planner/delete/monthly/plan/by/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -583,7 +583,7 @@ const MonthlyPlanner = () => {
       const fetchPlans = async () => {
         try {
           const token = sessionStorage.getItem('coordinatorToken');
-          const res = await fetch('http://localhost:5000/api/monthly/planner/get/all/monthly/planners', {
+          const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/monthly/planner/get/all/monthly/planners', {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
           });

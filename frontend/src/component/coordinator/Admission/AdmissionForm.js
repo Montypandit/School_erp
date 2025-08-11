@@ -63,7 +63,7 @@ export default function AdmissionForm() {
           return;
         }
 
-        const res = await fetch(`http://localhost:5000/api/inquiry/get/inquiry/${inquiryId}`, {
+        const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/inquiry/get/inquiry/${inquiryId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -258,7 +258,7 @@ export default function AdmissionForm() {
 
       const token = sessionStorage.getItem('coordinatorToken');
 
-      const res = await fetch('http://localhost:5000/api/final/admission/create/admission', {
+      const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/final/admission/create/admission', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

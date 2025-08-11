@@ -31,7 +31,7 @@ useEffect(() => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/final/admission/get/all-attendance/${selectedDate}`, {
+      const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all-attendance/${selectedDate}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

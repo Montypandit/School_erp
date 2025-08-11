@@ -30,7 +30,7 @@ export default function ExamSchedule() {
                 return;
             }
 
-            const res = await fetch("http://localhost:5000/api/exams/get/all/exams", {
+            const res = await fetch("https://school-erp-11-mr7k.onrender.com/api/exams/get/all/exams", {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

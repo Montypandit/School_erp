@@ -77,7 +77,7 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:5000/api/auth/get/user/role/${formData.email}`, {
+      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/auth/get/user/role/${formData.email}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -94,7 +94,7 @@ const AdminLogin = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/auth/user/login', {
+      const response = await fetch('https://school-erp-11-mr7k.onrender.com/api/auth/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

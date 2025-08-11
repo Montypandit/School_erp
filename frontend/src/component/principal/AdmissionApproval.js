@@ -27,12 +27,12 @@ const AdmissionApproval = () => {
           return;
         }
 
-        const admissionRes = await fetch('http://localhost:5000/api/admissions/get/all/admission/approval/status', {
+        const admissionRes = await fetch('https://school-erp-11-mr7k.onrender.com/api/admissions/get/all/admission/approval/status', {
           method: 'GET',
           headers: { 'Authorization': `Bearer ${token}` },
         });
 
-        const inquiryRes = await fetch('http://localhost:5000/api/inquiry/all/inquiries', {
+        const inquiryRes = await fetch('https://school-erp-11-mr7k.onrender.com/api/inquiry/all/inquiries', {
           method: 'GET',
           headers: { 'Authorization': `Bearer ${token}` },
         });
@@ -98,7 +98,7 @@ const AdmissionApproval = () => {
         return;
       }
 
-      const res = await fetch('http://localhost:5000/api/admissions/update/admission/status', {
+      const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/admissions/update/admission/status', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

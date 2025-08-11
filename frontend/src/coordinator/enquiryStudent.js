@@ -110,7 +110,7 @@ export default function EnquiryStudent() {
           return;
         }
 
-        const res = await fetch(`http://localhost:5000/api/inquiry/get/inquiry/${inquiryId}`,{
+        const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/inquiry/get/inquiry/${inquiryId}`,{
           method:'GET',
           headers:{
             'Content-Type': 'application/json',
@@ -183,7 +183,7 @@ export default function EnquiryStudent() {
         navigate('coordinator/login');
         return;
       }
-      const response = await fetch('http://localhost:5000/api/inquiry-process/create/inquiry-process', {
+      const response = await fetch('https://school-erp-11-mr7k.onrender.com/api/inquiry-process/create/inquiry-process', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

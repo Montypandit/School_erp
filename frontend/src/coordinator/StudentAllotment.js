@@ -10,7 +10,7 @@ const StudentAllotment = () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('coordinatorToken');
-      const res = await fetch('http://localhost:5000/api/coordinator/get/all/students/allocations', {
+      const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/coordinator/get/all/students/allocations', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();

@@ -156,7 +156,7 @@ const InquiryForm = () => {
     if (!validateForm()) return;
 
     try {
-      const res = await fetch('http://localhost:5000/api/inquiry/create/inquiry', {
+      const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/inquiry/create/inquiry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
