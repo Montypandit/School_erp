@@ -42,7 +42,8 @@ const TeacherSchedulePage = () => {
      */
     useEffect(() => {
         const fetchTeacherData = async () => {
-            const token = sessionStorage.getItem('teacherToken');
+            const startData = sessionStorage.getItem('teacherToken');
+            const token = startData ? JSON.parse(startData).token : null;
             if (!token) {
                 toast.error('Authentication token not found. Please log in.');
                 window.location.href = '/';
@@ -103,7 +104,8 @@ const TeacherSchedulePage = () => {
             setLoading(true);
             setError(null);
 
-            const token = sessionStorage.getItem('teacherToken');
+            const startData = sessionStorage.getItem('teacherToken');
+            const token = startData? JSON.parse(startData).token : null;
             if(!token){
                 toast.error('Please login to continue');
                 window.location.href = '/'

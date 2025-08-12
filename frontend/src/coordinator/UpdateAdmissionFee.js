@@ -58,7 +58,8 @@ const UpdateAdmissionFee = () => {
       }
       setLoading(true);
       try {
-        const token = sessionStorage.getItem('coordinatorToken');
+        const startData = sessionStorage.getItem('coordinatorToken');
+        const token = startData ?  JSON.parse(startData).token : null;
         if (!token) {
           toast.error('Authentication required.');
           navigate('/coordinator/login');
@@ -158,7 +159,8 @@ const UpdateAdmissionFee = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      const token = sessionStorage.getItem('coordinatorToken');
+      const startData = sessionStorage.getItem('coordinatorToken');
+      const token = startData ? JSON.parse(startData).token : null;
       if (!token) {
         toast.error('Authentication required.');
         setSubmitting(false);

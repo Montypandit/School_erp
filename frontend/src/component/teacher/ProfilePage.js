@@ -7,7 +7,8 @@ const TeacherProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = sessionStorage.getItem("teacherToken");
+        const startData = sessionStorage.getItem("teacherToken");
+        const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
         const response = await fetch("https://school-erp-11-mr7k.onrender.com/api/employees/get/teacher/profile", {
           headers: {
             "Content-Type": "application/json",

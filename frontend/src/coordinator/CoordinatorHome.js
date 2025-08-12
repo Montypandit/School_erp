@@ -15,7 +15,8 @@ const CoordinatorDashboard = () => {
       try {
         setLoading(true);
 
-        const token = sessionStorage.getItem('coordinatorToken');
+        const startDate = sessionStorage.getItem('coordinatorToken');
+        const token = startDate ? JSON.parse(startDate).token : null;
         if (!token) {
           toast.info('Please login to continue');
           navigate('coordinator/login');

@@ -103,7 +103,8 @@ export default function EnquiryStudent() {
   useEffect(() => {
     const fetchStudentData = async () => {
       try {
-        const token = sessionStorage.getItem('coordinatorToken');
+        const startData = sessionStorage.getItem('coordinatorToken');
+        const token=startData ? JSON.parse(startData).token : null;
         if(!token){
           toast.info('Please login to continue');
           navigate('coordinator/login');
@@ -177,7 +178,8 @@ export default function EnquiryStudent() {
 
       console.log("Saving data:", processData)
 
-      const token = sessionStorage.getItem('coordinatorToken');
+      const startData = sessionStorage.getItem('coordinatorToken');
+      const token = startData ? JSON.parse(startData).token : null;
       if(!token){
         toast.info('Please login to continue');
         navigate('coordinator/login');

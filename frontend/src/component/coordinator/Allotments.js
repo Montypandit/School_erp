@@ -46,7 +46,8 @@ const StudentAllotmentManager = () => {
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const token = sessionStorage.getItem('coordinatorToken');
+      const storedData = sessionStorage.getItem('coordinatorToken');
+      const token = storedData ? JSON.parse(storedData).token : null;
       if (!token) {
         toast.info('Please login to continue');
         navigate('/coordinator/login');

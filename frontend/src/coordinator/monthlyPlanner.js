@@ -363,7 +363,8 @@ const MonthlyPlanner = () => {
     const fetchPlans = async () => {
       setLoading(true);
       try {
-        const token = sessionStorage.getItem('coordinatorToken');
+        const startData = sessionStorage.getItem('coordinatorToken');
+        const token= startData ? JSON.parse(startData).token : null;
         const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/monthly/planner/get/all/monthly/planners', {
           method: 'GET',
           headers: {
@@ -469,7 +470,8 @@ const MonthlyPlanner = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = sessionStorage.getItem('coordinatorToken');
+      const startData = sessionStorage.getItem('coordinatorToken');
+      const token = startData ? JSON.parse(startData).token : null;
       if (!token) {
         toast.error('Please login to continue');
         navigate('/');
@@ -571,7 +573,8 @@ const MonthlyPlanner = () => {
     if (!window.confirm('Are you sure you want to delete this plan?')) return;
     setLoading(true);
     try {
-      const token = sessionStorage.getItem('coordinatorToken');
+      const startData = sessionStorage.getItem('coordinatorToken');
+      const token=startData ? JSON.parse(startData).token : null;
       const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/monthly/planner/delete/monthly/plan/by/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
@@ -582,7 +585,8 @@ const MonthlyPlanner = () => {
       // Refetch plans
       const fetchPlans = async () => {
         try {
-          const token = sessionStorage.getItem('coordinatorToken');
+          const startData = sessionStorage.getItem('coordinatorToken');
+          const token = startData ? JSON.parse(startData).token : null;
           const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/monthly/planner/get/all/monthly/planners', {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }

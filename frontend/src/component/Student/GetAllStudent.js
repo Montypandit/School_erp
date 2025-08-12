@@ -9,7 +9,8 @@ const apiService = {
 
   async fetchStudents() {
 
-    const token = sessionStorage.getItem('adminToken');
+    const startData = sessionStorage.getItem('adminToken');
+    const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
     if (!token) {
       toast.info('Please login to continue');
       window.location.href = '/'
@@ -37,7 +38,8 @@ const apiService = {
   async deleteStudent(admissionId) {
     try {
 
-      const token = sessionStorage.getItem('adminToken');
+      const startData = sessionStorage.getItem('adminToken');
+      const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
       if (!token) {
         toast.info('Please login to continue');
         window.location.href = '/'

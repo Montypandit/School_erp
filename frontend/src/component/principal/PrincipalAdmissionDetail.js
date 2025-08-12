@@ -18,7 +18,8 @@ const PrincipalAdmissionDetail = () => {
     const fetchDetails = async () => {
       try {
         setLoading(true);
-        const token = sessionStorage.getItem('principalToken');
+        const startData = sessionStorage.getItem('principalToken');
+        const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
         if (!token) {
           toast.info('Please login to continue');
           navigate('/principal/login');
@@ -64,7 +65,8 @@ const PrincipalAdmissionDetail = () => {
 
     setIsUpdating(true);
     try {
-      const token = sessionStorage.getItem('principalToken');
+      const startData = sessionStorage.getItem('principalToken');
+      const token = startData ? JSON.parse(startData).token : null;
       if(!token){
         toast.info('Please login to continue');
         navigate('/principal/login');

@@ -32,7 +32,8 @@ const PTMManagement = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = sessionStorage.getItem('teacherToken');
+    const startData = sessionStorage.getItem('teacherToken');
+    const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
     if (!token) {
       toast.info('Please login to continue');
       navigate('/');
@@ -88,7 +89,8 @@ const PTMManagement = () => {
 
     const fetchStudents = async () => {
       try {
-        const token = sessionStorage.getItem('teacherToken');
+        const startData = sessionStorage.getItem('teacherToken');
+        const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
         if (!token) {
           toast.info('Please login to continue');
           navigate('/');
@@ -126,7 +128,8 @@ const PTMManagement = () => {
 
     const fetchCurrTeacherClasses = async () => {
       try {
-        const token = sessionStorage.getItem('teacherToken');
+        const startData = sessionStorage.getItem('teacherToken');
+        const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
         const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/teaching/schedule/get/teaching/schedule/${empId}`, {
           method: 'GET',
           headers: {
@@ -225,7 +228,8 @@ const PTMManagement = () => {
     };
 
     try {
-      const token = sessionStorage.getItem('teacherToken');
+      const startData = sessionStorage.getItem('teacherToken');
+      const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
       const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/ptm/schedule', {
         method: 'POST',
         headers: {
@@ -343,7 +347,8 @@ School Administration
     }
 
     try {
-      const token = sessionStorage.getItem('teacherToken');
+      const startData = sessionStorage.getItem('teacherToken');
+      const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
       const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/ptm/update/ptm/status/${ptmId}/${student.admissionId}`, {
         method: 'PUT',
         headers: {

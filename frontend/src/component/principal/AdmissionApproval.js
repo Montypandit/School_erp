@@ -20,7 +20,8 @@ const AdmissionApproval = () => {
     const fetchAdmissionsForApproval = async () => {
       setLoading(true);
       try {
-        const token = sessionStorage.getItem('principalToken');
+        const startData = sessionStorage.getItem('principalToken');
+        const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
         if (!token) {
           toast.info('Please login to continue');
           navigate('/');
@@ -86,7 +87,8 @@ const AdmissionApproval = () => {
 
   const handleUpdateStatus = async (inquiryId) => {
     try {
-      const token = sessionStorage.getItem('principalToken');
+      const startData = sessionStorage.getItem('principalToken');
+      const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
       if (!token) {
         toast.error('Authentication error. Please log in again.');
         return;

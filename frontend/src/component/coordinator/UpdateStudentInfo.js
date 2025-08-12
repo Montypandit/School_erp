@@ -67,7 +67,8 @@ const UpdateStudentInfo = () => {
     const fetchStudentData = async () => {
       setLoading(true);
       try {
-        const token = getToken();
+        const storedData = getToken();
+        const token = storedData ? JSON.parse(storedData).token : null;
         if (!token) {
           toast.info('Please login to continue');
           navigate('/');
@@ -219,7 +220,8 @@ const UpdateStudentInfo = () => {
     try {
       const coordinatorToken = sessionStorage.getItem('coordinatorToken');
       const adminToken = sessionStorage.getItem('adminToken');
-      const token = coordinatorToken || adminToken;
+      
+      const token = (coordinatorToken || adminToken) ?  JSON.parse(coordinatorToken || adminToken).token : null;
       let updatedFormData = { ...formData };
 
       if (photos.child.file) {

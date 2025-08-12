@@ -54,7 +54,8 @@ const FeeManagementPage = () => {
         setError('');
 
         try {
-            const token = sessionStorage.getItem('coordinatorToken');
+            const startData = sessionStorage.getItem('coordinatorToken');
+            const token = startData ? JSON.parse(startData).token:null;
             if (!token) {
                 navigate('/')
                 return;
@@ -122,7 +123,8 @@ const FeeManagementPage = () => {
         setLoading(true);
         setError('');
         try {
-            const token = sessionStorage.getItem('coordinatorToken');
+            const startData = sessionStorage.getItem('coordinatorToken');
+            const token=startData ? JSON.parse(startData).token : null;
             if (!token) {
                 navigate('/');
                 return;
@@ -209,7 +211,8 @@ const FeeManagementPage = () => {
 
         setLoading(true);
         try {
-            const token = sessionStorage.getItem('coordinatorToken');
+            const startData = sessionStorage.getItem('coordinatorToken');
+            const token = startData ? JSON.parse(startData).token : null;
             if (!token) {
                 navigate('/');
                 return;

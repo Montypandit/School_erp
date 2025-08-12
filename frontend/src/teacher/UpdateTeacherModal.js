@@ -131,7 +131,8 @@ const UpdateTeacherModal = ({ open, onClose, teacherData, onUpdateSuccess }) => 
         }
 
         try {
-            const token = sessionStorage.getItem('adminToken');
+            const startData = sessionStorage.getItem('adminToken');
+            const token = startData ? JSON.parse(startData).token : null;
             if (!token) {
                 toast.error('Authentication token not found.');
                 setLoading(false);

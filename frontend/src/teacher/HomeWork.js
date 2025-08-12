@@ -24,7 +24,8 @@ const HomeWork = () => {
   // Fetch teacher's data and schedules on component mount
   useEffect(() => {
     const fetchTeacherData = async () => {
-      const token = sessionStorage.getItem('teacherToken');
+      const startData = sessionStorage.getItem('teacherToken');
+      const token = startData ? JSON.parse(startData).token : null;
       if (!token) {
         toast.error('Please login to continue');
         window.location.href = '/teacher/login';
@@ -174,7 +175,8 @@ const HomeWork = () => {
     setIsSubmitting(true);
     
     try {
-      const token = sessionStorage.getItem('teacherToken');
+      const startData = sessionStorage.getItem('teacherToken');
+      const token = startData ? JSON.parse(startData).token : null;
       if (!token) {
         throw new Error('No authentication token found');
       }

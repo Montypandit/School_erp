@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   Check,
   X,
@@ -17,10 +20,33 @@ export default function LeaveApproval() {
   const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const fetchLeaves = async () => {
     try {
-      const token = sessionStorage.getItem("adminToken");
+      //const token = sessionStorage.getItem("adminToken");
+
+      const raw = sessionStorage.getItem("adminToken");
+      
+            if (!raw) {
+              toast.info("Please login to continue");
+              navigate("/admin/login");
+              return;
+            }
+      
+            let parsed;
+            try {
+              parsed = JSON.parse(raw);
+            } catch {
+              toast.error("Invalid token format. Please login again.");
+              navigate("/admin/login");
+              return;
+            }
+      
+            const token = parsed.token;
+
+
+
       const res = await fetch("https://school-erp-11-mr7k.onrender.com/api/leaves/get/all/leaves", {
         method: "GET",
         headers: {
@@ -50,7 +76,24 @@ export default function LeaveApproval() {
 
   const updateRequestStatus = async (id, status) => {
     try {
-      const token = sessionStorage.getItem("adminToken");
+      const raw = sessionStorage.getItem("adminToken");
+      
+            if (!raw) {
+              toast.info("Please login to continue");
+              navigate("/admin/login");
+              return;
+            }
+      
+            let parsed;
+            try {
+              parsed = JSON.parse(raw);
+            } catch {
+              toast.error("Invalid token format. Please login again.");
+              navigate("/admin/login");
+              return;
+            }
+      
+            const token = parsed.token;
 
       const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/leaves/update/leave/${id}`, {
         method: "PUT",

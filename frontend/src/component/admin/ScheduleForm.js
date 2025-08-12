@@ -68,7 +68,19 @@ export default function ScheduleForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = sessionStorage.getItem("adminToken");
+    const raw = sessionStorage.getItem("adminToken");
+          
+                
+          
+                let parsed;
+                try {
+                  parsed = JSON.parse(raw);
+                } catch {
+                  
+                  return;
+                }
+          
+                const token = parsed.token;
 
     const response = await fetch("https://school-erp-11-mr7k.onrender.com/api/schedules/create/schedule", {
       method: "POST",

@@ -32,7 +32,8 @@ const EmployeeProfile = () => {
   useEffect(() => {
     const fetchEmployeeData = async () => {
       try {
-        const token = getToken();
+        const storedData = getToken();
+        const token = storedData ? JSON.parse(storedData).token : null;
         if (!token) {
           toast.info('Please login to continue');
           navigate('/');
@@ -100,7 +101,8 @@ const EmployeeProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = getToken();
+      const startDate = getToken();
+      const token= startDate ? JSON.parse(startDate).token : null;
       if (!token) {
         toast.info('Please login to continue');
         navigate('/');

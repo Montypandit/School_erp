@@ -77,6 +77,7 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
+      // First, check user role by email
       const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/auth/get/user/role/${formData.email}`, {
         method: 'GET',
         headers: {
@@ -84,16 +85,19 @@ const AdminLogin = () => {
         }
       });
 
-      const data = await res.json();
-      if(!res.ok){
-        throw new Error('Failed to fetch user role')
+      if (!res.ok) {
+        throw new Error('Failed to fetch user role');
       }
+
+      const data = await res.json();
+
       if (data.role !== 'admin') {
         toast.info(`Please login with ${data.role} portal`);
         navigate('/');
         return;
       }
 
+      // Login API call
       const response = await fetch('https://school-erp-11-mr7k.onrender.com/api/auth/user/login', {
         method: 'POST',
         headers: {
@@ -108,21 +112,22 @@ const AdminLogin = () => {
       if (!response.ok) {
         const errorText = await response.text();
         let errorData = { message: errorText || `HTTP error! status: ${response.status}` };
-
-        const err = new Error(errorData.message);
-        err.response = { status: response.status, data: errorData };
-        throw err;
+        throw new Error(errorData.message);
       }
 
-      const token = await response.text();
-      sessionStorage.setItem('adminToken', token);
+      // Parse JSON response (not text)
+      const loginData = await response.json();
+
+      // Save token object as string in sessionStorage
+      sessionStorage.setItem('adminToken', JSON.stringify(loginData));
       sessionStorage.setItem('email', formData.email);
+
       toast.success('Login successful! Redirecting...');
       navigate('/admin/home');
 
     } catch (error) {
-      console.log(error)
-      toast.error('Something went wrong');
+      console.error(error);
+      toast.error(error.message || 'Something went wrong');
     } finally {
       setIsLoading(false);
     }

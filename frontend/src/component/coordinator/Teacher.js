@@ -45,7 +45,8 @@ const TeacherAllocationPage = () => {
       setScheduleLoading(true);
       setTeacherSchedule([]);
       setShowScheduleModal(true);
-      const token = sessionStorage.getItem('coordinatorToken');
+      const storedData = sessionStorage.getItem('coordinatorToken');
+      const token = storedData ? JSON.parse(storedData).token : null;
       if (!token) {
         toast.error('Please login to continue');
         navigate('/');
@@ -77,7 +78,8 @@ const TeacherAllocationPage = () => {
     try {
       setLoading(true);
 
-      const token = sessionStorage.getItem('coordinatorToken');
+      const storedData = sessionStorage.getItem('coordinatorToken');
+      const token = storedData ? JSON.parse(storedData).token : null;
       if(!token){
         toast.error('Please login to continue');
         navigate('/');

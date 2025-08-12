@@ -32,7 +32,8 @@ const AttendancePage = () => {
   useEffect(() => {
     const fetchAllStudentsAndAttendance = async () => {
       try {
-        const token = sessionStorage.getItem("teacherToken");
+        const startData = sessionStorage.getItem("teacherToken");
+        const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
 
         // Fetch all students
         const res = await fetch("https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions", {
@@ -100,7 +101,8 @@ const AttendancePage = () => {
   };
   const handleSaveAttendance = async () => {
     setIsSaving(true);
-    const token = sessionStorage.getItem("teacherToken");
+    const startData = sessionStorage.getItem("teacherToken");
+    const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
 
     // validate selectedClass
     if (!selectedClass) {

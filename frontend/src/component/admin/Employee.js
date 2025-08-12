@@ -20,12 +20,24 @@ const AdminEmployeeManagement = () => {
         const fetchEmployees = async () => {
             setLoading(true);
             try {
-                const token = sessionStorage.getItem('adminToken');
-                if (!token) {
-                    toast.info('Please login to continue');
-                    navigate('/');
-                    return;
-                }
+                const raw = sessionStorage.getItem("adminToken");
+                      
+                            if (!raw) {
+                              toast.info("Please login to continue");
+                              navigate("/admin/login");
+                              return;
+                            }
+                      
+                            let parsed;
+                            try {
+                              parsed = JSON.parse(raw);
+                            } catch {
+                              toast.error("Invalid token format. Please login again.");
+                              navigate("/admin/login");
+                              return;
+                            }
+                      
+                            const token = parsed.token;
 
                 // 1. Fetch all employees
                 const employeeRes = await fetch('https://school-erp-11-mr7k.onrender.com/api/employees/get/all/employees', {

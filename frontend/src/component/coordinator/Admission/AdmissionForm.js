@@ -56,7 +56,8 @@ export default function AdmissionForm() {
       if (!inquiryId) return;
 
       try {
-        const token = sessionStorage.getItem('coordinatorToken'); // Assuming coordinator token is used
+        const startData = sessionStorage.getItem('coordinatorToken'); // Assuming coordinator token is used
+        const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
         if (!token) {
           toast.info('Please login to continue');
           navigate('/coordinator/login');
@@ -256,8 +257,8 @@ export default function AdmissionForm() {
         applicationId: `ADM${Date.now()}`,
       };
 
-      const token = sessionStorage.getItem('coordinatorToken');
-
+      const startData = sessionStorage.getItem('coordinatorToken');
+      const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage 
       const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/final/admission/create/admission', {
         method: 'POST',
         headers: {

@@ -21,7 +21,8 @@ const StudentListPage = () => {
 
   useEffect(() => {
     const fetchAllStudentFees = async () => {
-      const token = sessionStorage.getItem('coordinatorToken');
+      const startData = sessionStorage.getItem('coordinatorToken');
+      const token = startData ? JSON.parse(startData).token : null;
       if (!token) {
         toast.info('Please login to continue');
         navigate('/coordinator/login');

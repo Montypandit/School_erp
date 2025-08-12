@@ -49,7 +49,8 @@ export default function ExamResultPage() {
 
   // Fetch employee ID
   const fetchEmpId = useCallback(async () => {
-    const token = sessionStorage.getItem("teacherToken");
+    const startData = sessionStorage.getItem("teacherToken");
+    const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
     const email = sessionStorage.getItem("email");
     if (!token || !email) {
       toast.info("Please login to continue");
@@ -80,7 +81,9 @@ export default function ExamResultPage() {
   // Fetch teacher's assigned classes
   const fetchCurrTeacherClasses = useCallback(
     async (empIdParam) => {
-      const token = sessionStorage.getItem("teacherToken");
+      const startData = sessionStorage.getItem("teacherToken");
+      const token = startData ? JSON.parse(startData).token : null;
+
       if (!token || !empIdParam) {
         toast.info("Please login to continue");
         navigate("/");
@@ -111,7 +114,8 @@ export default function ExamResultPage() {
 
   // Fetch all students
   const fetchAllStudents = useCallback(async () => {
-    const token = sessionStorage.getItem("teacherToken");
+    const startData = sessionStorage.getItem("teacherToken");
+    const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
     if (!token) {
       toast.info("Please login to continue");
       navigate("/");

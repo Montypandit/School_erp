@@ -20,7 +20,8 @@ const StudentPromotionPage = () => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const token = sessionStorage.getItem('principalToken');
+                const startData = sessionStorage.getItem('principalToken');
+                const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
                 if (!token) {
                     toast.error('Please login as principal.');
                     navigate('/');
@@ -77,7 +78,8 @@ const StudentPromotionPage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const token = sessionStorage.getItem('principalToken');
+            const startData = sessionStorage.getItem('principalToken');
+            const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
             if (!token) throw new Error('Please login as principal.');
 
             const payload = {

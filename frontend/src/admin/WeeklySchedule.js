@@ -12,7 +12,21 @@ import {
 
 const fetchScheduleData = async () => {
   try {
-    const token = sessionStorage.getItem('adminToken');
+    //const token = sessionStorage.getItem('adminToken');
+    const raw = sessionStorage.getItem("adminToken");
+          
+                
+          
+                let parsed;
+                try {
+                  parsed = JSON.parse(raw);
+                } catch {
+                 
+                  return;
+                }
+          
+                const token = parsed.token;
+
     const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/schedules/get/all/schedules', {
       method: 'GET',
       headers: {

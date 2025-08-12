@@ -48,7 +48,8 @@ const PrincipalHome = () => {
   useEffect(() => {
     const fetchAttendanceStats = async () => {
       try {
-        const token = sessionStorage.getItem("principalToken");
+        const startData = sessionStorage.getItem("principalToken");
+        const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
         const today = new Date().toISOString().split("T")[0];
 
         const res = await fetch(
@@ -94,7 +95,8 @@ const PrincipalHome = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = sessionStorage.getItem("principalToken");
+        const startData = sessionStorage.getItem("principalToken");
+        const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
         const response = await fetch(
           "https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions",
           {
@@ -121,7 +123,8 @@ const PrincipalHome = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = sessionStorage.getItem("principalToken");
+        const startData = sessionStorage.getItem("principalToken");
+        const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
         const response = await fetch(
           "https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions",
           {
@@ -174,7 +177,7 @@ const PrincipalHome = () => {
         <div>
           <h2 className="text-xl font-semibold text-gray-700 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            <ActionButton href="" icon={<Calendar />} label="Admission Approval" />
+            <ActionButton href="/principal/admission/approvals" icon={<Calendar />} label="Admission Approval" />
             <ActionButton href="" icon={<BarChart3 />} label="Teachers Report" />
             <ActionButton href="/principal/report" icon={<FileText />} label="Student Reports" />
             {/* <ActionButton href="/teacher/homework" icon={<BookOpen />} label="Homework" /> */}

@@ -278,7 +278,8 @@ const ActivityPlanner = () => {
   const fetchActivities = async () => {
     setLoading(true);
     try {
-      const token = sessionStorage.getItem('coordinatorToken');
+      const startDate = sessionStorage.getItem('coordinatorToken');
+      const token= startDate ? JSON.parse(startDate).token : null;
       if(!token){
         toast.error('Please login to continue');
         navigate('/');
@@ -448,7 +449,8 @@ const downloadExcel = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const token = sessionStorage.getItem('coordinatorToken');
+      const startData = sessionStorage.getItem('coordinatorToken');
+      const token = startData? JSON.parse(startData).token : null;
       if (!token) {
         toast.error('Please login to continue');
         navigate('/');
@@ -492,7 +494,8 @@ const downloadExcel = () => {
     if (!window.confirm('Are you sure you want to delete this activity?')) return;
     setLoading(true);
     try {
-      const token = sessionStorage.getItem('coordinatorToken');
+      const startData = sessionStorage.getItem('coordinatorToken');
+      const token = startData ? JSON.parse(startData).token : null;
       const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/activity/planner/delete/activity/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }

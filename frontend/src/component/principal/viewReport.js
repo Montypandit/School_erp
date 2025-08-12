@@ -22,7 +22,8 @@ useEffect(() => {
   const fetchAttendanceData = async () => {
     setLoading(true);
 
-    const token = sessionStorage.getItem("principalToken");
+    const startData = sessionStorage.getItem("principalToken");
+    const token = startData ? JSON.parse(startData).token : null;
     if (!token) {
       console.warn("No token found. Please log in again.");
       setLoading(false);

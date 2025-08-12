@@ -28,7 +28,9 @@ const StudentManagement = () => {
         setLoading(true);
         setError(null);
         try {
-            const token = sessionStorage.getItem('principalToken');
+            const startData = sessionStorage.getItem('principalToken');
+            const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
+
             if (!token) {
                 toast.info('Please login to continue')
                 navigate('/');
@@ -60,7 +62,8 @@ const StudentManagement = () => {
 
     const fetchStudentDetails = async (admissionId) => {
         try {
-            const token = sessionStorage.getItem('principalToken');
+            const startData = sessionStorage.getItem('principalToken');
+            const token = startData ? JSON.parse(startData).token : null;
             if (!token) {
                 toast.info('Please login to continue')
                 navigate('/');
@@ -147,7 +150,8 @@ const StudentManagement = () => {
     const handleUpdateSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = sessionStorage.getItem('principalToken');
+            const startData = sessionStorage.getItem('principalToken');
+            const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
             if (!token) {
                 toast.info('Please login to continue')
                 navigate('/');

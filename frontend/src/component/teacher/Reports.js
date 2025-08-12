@@ -21,7 +21,8 @@ const AttendanceReportPage = () => {
     const fetchAttendanceData = async () => {
       setLoading(true);
 
-      const token = sessionStorage.getItem("teacherToken");
+      const startData = sessionStorage.getItem("teacherToken");
+      const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
       if (!token) {
         console.warn("No token found. Please log in again.");
         setLoading(false);

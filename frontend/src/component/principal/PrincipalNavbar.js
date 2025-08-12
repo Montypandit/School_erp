@@ -50,10 +50,10 @@ const PrincipalNavbar = () => {
                 Admission Approval
               </Link>
               <Link
-                to="/student/page"
+                to="/student/promotion/page/:admissionId"
                 className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
-                Students
+                Students Promation
               </Link>
               <Link
                 to="/student/status/page"
