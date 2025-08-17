@@ -1,21 +1,22 @@
-import React, { useState } from "react"
-import { Send, MapPin, Phone, Mail, Clock, Building2 } from 'lucide-react'
-import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import React, { useState } from "react";
+import { Send, MapPin, Phone, Mail, Clock, Building2 } from 'lucide-react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import MainNavBar from './MainNavBar';
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    company: "",
+    
     department: "",
     subject: "",
     message: ""
   });
 
   const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = (e) => {
@@ -36,23 +37,24 @@ const ContactPage = () => {
       return;
     }
 
-    const coordinatorPhone = "918279551407"; // Replace with actual coordinator number
+   
 
+    // Create WhatsApp message with nice formatting
     const whatsappMessage = `
-      Contact Form Submission:
-      Name: ${firstName} ${lastName}
-      Email: ${email}
-      Department: ${department || "N/A"}
-      Subject: ${subject}
-      Message: ${message}
+*Contact Form Submission*
+Name: ${firstName} ${lastName}
+Email: ${email}
+Department: ${department || "N/A"}
+Subject: ${subject}
+Message: ${message}
     `.trim();
 
     const encodedMessage = encodeURIComponent(whatsappMessage);
-    const whatsappURL = `https://wa.me/${coordinatorPhone}?text=${encodedMessage}`;
+    const whatsappURL = `https://wa.me/?text=${encodedMessage}`;
 
     window.open(whatsappURL, "_blank");
 
-    // Reset form
+    // Reset form after sending
     setFormData({
       firstName: "",
       lastName: "",
@@ -63,11 +65,18 @@ const ContactPage = () => {
       message: ""
     });
 
-    toast.success("Message sent via WhatsApp!");
+    // Delay toast to prevent removalReason bug
+    setTimeout(() => {
+      toast.success("Message sent via WhatsApp!");
+    }, 100);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    
+  <>
+    <MainNavBar />
+    <div className="min-h-screen bg-gray-50 py-12 px-4 pt-24">
+    
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-blue-900 mb-4">Contact Us</h1>
@@ -105,6 +114,8 @@ const ContactPage = () => {
                   <input type="text" value={formData.subject} onChange={(e) => handleInputChange("subject", e.target.value)} required className="w-full border rounded px-3 py-2" />
                 </div>
               </div>
+
+              
 
               <div>
                 <label className="block text-sm font-medium mb-1">Department</label>
@@ -165,6 +176,7 @@ const ContactPage = () => {
       </div>
       <ToastContainer position="top-center" />
     </div>
+    </>
   );
 };
 

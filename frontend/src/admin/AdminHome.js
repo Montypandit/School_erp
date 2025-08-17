@@ -466,6 +466,8 @@ const AdminHome = () => {
   const presentTeacherPercentage = totalTeachers > 0 ? (totalTeachers / totalTeachers) * 100 : 0;
 
   return (
+    <>
+    <AdminNavbar />
     <div
       style={{
         padding: '20px',
@@ -473,7 +475,7 @@ const AdminHome = () => {
         minHeight: '100vh',
       }}
     >
-      <AdminNavbar />
+      
 
       <h1
         style={{
@@ -559,6 +561,7 @@ const AdminHome = () => {
         <p style={{ color: '#666', fontStyle: 'italic' }}>Recent system activities will appear here.</p>
       </div>
     </div>
+    </>
   );
 };
 

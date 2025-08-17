@@ -161,7 +161,7 @@ const PrincipalHome = () => {
 
       <div className="min-h-screen bg-gray-50 p-4 space-y-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Teacher Dashboard</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Principal Dashboard</h1>
           <p className="text-gray-600">Welcome back! Here's what's happening today.</p>
         </div>
 
@@ -180,7 +180,7 @@ const PrincipalHome = () => {
             <ActionButton href="/principal/admission/approvals" icon={<Calendar />} label="Admission Approval" />
             <ActionButton href="" icon={<BarChart3 />} label="Teachers Report" />
             <ActionButton href="/principal/report" icon={<FileText />} label="Student Reports" />
-            {/* <ActionButton href="/teacher/homework" icon={<BookOpen />} label="Homework" /> */}
+            <ActionButton href="/student/status/page" icon={<BookOpen />} label="Student Status" />
           </div>
         </div>
 

@@ -32,31 +32,31 @@ const TeacherNavbar = () => {
             <div className="flex items-center space-x-4">
               <Link
                 to="/teacher/home"
-                className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="bg-blue-100 hover:bg-blue-200 text-gray-800 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Dashboard
               </Link>
               <Link
                 to="/teacher/attendence"
-                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="text-gray-600 hover:bg-blue-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Attendance
               </Link>
               <Link
                 to="/teacher/results"
-                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="text-gray-600 hover:bg-blue-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Results
               </Link>
               <Link
                 to="/teacher/ptm"
-                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="text-gray-600 hover:bg-blue-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 PTM
               </Link>
               <Link
                 to="/teacher/report"
-                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="text-gray-600 hover:bg-blue-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Reports
               </Link>
@@ -68,7 +68,7 @@ const TeacherNavbar = () => {
           <div className="flex items-center justify-end gap-4">
             {/* User Icon */}
             <Link
-              to="/teacher/profile"
+              to="/profile"
               className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full flex items-center justify-center font-semibold shadow-md"
             >
               <svg

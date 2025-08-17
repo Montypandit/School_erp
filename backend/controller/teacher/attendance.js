@@ -142,7 +142,7 @@ router.get('/get/attendance', authMiddleware, authorizeRoles('admin', 'coordinat
 
 
 // ======================= GET ALL ATTENDANCE RECORDS FOR A SPECIFIC DATE =======================
-router.get('/get/all-attendance/:date', authMiddleware, authorizeRoles('admin','teacher','principal'), async (req, res) => {
+router.get('/get/all-attendance/bydate', authMiddleware, authorizeRoles('admin','teacher','principal'), async (req, res) => {
   try {
     const { date } = req.params;
 

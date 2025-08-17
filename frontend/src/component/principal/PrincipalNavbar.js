@@ -33,31 +33,31 @@ const PrincipalNavbar = () => {
             <div className="flex items-center space-x-4">
               <Link
                 to="/principal/home"
-                className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="text-gray-600 hover:bg-blue-200 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Dashboard
               </Link>
               <Link
                 to="/principal/report"
-                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="text-gray-600 hover:bg-blue-200 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Reports
               </Link>
               <Link
                 to="/principal/admission/approvals"
-                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="text-gray-600 hover:bg-blue-200 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Admission Approval
               </Link>
               <Link
                 to="/student/promotion/page/:admissionId"
-                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="text-gray-600 hover:bg-blue-200 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Students Promation
               </Link>
               <Link
                 to="/student/status/page"
-                className="text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
+                className="text-gray-600 hover:bg-blue-200 hover:text-gray-900 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 transform hover:scale-105"
               >
                 Student Status
               </Link>
@@ -68,7 +68,7 @@ const PrincipalNavbar = () => {
           <div className="flex items-center justify-end gap-4">
             {/* User Icon */}
             <Link
-              to="/employee/profile"
+              to="/profile"
               className="w-9 h-9 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full flex items-center justify-center font-semibold shadow-md"
             >
               <svg

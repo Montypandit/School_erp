@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import Home from './Home';
 import About from './About';
+import AllProfile from './Profile';
 import AdminLogin from './admin/AdminLogin';
 import AdminHome from './admin/AdminHome';
 import InquiryForm from "./component/coordinator/InquiryForm";
@@ -32,6 +33,7 @@ import WeeklySchedule from "./admin/WeeklySchedule";
 import Employee from "./component/admin/Employee"
 import AdmissionApproval from "./component/principal/AdmissionApproval"
 import StudentStatus from "./component/principal/StudentStatus";
+
 
 // Coordinator Components
 import UpdateStudentInfo from "./component/coordinator/UpdateStudentInfo";
@@ -67,6 +69,7 @@ const App = () => {
         <Route path="/parent/inquiry/form" element={<InquiryForm />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<AllProfile />} />
 
         {/* Admin Module */}
         <Route path='/admin/login' element={<AdminLogin />} />

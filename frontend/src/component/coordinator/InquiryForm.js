@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toast } from 'react-toastify';
+import CoordinatorNavbar from './CoordinatorNavbar';
 
 const InquiryForm = () => {
   const [formData, setFormData] = useState({
@@ -201,6 +202,8 @@ const InquiryForm = () => {
   };
 
   return (
+    <>
+    <CoordinatorNavbar/>
     <div className="max-w-4xl mx-auto p-6 bg-white">
       <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg mb-8">
         <h1 className="text-3xl font-bold text-center">Student Inquiry Form</h1>
@@ -637,6 +640,7 @@ const InquiryForm = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
