@@ -122,7 +122,7 @@ const EmployeeForm = () => {
       const token = parsed.token;
 
       const res = await fetch(
-        "https://school-erp-11-mr7k.onrender.com/api/employees/create/employee",
+        "https://school-erp-1-exji.onrender.com/api/employees/create/employee",
         {
           method: "POST",
           headers: {

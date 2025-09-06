@@ -52,7 +52,7 @@
 //         const today = new Date().toISOString().split("T")[0];
 
 //         const res = await fetch(
-//           `https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all-attendance?date=${today}`,
+//           `https://school-erp-1-exji.onrender.com/api/final/admission/get/all-attendance?date=${today}`,
 //           {
 //             headers: {
 //               "Content-Type": "application/json",
@@ -121,7 +121,7 @@
 //           return;
 //         }
 //         const response = await fetch(
-//           "https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions",
+//           "https://school-erp-1-exji.onrender.com/api/final/admission/get/all/admissions",
 //           {
 //             headers: {
 //               "Content-Type": "application/json",
@@ -253,7 +253,7 @@ const TeacherHome = () => {
 
         const today = new Date().toISOString().split("T")[0];
         const res = await fetch(
-          `https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all-attendance?date=${today}`,
+          `https://school-erp-1-exji.onrender.com/api/final/admission/get/all-attendance?date=${today}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -318,7 +318,7 @@ const TeacherHome = () => {
         }
 
         const response = await fetch(
-          "https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions",
+          "https://school-erp-1-exji.onrender.com/api/final/admission/get/all/admissions",
           {
             headers: {
               "Content-Type": "application/json",

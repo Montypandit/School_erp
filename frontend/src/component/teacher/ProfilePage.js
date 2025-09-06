@@ -9,7 +9,7 @@ const TeacherProfile = () => {
       try {
         const startData = sessionStorage.getItem("teacherToken");
         const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
-        const response = await fetch("https://school-erp-11-mr7k.onrender.com/api/employees/get/teacher/profile", {
+        const response = await fetch("https://school-erp-1-exji.onrender.com/api/employees/get/teacher/profile", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

@@ -54,7 +54,7 @@ const StudentAllotmentManager = () => {
         return;
       }
 
-      const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions', {
+      const res = await fetch('https://school-erp-1-exji.onrender.comapi/final/admission/get/all/admissions', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -238,7 +238,7 @@ const StudentAllotmentManager = () => {
 
       // Send the update to the backend
       const response = await fetch(
-        'https://school-erp-11-mr7k.onrender.com/api/final/admission/students/allocate/section',
+        'https://school-erp-1-exji.onrender.comapi/final/admission/students/allocate/section',
         {
           method: 'POST',
           headers: {

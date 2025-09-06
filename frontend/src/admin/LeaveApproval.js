@@ -47,7 +47,7 @@ export default function LeaveApproval() {
 
 
 
-      const res = await fetch("https://school-erp-11-mr7k.onrender.com/api/leaves/get/all/leaves", {
+      const res = await fetch("https://school-erp-1-exji.onrender.com/api/leaves/get/all/leaves", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -95,7 +95,7 @@ export default function LeaveApproval() {
       
             const token = parsed.token;
 
-      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/leaves/update/leave/${id}`, {
+      const res = await fetch(`https://school-erp-1-exji.onrender.com/api/leaves/update/leave/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

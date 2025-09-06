@@ -52,7 +52,7 @@ const TeacherAllocationPage = () => {
         navigate('/');
         return;
       }
-      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/teaching/schedule/get/teaching/schedule/${empId}`, {
+      const res = await fetch(`https://school-erp-1-exji.onrender.com/api/teaching/schedule/get/teaching/schedule/${empId}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -86,7 +86,7 @@ const TeacherAllocationPage = () => {
         return;
       }
       // Assuming the API endpoint from addEmployee.js
-      const response = await fetch('https://school-erp-11-mr7k.onrender.com/api/employees/get/all/employees', {
+      const response = await fetch('https://school-erp-1-exji.onrender.com/api/employees/get/all/employees', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`, 
@@ -161,7 +161,7 @@ const TeacherAllocationPage = () => {
         return;
       }
 
-      const response = await fetch('https://school-erp-11-mr7k.onrender.com/api/teaching/schedule/create/teaching/schedule', {
+      const response = await fetch('https://school-erp-1-exji.onrender.com/api/teaching/schedule/create/teaching/schedule', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

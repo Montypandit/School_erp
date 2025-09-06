@@ -82,7 +82,7 @@ export default function ScheduleForm() {
           
                 const token = parsed.token;
 
-    const response = await fetch("https://school-erp-11-mr7k.onrender.com/api/schedules/create/schedule", {
+    const response = await fetch("https://school-erp-1-exji.onrender.comapi/schedules/create/schedule", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

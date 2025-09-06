@@ -36,7 +36,7 @@ const AttendancePage = () => {
         const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage
 
         // Fetch all students
-        const res = await fetch("https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions", {
+        const res = await fetch("https://school-erp-1-exji.onrender.com/api/final/admission/get/all/admissions", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -50,7 +50,7 @@ const AttendancePage = () => {
           // Fetch saved attendance for selected class and date
           if (selectedClass && selectedDate) {
             const res2 = await fetch(
-              `https://school-erp-11-mr7k.onrender.com/api/final/attendance/get/attendance?class=${selectedClass}&date=${selectedDate}`,
+              `https://school-erp-1-exji.onrender.com/api/final/attendance/get/attendance?class=${selectedClass}&date=${selectedDate}`,
               {
                 headers: {
                   "Content-Type": "application/json",
@@ -126,7 +126,7 @@ const AttendancePage = () => {
     }
 
     try {
-      const res = await fetch("https://school-erp-11-mr7k.onrender.com/api/final/attendance/save/attendence", {
+      const res = await fetch("https://school-erp-1-exji.onrender.com/api/final/attendance/save/attendence", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -365,7 +365,7 @@ export default AttendancePage;
 //       try {
 //         const token = sessionStorage.getItem("teacherToken");
 
-//         const res = await fetch("https://school-erp-11-mr7k.onrender.com/api/final/admission/get/all/admissions", {
+//         const res = await fetch("https://school-erp-1-exji.onrender.com/api/final/admission/get/all/admissions", {
 //           headers: {
 //             "Content-Type": "application/json",
 //             Authorization: `Bearer ${token}`,
@@ -379,7 +379,7 @@ export default AttendancePage;
 
 //           if (assignedClass && assignedSection && selectedDate) {
 //             const res2 = await fetch(
-//               `https://school-erp-11-mr7k.onrender.com/api/final/admission/get/attendance?class=${assignedClass}&section=${assignedSection}&date=${selectedDate}`,
+//               `https://school-erp-1-exji.onrender.com/api/final/admission/get/attendance?class=${assignedClass}&section=${assignedSection}&date=${selectedDate}`,
 //               {
 //                 headers: {
 //                   "Content-Type": "application/json",
@@ -460,7 +460,7 @@ export default AttendancePage;
 //     }
 
 //     try {
-//       const res = await fetch("https://school-erp-11-mr7k.onrender.com/api/final/admission/save/attendence", {
+//       const res = await fetch("https://school-erp-1-exji.onrender.com/api/final/admission/save/attendence", {
 //         method: "POST",
 //         headers: {
 //           "Content-Type": "application/json",

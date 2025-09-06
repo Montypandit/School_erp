@@ -75,7 +75,7 @@ const UpdateStudentInfo = () => {
           return;
         }
 
-        const roleResponse = await fetch(`https://school-erp-11-mr7k.onrender.com/api/auth/get/user/role?email=${encodeURIComponent(sessionStorage.getItem('email'))}`, {
+        const roleResponse = await fetch(`https://school-erp-1-exji.onrender.com/api/auth/get/user/role?email=${encodeURIComponent(sessionStorage.getItem('email'))}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json'
@@ -93,7 +93,7 @@ const UpdateStudentInfo = () => {
           throw new Error('Failed to fetch employee data');
         }
 
-        const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/get/student/${admissionId}`, {
+        const res = await fetch(`https://school-erp-1-exji.onrender.com/api/final/admission/get/student/${admissionId}`, {
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -234,7 +234,7 @@ const UpdateStudentInfo = () => {
         updatedFormData.motherImageUrl = photos.mother.url;
       }
 
-      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/update/admission/${admissionId}`, {
+      const res = await fetch(`https://school-erp-1-exji.onrender.comapi/final/admission/update/admission/${admissionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

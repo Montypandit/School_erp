@@ -365,7 +365,7 @@ const MonthlyPlanner = () => {
       try {
         const startData = sessionStorage.getItem('coordinatorToken');
         const token= startData ? JSON.parse(startData).token : null;
-        const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/monthly/planner/get/all/monthly/planners', {
+        const res = await fetch('https://school-erp-1-exji.onrender.com/api/monthly/planner/get/all/monthly/planners', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -478,7 +478,7 @@ const MonthlyPlanner = () => {
         return;
       }
       if (formData._id) {
-        const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/monthly/planner/update/monthly-plan/by/${formData._id}`, {
+        const res = await fetch(`https://school-erp-1-exji.onrender.com/api/monthly/planner/update/monthly-plan/by/${formData._id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -489,7 +489,7 @@ const MonthlyPlanner = () => {
         if (!res.ok) throw new Error('Failed to update plan');
         toast.success('Planner Updated Successfully');
       } else {
-        const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/monthly/planner/create/monthly/planner', {
+        const res = await fetch('https://school-erp-1-exji.onrender.com/api/monthly/planner/create/monthly/planner', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -575,7 +575,7 @@ const MonthlyPlanner = () => {
     try {
       const startData = sessionStorage.getItem('coordinatorToken');
       const token=startData ? JSON.parse(startData).token : null;
-      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/monthly/planner/delete/monthly/plan/by/${id}`, {
+      const res = await fetch(`https://school-erp-1-exji.onrender.com/api/monthly/planner/delete/monthly/plan/by/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -587,7 +587,7 @@ const MonthlyPlanner = () => {
         try {
           const startData = sessionStorage.getItem('coordinatorToken');
           const token = startData ? JSON.parse(startData).token : null;
-          const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/monthly/planner/get/all/monthly/planners', {
+          const res = await fetch('https://school-erp-1-exji.onrender.com/api/monthly/planner/get/all/monthly/planners', {
             method: 'GET',
             headers: { 'Authorization': `Bearer ${token}` }
           });

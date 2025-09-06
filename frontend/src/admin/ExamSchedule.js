@@ -46,7 +46,7 @@ export default function ExamSchedule() {
       const token = parsed.token;
 
       const res = await fetch(
-        "https://school-erp-11-mr7k.onrender.com/api/exams/get/all/exams",
+        "https://school-erp-1-exji.onrender.compi/exams/get/all/exams",
         {
           method: "GET",
           headers: {

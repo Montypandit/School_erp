@@ -60,7 +60,7 @@ const FeeManagementPage = () => {
                 navigate('/')
                 return;
             }
-            const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/final/admission/get/student/${admissionId}`, {
+            const res = await fetch(`https://school-erp-1-exji.onrender.com/api/final/admission/get/student/${admissionId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ const FeeManagementPage = () => {
             }));
 
 
-            const resp = await fetch(`https://school-erp-11-mr7k.onrender.com/api/admission/fees/get/admission/fee/${admissionId}`, {
+            const resp = await fetch(`https://school-erp-1-exji.onrender.com/api/admission/fees/get/admission/fee/${admissionId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ const FeeManagementPage = () => {
                 navigate('/');
                 return;
             }
-            const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/monthly/fees/get/fees/${admissionId}`, {
+            const res = await fetch(`https://school-erp-1-exji.onrender.com/api/monthly/fees/get/fees/${admissionId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ const FeeManagementPage = () => {
                 navigate('/');
                 return;
             }
-            const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/monthly/fees/paid/fees/${admissionId}`, {
+            const res = await fetch(`https://school-erp-1-exji.onrender.com/api/monthly/fees/paid/fees/${admissionId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -40,7 +40,7 @@ const AdminEmployeeManagement = () => {
                             const token = parsed.token;
 
                 // 1. Fetch all employees
-                const employeeRes = await fetch('https://school-erp-11-mr7k.onrender.com/api/employees/get/all/employees', {
+                const employeeRes = await fetch('https://school-erp-1-exji.onrender.compi/employees/get/all/employees', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ const AdminEmployeeManagement = () => {
                 const employeesWithStatus = await Promise.all(
                     employeeData.map(async (employee) => {
                         try {
-                            const statusRes = await fetch(`https://school-erp-11-mr7k.onrender.com/api/auth/get/user/${employee.email}`, {
+                            const statusRes = await fetch(`https://school-erp-1-exji.onrender.comauth/get/user/${employee.email}`, {
                                 method: 'GET',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ const AdminEmployeeManagement = () => {
         try {
             setIsUpdating(true);
             const token = sessionStorage.getItem('adminToken');
-            const response = await fetch(`https://school-erp-11-mr7k.onrender.com/api/employees/update/employee/${selectedEmployee.empId}`, {
+            const response = await fetch(`https://school-erp-1-exji.onrender.comapi/employees/update/employee/${selectedEmployee.empId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

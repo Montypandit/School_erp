@@ -281,7 +281,7 @@
 //           setLoading(false);
 //           return;
 //         }
-//         const response = await fetch("https://school-erp-11-mr7k.onrender.com/api/teachers/getallteacher", {
+//         const response = await fetch("https://school-erp-1-exji.onrender.compi/teachers/getallteacher", {
 //           headers: {
 //             "Content-Type": "application/json",
 //             Authorization: `Bearer ${token}`,
@@ -898,7 +898,7 @@ const GetAllTeacher = () => {
           return;
         }
 
-        const response = await fetch("https://school-erp-11-mr7k.onrender.com/api/teachers/getallteacher", {
+        const response = await fetch("https://school-erp-1-exji.onrender.compi/teachers/getallteacher", {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

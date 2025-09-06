@@ -285,7 +285,7 @@ const ActivityPlanner = () => {
         navigate('/');
         return;
       }
-      const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/activity/planner/get/all/activities', {
+      const res = await fetch('https://school-erp-1-exji.onrender.com/api/activity/planner/get/all/activities', {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -461,8 +461,8 @@ const downloadExcel = () => {
       const payload = { ...formData };
 
       const url = isUpdateMode
-        ? `https://school-erp-11-mr7k.onrender.com/api/activity/planner/update/activity/${formData._id}`
-        : 'https://school-erp-11-mr7k.onrender.com/api/activity/planner/create/new/activity';
+        ? `https://school-erp-1-exji.onrender.com/api/activity/planner/update/activity/${formData._id}`
+        : 'https://school-erp-1-exji.onrender.com/api/activity/planner/create/new/activity';
       
       const method = isUpdateMode ? 'PUT' : 'POST';
 
@@ -496,7 +496,7 @@ const downloadExcel = () => {
     try {
       const startData = sessionStorage.getItem('coordinatorToken');
       const token = startData ? JSON.parse(startData).token : null;
-      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/activity/planner/delete/activity/${id}`, {
+      const res = await fetch(`https://school-erp-1-exji.onrender.com/api/activity/planner/delete/activity/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

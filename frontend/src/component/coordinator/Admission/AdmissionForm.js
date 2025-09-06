@@ -64,7 +64,7 @@ export default function AdmissionForm() {
           return;
         }
 
-        const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/inquiry/get/inquiry/${inquiryId}`, {
+        const res = await fetch(`https://school-erp-1-exji.onrender.com/api/inquiry/get/inquiry/${inquiryId}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -259,7 +259,7 @@ export default function AdmissionForm() {
 
       const startData = sessionStorage.getItem('coordinatorToken');
       const token = startData ? JSON.parse(startData).token : null; // Parse token from session storage 
-      const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/final/admission/create/admission', {
+      const res = await fetch('https://school-erp-1-exji.onrender.com/final/admission/create/admission', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

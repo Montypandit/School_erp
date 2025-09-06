@@ -152,4 +152,39 @@ router.get('/get/employee/count/role/:role',authMiddleware, authorizeRoles('admi
   }
 });
 
+router.get('/me', authMiddleware, async (req, res) => {
+  try {
+    const employee = await Employee.findOne({ empId: req.user.empId }); // req.user comes from authMiddleware
+
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    res.status(200).json({ employee });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// =============================
+// NEW: Update logged-in employee profile
+// =============================
+router.put('/me', authMiddleware, async (req, res) => {
+  try {
+    const updatedEmployee = await Employee.findOneAndUpdate(
+      { empId: req.user.empId },
+      req.body,
+      { new: true }
+    );
+
+    if (!updatedEmployee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    res.status(200).json({ message: 'Employee updated successfully', employee: updatedEmployee });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

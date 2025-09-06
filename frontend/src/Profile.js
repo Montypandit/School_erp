@@ -16,7 +16,7 @@ const EmployeeProfile = () => {
     const fetchEmployee = async () => {
       try {
         const res = await fetch(
-          `https://school-erp-11-mr7k.onrender.com/api/employees/me`, // backend /me route
+          `https://school-erp-1-exji.onrender.com/api/employees/me`, // backend /me route
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -43,7 +43,7 @@ const EmployeeProfile = () => {
   const handleSave = async () => {
     try {
       const res = await fetch(
-        `https://school-erp-11-mr7k.onrender.com/api/employees/me`,
+        `https://school-erp-1-exji.onrender.com/api/employees/me`,
         {
           method: "PUT",
           headers: {

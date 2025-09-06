@@ -22,7 +22,7 @@ const CoordinatorDashboard = () => {
           navigate('coordinator/login');
           return;
         }
-        const admissionRes = await fetch('https://school-erp-11-mr7k.onrender.com/api/admissions/get/all/admission/approval/status', {
+        const admissionRes = await fetch('https://school-erp-1-exji.onrender.com/api/admissions/get/all/admission/approval/status', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ const CoordinatorDashboard = () => {
           }
         });
 
-        const inquiryRes = await fetch('https://school-erp-11-mr7k.onrender.com/api/inquiry/all/inquiries', {
+        const inquiryRes = await fetch('https://school-erp-1-exji.onrender.com/api/inquiry/all/inquiries', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

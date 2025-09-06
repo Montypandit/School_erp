@@ -35,7 +35,7 @@ const HomeWork = () => {
       try {
         // First get teacher's info
         const teacherRes = await fetch(
-          `https://school-erp-11-mr7k.onrender.com/api/employees/get/employee/email/${sessionStorage.getItem('email')}`,
+          `https://school-erp-1-exji.onrender.com/api/employees/get/employee/email/${sessionStorage.getItem('email')}`,
           {
             method: 'GET',
             headers: {
@@ -54,7 +54,7 @@ const HomeWork = () => {
 
         // Then get teacher's schedule
         const scheduleRes = await fetch(
-          `https://school-erp-11-mr7k.onrender.com/api/teaching/schedule/get/teaching/schedule/${teacherData.empId}`,
+          `https://school-erp-1-exji.onrender.com/api/teaching/schedule/get/teaching/schedule/${teacherData.empId}`,
           {
             method: 'GET',
             headers: {
@@ -187,7 +187,7 @@ const HomeWork = () => {
       // If not found in session storage, try to fetch teacher's profile
       if (!teacherAdmissionId) {
         try {
-          const profileResponse = await fetch(`https://school-erp-11-mr7k.onrender.com/api/employees/get/employee/email/${sessionStorage.getItem('email')}`, {
+          const profileResponse = await fetch(`https://school-erp-1-exji.onrender.com/api/employees/get/employee/email/${sessionStorage.getItem('email')}`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
@@ -233,7 +233,7 @@ const HomeWork = () => {
       };
       
       
-      const response = await fetch('https://school-erp-11-mr7k.onrender.com/api/homework/for/students/create/homework', {
+      const response = await fetch('https://school-erp-1-exji.onrender.com/api/homework/for/students/create/homework', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

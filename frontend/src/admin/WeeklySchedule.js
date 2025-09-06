@@ -27,7 +27,7 @@ const fetchScheduleData = async () => {
           
                 const token = parsed.token;
 
-    const res = await fetch('https://school-erp-11-mr7k.onrender.com/api/schedules/get/all/schedules', {
+    const res = await fetch('https://school-erp-1-exji.onrender.com/api/schedules/get/all/schedules', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

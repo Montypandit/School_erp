@@ -84,7 +84,7 @@ const CoordinatorLogin = () => {
 
     try {
 
-      const res = await fetch(`https://school-erp-11-mr7k.onrender.com/api/auth/get/user/role/${formData.email}`, { // Pass email as query parameter
+      const res = await fetch(`https://school-erp-1-exji.onrender.com/api/auth/get/user/role/${formData.email}`, { // Pass email as query parameter
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -98,7 +98,7 @@ const CoordinatorLogin = () => {
         return;
       }
 
-      const response = await fetch('https://school-erp-11-mr7k.onrender.com/api/auth/user/login', {
+      const response = await fetch('https://school-erp-1-exji.onrender.com/api/auth/user/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
